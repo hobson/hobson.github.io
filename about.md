@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-I'm a software developer, data scientist, and robitics tinkerer in Portland Oregon.
+I'm a software developer, data scientist and robotics engineer in Portland Oregon.
 
 ### Passion for AI
 
