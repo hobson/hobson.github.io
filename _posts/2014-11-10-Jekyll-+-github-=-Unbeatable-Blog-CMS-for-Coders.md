@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Finally a Simple, Free, Decent-Looking Blog Template
+title: Finally, A Free, Decent-Looking Blog Template
 ---
 
 I'm loving this [Jekyll](https://github.com/jekyll) thing. You won't see many pull requests from me, but this thing sure is an efficient blogging tool.
