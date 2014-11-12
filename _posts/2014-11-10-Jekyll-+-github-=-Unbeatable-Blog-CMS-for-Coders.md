@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Finally, A Free, Decent Static Blog Framework
+title: Finally a Decent Open Source Blog Framework
 ---
 
 I'm loving this [Jekyll](https://github.com/jekyll) thing. You won't see many pull requests from me, but this thing sure is an efficient blogging tool.
