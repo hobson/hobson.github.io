@@ -5,7 +5,9 @@ title: Love Python? Interested in NLP?
 
 Here are the highlights of a [tutorial on Natural Language Processing](http://www.hobsonlane.com/pug/) that I gave at the [PDX python user group](http://www.meetup.com/pdxpython/).
 
-![Force-directed graph of word-document connections](images/word-doc-graph.png)
+![Force-directed-graph-of-word-document-connections]({{ site.baseurl }}/images/word-doc-graph.png)
+
+![_config.yml]({{ site.baseurl }}/images/config.png)
 
 At this tutorial we learned how to quickly [count up all the words](http://www.hobsonlane.com/pug/pug/docs/slidedeck-pdxpy/index.html#9) in the US presidential inaugural speeches from an NLTK data set. Thank you, [Lizhong](http://web.mit.edu/lizhong/www/) for introducing me to this interesting historical corpus (set of documents).
 
