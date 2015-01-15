@@ -3,7 +3,7 @@ layout: post
 title: Graph Search Using Networkx
 ---
 
-I'm having fun with a traveling salesman, minimum spanning tree problem over [here](http://github.com/hobson/sidetest/). Check it out for pretty graph diagrams and some cool Networkx python examples.
+I'm having fun with a traveling salesman, minimum spanning tree problem over [here](http://github.com/hobson/sidetest#PossibleAlgorithms). Check it out for pretty graph diagrams and some cool Networkx python examples.
 
 With a typical retailer website, you can query with a zip code to get a list of the closest N stores. Say you want to "visit" all the stores with as few queries as possible. 
 
