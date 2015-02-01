@@ -25,15 +25,15 @@ From the Wikipedia article on finite state machines:
 
 A deterministic finite state machine or acceptor deterministic finite state machine is:
 
-A quintuple (\Sigma, S, s_0, \delta, F)
+A quintuple \\((\Sigma, S, s_0, \delta, F)\\)
 
 where:
     
-**<math>\Sigma</math> is the input [[alphabet (computer science)|alphabet]] (a finite, non-empty set of symbols).
-**<math>S</math> is a finite, non-empty set of states.
-**<math>s_0</math> is an initial state, an element of <math>S</math>.
-**<math>\delta</math> is the state-transition function: <math>\delta: S \times \Sigma \rightarrow S</math> (in a [[nondeterministic finite automaton]] it would be <math>\delta: S \times \Sigma \rightarrow \mathcal{P}(S)</math>, i.e., <math>\delta</math> would return a set of states).
-**<math>F</math> is the set of final states, a (possibly empty) subset of <math>S</math>.
+\\(\Sigma\\) is the input alphabet (a finite, non-empty set of symbols)
+\\(S\\) is a finite, non-empty set of states.
+\\(s_0\\) is an initial state, an element of \\(S\\).
+\\(\delta\\) is the state-transition function: \\(\delta: S \times \Sigma \rightarrow S\\) (in a [[nondeterministic finite automaton]] it would be \\(\delta: S \times \Sigma \rightarrow \mathcal{P}(S)\\), i.e., \\(\delta\\) would return a set of states).
+\\(F\\) is the set of final states, a (possibly empty) subset of \\(S\\).
 
 And the wikipedia article for automata:
 
