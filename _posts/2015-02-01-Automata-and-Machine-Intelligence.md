@@ -30,26 +30,26 @@ From the Wikipedia article on finite state machines:
 
 where:
     
-> \\(\Sigma\\) is the input alphabet (a finite, non-empty set of symbols)
-> \\(S\\) is a finite, non-empty set of states.
-> \\(s_0\\) is an initial state, an element of \\(S\\).
+> \\(\Sigma\\) is the input alphabet (a finite, non-empty set of symbols).  
+> \\(S\\) is a finite, non-empty set of states.  
+> \\(s_0\\) is an initial state, an element of \\(S\\).  
 > \\(\delta\\) is the state-transition function: \\(\delta: S \times \Sigma \rightarrow S\\) 
->     in a nondeterministic finite automaton it would be \\(\delta: S \times \Sigma \rightarrow \mathcal{P}(S)\\), 
->     i.e, \\(\delta\\) would return a set of states.
-> \\(F\\) is the set of final states, a (possibly empty) subset of \\(S\\).
+>     in a nondeterministic finite automaton it would be \\(\delta: S \times \Sigma \rightarrow \mathcal{P}(S)\\),  
+>     i.e, \\(\delta\\) would return a set of states.  
+> \\(F\\) is the set of final states, a (possibly empty) subset of \\(S\\).  
 
 And the wikipedia article for automata:
 
-> A deterministic finite '''automaton''' is represented formally by a 5-tuple \\((Q, \Sigma, \delta, q_0, F)\\) 
+> A deterministic finite '''automaton''' is represented formally by a 5-tuple \\((Q, \Sigma, \delta, q_0, F)\\)
 
 where:
 
-> \\(Q\\) is a finite set of states.
-> \\(\Sigma\\) is a finite set of symbols, called the alphabet of the automaton.
-> \\(\delta\\) is the transition function, that is, \\(\delta: Q \cross \Sigma \rightarrow Q\\).
-> \\(q_0\\) is the start state, that is, the state of the automaton before any input has been processed, 
-> > where \\(q_0 > ∈ Q\\).
-> \\(F\\)is a set of states of \\(Q\\) (i.e. \\(F ⊆ Q\\)) called accept states.
+> \\(Q\\) is a finite set of states.  
+> \\(\Sigma\\) is a finite set of symbols, called the alphabet of the automaton.  
+> \\(\delta\\) is the transition function, that is, \\(\delta: Q \times \Sigma \rightarrow Q\\).  
+> \\(q_0\\) is the start state, that is, the state of the automaton before any input has been processed,  
+> where \\(q_0 > ∈ Q\\).  
+> \\(F\\)is a set of states of \\(Q\\) (i.e. \\(F ⊆ Q\\)) called accept states.  
 
 Looks like a lot of overlap, now that I put them all on the same page. They all three have a finite set of states, (\\S\\) or \\(Q\\). The state transition function is called \\(\gamma\\) in the AI Planning survey, but called \\(\delta\\). The automata have \\(\Sigma\\) as a set of input symbols but these correspond to actions that trigger state transitions, and AI Planning just enumerates theses symbols representing actions in the set \\(A\\). Producing a sequence of these that transition from a start state to a goal are the objective of an AI Planning system.
 
