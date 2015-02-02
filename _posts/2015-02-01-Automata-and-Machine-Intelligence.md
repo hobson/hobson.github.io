@@ -8,20 +8,20 @@ More and more, the smart people I meet are talking about Automata, Natural Langu
 From Nau, D., "Current Trends in AI Planning", 2007, a reading requirmeent for the coursera AI Planning course:
 
 > A state-transition system (or discrete-event system) is a 4-tuple:  
-> > Σ = (S, A, E, γ)  
+> Σ = (S, A, E, γ)  
 > where:   
-> > S = {s0, s1, s2, ...} is a set of states;
-> > A = {a1, a2, ...} is a set of actions--state transitions controlled by the plan executor;
-> > E = {e1, e2, ...} is a set of events--state transitions not controlled by a plan executor;
-> > γ : S × (A ∪ E) → 2S is a state-transition function (an action for every possible state)
+> S = {s0, s1, s2, ...} is a set of states;
+> A = {a1, a2, ...} is a set of actions--state transitions controlled by the plan executor;
+> E = {e1, e2, ...} is a set of events--state transitions not controlled by a plan executor;
+> γ : S × (A ∪ E) → 2S is a state-transition function (an action for every possible state)
 > A state-transition system may be represented by a directed graph whose nodes are the states
 > in S (for example, see figure 5).
 
 From the Wikipedia article on finite state machines:
 
 > A deterministic finite state machine or acceptor deterministic finite state machine is:  
-> > A quintuple \\((\Sigma, S, s_0, \delta, F)\\)  
-where:  
+> A quintuple \\((\Sigma, S, s_0, \delta, F)\\)  
+> where:  
 > \\(\Sigma\\) is the input alphabet (a finite, non-empty set of symbols).  
 > \\(S\\) is a finite, non-empty set of states.  
 > \\(s_0\\) is an initial state, an element of \\(S\\).  
