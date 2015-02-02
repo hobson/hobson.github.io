@@ -3,7 +3,7 @@ layout: post
 title: Automata and Machine Intelligence
 ---
 
-More and more, the smart people I meet are talking about Automata, Natural Language Processing, and Graph Search (AI/MI Planning) all in the same breath. I've taken MOOCs on all 3 and played but think I need to revisit automata. Because math proofs rely on automata to model machine intelligence, they are at the core of understanding what is possible. And I'm finding some interesting connections to graph search that I missed the first time around. 
+More and more, the smart people I meet are talking about Automata, Natural Language Processing, and Graph Search (AI/MI Planning) all in the same breath. I've taken MOOCs on all 3, but think I need to revisit automata. Math proofs rely on automata to model machine intelligence. And they are at the core of understanding what is possible with AI/MI. And I'm finding some interesting connections that I missed the first time around. 
 
 From Nau, D., "Current Trends in AI Planning", 2007, a reading requirmeent for the coursera AI Planning course:
 
