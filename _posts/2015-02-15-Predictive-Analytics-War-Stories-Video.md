@@ -3,7 +3,7 @@ layout: post
 title: Predictive Analytics War Stories Video
 ---
 
-Thank you, [David Barton](https://www.linkedin.com/profile/view?id=100854240) and [Innovation Enterprise](ieonline.com) for recording my [presentation](http://youtu.be/8n338W0yvoM) at the Predictive Analytics Summit in San Diego. Really knocks down my ego a notch to see my awkwardness on tape (like hearing your voice on an answering machine) and motivates me to improve. 
+Thank you, [David Barton](https://www.linkedin.com/profile/view?id=100854240) and [Innovation Enterprise](//ieondemand.com) for recording my [presentation](http://youtu.be/8n338W0yvoM) at the [Predictive Analytics Summit](http://theinnovationenterprise.com/summits/predictive-analytics-innovation-summit-san-diego2015/schedule) in San Diego. It really knocked down my ego a notch to see my awkwardness. You motivated me to practive a bit more next time. 
 
 <iframe src="http://youtube.com/embed/8n338W0yvoM?wmode=opaque" frameborder="0">Predictive Analytics War Stories</iframe>
 
