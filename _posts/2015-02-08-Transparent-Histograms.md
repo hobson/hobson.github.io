@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Another Challenge Do-Over
+title: Transparent Histograms
 ---
 
 Spent a lot of this week working on prettifying bar charts, histograms and animations for some reveal.js slides.  
