@@ -10,8 +10,8 @@ For February's Python User Group I did a lightning talk live demo using [`pybrai
 1. Improve prediction accuracy
 2. Modularizing/generalize the approach
 3. Eliminate validation cheating
-    a. no future data used in training
-    b. nonoverlapping validation and training data sets
+    1. no future data used in training
+    2. nonoverlapping validation and training data sets
 
 ## Gotchas with time-series data
 
