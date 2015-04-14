@@ -1,9 +1,9 @@
 ---
 layout: post
-title: PyCon 2015 -- Predict Weather With [pybrain](//github.com/pybrain/pybrain)
+title: PyCon 2015 -- Predict Weather With PyBrain
 ---
 
-Here are the [latest slides](/images/pycon2015-predict-weather-with-pybrain.html) for a [PyCon 2015](http://us.pycon.org/2015/) lightning talk on neural nets "Predict Weather with pybrain" (with a little help from [pug-ann](http://github.com/hobson/pug-ann)). Appologies if you attempted to follow along and execute the code on the slides. WiFi dropped before I could save updated [slides.com](//slides.com/hobsonlane/pycon2015-predict-weather-with-pybrain.html) reveal.js slides. So the slides didn't reflect the latest version of pug-ann. I've gotta start hand-editing locally. The typos were embarrassing. TLDR: a 6-node neural net can predict the max temperature in Portland a day in advance with about 5 deg C (10 deg F) 1-sigma error. 
+Here are the [latest slides](/images/pycon2015-predict-weather-with-pybrain.html) for a [PyCon 2015](http://us.pycon.org/2015/) lightning talk on neural nets "Predict Weather with [PyBrain](http://pybrain.org)", with a little help(er) from [pug-ann](http://github.com/hobson/pug-ann). Appologies if you attempted to follow along and execute the code on the slides. WiFi dropped before I could save updated [slides.com](//slides.com/hobsonlane/pycon2015-predict-weather-with-pybrain.html) reveal.js slides. So the slides didn't reflect the latest version of pug-ann. I've got to start building slides locally. The typos were embarrassing. TLDR; A 6-node neural net can predict the max temperature in Portland a day in advance with about 5 deg C (10 deg F) 1-sigma error. 
 
 This performance seems poor to me. I think I could do better by hand with the same data and same lack of meteorology knowledge. You'll want to add some additional features (inputs) to your net to improve accuracy. You might also want to add a nonlinear node. I'm looking forward to implementing some auto-tuning wrappers that will do this "feature engineering" for you.
 
