@@ -14,15 +14,15 @@ grep mongod /var/log/audit/audit.log | audit2allow -M mypol && semodule -i mypol
 
 [Here](/images/allow-access)'s a shell script that should work for any service name you indicate as the first argument on the command line:
 
-  {% highlight bash %}
-  #!/usr/bin/env bash
-  for i in {1..10}
-  do
-      echo "Round ${i}: Searching the SE Linux audit log (/var/log/audit/audit.log) for the '$1' service and allowing it to do whatever it wants (audit2allow -M my${1}policy)..."
-      grep "$1" /var/log/audit/audit.log | audit2allow -l && grep "$1" /var/log/audit/audit.log | audit2allow -M "my${1}policy" && semodule -i "my${1}policy.pp"
-      sleep 2s
-  done
-  {% endhighlight %}
+{% highlight bash %}
+#!/usr/bin/env bash
+for i in {1..10}
+do
+    echo "Round ${i}: Searching the SE Linux audit log (/var/log/audit/audit.log) for the '$1' service and allowing it to do whatever it wants (audit2allow -M my${1}policy)..."
+    grep "$1" /var/log/audit/audit.log | audit2allow -l && grep "$1" /var/log/audit/audit.log | audit2allow -M "my${1}policy" && semodule -i "my${1}policy.pp"
+    sleep 2s
+done
+{% endhighlight %}
 
 
 So to get mongodb running you need to allow `mongod` (again, as root) with:
