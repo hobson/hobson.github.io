@@ -24,7 +24,6 @@ do
 done
 {% endhighlight %}
 
-
 So to get mongodb running you need to allow `mongod` (again, as root) with:
 
 {% highlight bash %}
