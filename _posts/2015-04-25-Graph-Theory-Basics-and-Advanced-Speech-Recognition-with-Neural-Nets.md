@@ -3,7 +3,9 @@ layout: post
 title: Graph Theory Basics, and Speech Recognition with Neural Nets
 ---
 
-Here are the highlights from this week's ["Talking Machines"](http://www.thetalkingmachines.com/) on twitter at (). Thank you [thunder](https://github.com/ThunderShiviah/) for turning me on to this awesome podcast! This is a work in progress, so bear with me. The guests talked fast and used a lot of acronyms.
+Here are the highlights from this week's ["Talking Machines"](http://www.thetalkingmachines.com/) on twitter at (). Thank you [Thunder](https://github.com/ThunderShiviah/) for turning me on to this awesome podcast! 
+
+The guests talked fast and used a lot of acronyms so bear with me.
 
 Graphs
 ------
@@ -40,6 +42,7 @@ Bayesean Neural Nets useful on large datasets as opposed to conventional multila
 
 Alphabet Soup
 -------------
+
 LR: Logistic Regression
 SVM: Support Vector Machines
 FMLLR: ? ? Linear Logistic Regression
@@ -57,6 +60,7 @@ GBRBM: Gaussian Bernouli Restricted Boltzman machine
 
 People
 ------
+
 Dong Yu fixed hard-coded 1250 limit on 4-bit symbols in the encoder.
 Peter Orbans -- network theory
 John Hopfield -- went to University of Toronto  
