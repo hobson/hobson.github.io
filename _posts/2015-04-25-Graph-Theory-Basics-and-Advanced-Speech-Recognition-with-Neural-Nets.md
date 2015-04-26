@@ -48,6 +48,7 @@ FMLLR
 :   ? ? Linear Logistic Regression</dd>
 GBRBM
 :   Gaussian Bernouli Restricted Boltzman machine</dd>
+
 <dl>
 <dl>
   <dt><strong>GMM</strong><dt>
