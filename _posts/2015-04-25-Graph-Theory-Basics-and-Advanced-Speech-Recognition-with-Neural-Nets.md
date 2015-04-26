@@ -3,37 +3,39 @@ layout: post
 title: Graph Theory Basics, and Speech Recognition with Neural Nets
 ---
 
-Here are the highlights from this week's ["Talking Machines"](http://www.thetalkingmachines.com/) on twitter at (https://twitter.com/tlkngmchns). Thank you [Thunder](https://github.com/ThunderShiviah/) for turning me on to this awesome podcast! 
+Here are the highlights from this week's ["Talking Machines"](http://www.thetalkingmachines.com/) podcast from [@tlkngmchns](https://twitter.com/tlkngmchns). Thank you [Thunder](https://github.com/ThunderShiviah/) for turning me on to this awesome podcast! 
 
-The guests talked fast and used a lot of acronyms so bear with me.
+Graphs (Networks)
+-----------------
 
-Graphs
-------
+Kyle Adams (Harvard) started the podcast with an overview of graph theory. The only thing I got out of it was that "graph limits" are a recent area of research in graph theory -- techniques for dealing with large networks.
 
-Katherine Gorman and Kyle Adams talked about graph theory and approaches to selecting a model for a given Data Science problem. Kyle recommends first trying simple, off-the-shelf implementations of simple algorithms like Logistic Regression, Support Vector Machines, or Random Forests. 
+Where to Start?
+---------------
 
-You can then branch your decision tree as you discover these two main classes of "difficult problems"
+Katherine Gorman and Kyle Adams answered a caller's question about selecting a model for a given Data Science problem. Kyle recommends first trying simple, off-the-shelf implementations of simple algorithms like Logistic Regression, Support Vector Machines, or Random Forests.
 
-1. Logistic Regrssion will fail on big nonlinearities.
-1. a. just add nonlinearities (kernels or transformations) to your LR, SVM
-1. b. use neural nets or other nonlinear techniques
-2. High dimensionality, has two solutions
-2. a. Image processing doesn't reduce the dimensions, just uses convolutional neural nets to segment the dimensions
-2. b. Genetics -- shrink most weights down to zero to find strongest influencers 
+Then there are two main forks in the "decision tree" when you encounter a one of the two main classes of "difficult problems."
 
-Probabilistic matrix factorization and SVD are both used for dimension reduction and latent feature identification. Graph Limits are an area of research in graph theory -- techniques for dealing with large networks.
+1. Significant nonlinearities (logistic Regrssion will fail)
+    a. Try adding nonlinearities (kernels or transformations) to your LR, SVM
+    b. Pursue neural nets or other nonlinear techniques
+2. High dimensionality
+    a. If you need all the dimensions (e.g. image processing), use convolutional neural nets to segment the dimensions
+    b. If your data is sparsely influentual (e.g. bioinformatics) -- shrink most weights down to zero to extract strongest influencers 
+    c.  Use probabilistic matrix factorization and SVD extract latent features. 
 
 Neural Nets for Speech
 ----------------------
 
-In the second half they interviewed George Dahl who shook up the world of speech recognition by employing neural nets in place of Gaussian Mixture Models. He used this technique to when the Kaggle challenge posed by Merck and then later employed this technique to improve upon speech recognition algorithms at Microsoft for Bing.
+In the second half they got to the meat of the podcast, an interview with George Dahl. Dr. Dahl (just defended) shook up the world of speech recognition by employing neural nets in place of Gaussian Mixture Models. He used this technique to win the Kaggle challenge posed by Merck. He later employed this technique to improve upon speech recognition algorithms in Bing at Microsoft.
 
 The open source package [Kaldi](http://kaldi.sourceforge.net/about.html) has recently incorporated neural nets into its speech recognition algorithm. This was the only open source impelementation of Dahl's approach that he mentioned. The others are at Microsoft, IBM, and Google.
 
 [Abdel-rahman Mohamed](http://www.cs.toronto.edu/~asamir/) and [George Dahl](http://www.cs.toronto.edu/~gdahl/) at Torronto worked on phone recognition for [TIMIT](https://en.wikipedia.org/wiki/TIMIT).
-Lee Dang at Microsoft understood TIMIT, a dataset of only a few hours of speech segmented into phones. Phones are actual uterances of phonemes. Lee hired Abdel and George on an internship to try their technique on large vocabularies (Bing searches). It continued to work well once they solved a low level bug in the code (hardcoded symbol limit of 1250).
+Lee Dang at Microsoft understood TIMIT, a dataset of only a few hours of speech segmented into phones. Phones are actual uterances of phonemes. Lee hired Abdel and George on an internship to try their technique on large vocabularies (Bing searches). It continued to work well once they solved a low level bug in the code, a hardcoded symbol/phone(?) limit of 1250 or 4000 bits.
 
-"The biggest problems with the current approach are the GMM, HMM, N-gram language model" (everything except the beam search decoder part of the pipeline which is pretty good).
+"The biggest problems with the current pipeline are the GMM, HMM, N-gram language model." Basically, everything except the beam search decoder part of the pipeline "which is pretty good."
 
 Bioinformatics ignored neural nets until George Dahl and Ruslan (Rus) Salakhutdinov won the Merck challenge on Kaggle.
 Russ Sulukudena 15% improvement on baseline by Merck
