@@ -44,29 +44,70 @@ Bayesean Neural Nets useful on large datasets as opposed to conventional multila
 Alphabet Soup
 -------------
 
-FMLLR: ? ? Linear Logistic Regression
-GBRBM: Gaussian Bernouli Restricted Boltzman machine
-GMM: Gaussian Mixture Model, first step in speech recognition, creates training set
-HMM: Hidden Markhov Model, N-gram language model, 
-LR: Logistic Regression
-LVCSR: Large Vocabulary Continuous Speech Recognition
-MCMC: Markov Chain Monte Carlo
-MCRBM: Monte Carlo Restricted Boltzman Machine
-NNLM: Neural Net Language Models
-QSAR: Quantitative Structural Activity Relation prediction (the Merck Kaggle challenge)
-RNN: Recurrent Neural Net
-SVM: Support Vector Machines
-[TIMIT](https://en.wikipedia.org/wiki/TIMIT): Texas Instruments and Mass. Inst. Tech, speech recognition data set and problem
-VMI?: Verbmobil-I? VM-I was the first integrated system to perform spontaneous speech to speech translation/transcoding
+<dl>
+  <dt><strong>FMLLR</strong><dt>
+    <dd> ? ? Linear Logistic Regression</dd>
+<dl>
+  <dt><strong>GBRBM</strong><dt>
+    <dd> Gaussian Bernouli Restricted Boltzman machine</dd>
+<dl>
+<dl>
+  <dt><strong>GMM</strong><dt>
+    <dd> Gaussian Mixture Model, first step in speech recognition, creates training set</dd>
+<dl>
+<dl>
+  <dt><strong>HMM</strong><dt>
+    <dd> Hidden Markhov Model (equivalent to an N-gram language model?)</dd>
+<dl>
+<dl>
+  <dt><strong>LR</strong><dt>
+    <dd> Logistic Regression
+<dl>
+  <dt><strong>LVCSR</strong><dt>
+    <dd> Large Vocabulary Continuous Speech Recognition</dd>
+<dl>
+<dl>
+  <dt><strong>MCMC</strong><dt>
+    <dd> Markov Chain Monte Carlo</dd>
+<dl>
+<dl>
+  <dt><strong>MCRBM</strong><dt>
+    <dd> Monte Carlo Restricted Boltzman Machine</dd>
+<dl>
+<dl>
+  <dt><strong>NNLM</strong><dt>
+    <dd> Neural Net Language Models, N-gram Language Model?</dd>
+<dl>
+<dl>
+  <dt><strong>QSAR</strong><dt>
+    <dd> Quantitative Structural Activity Relation prediction (the Merck Kaggle challenge)</dd>
+<dl>
+<dl>
+  <dt><strong>RNN</strong><dt>
+    <dd> Recurrent Neural Net</dd>
+<dl>
+<dl>
+  <dt><strong>SVM</strong><dt>
+    <dd> Support Vector Machines</dd>
+<dl>
+<dl>
+  <dt><strong>[TIMIT](https</strong><dt>
+    <dd>//en.wikipedia.org/wiki/TIMIT)</strong><dt>
+    <dd> Texas Instruments and Mass. Inst. Tech, speech recognition data set and problem</dd>
+<dl>
+<dl>
+  <dt><strong>VMI?</strong><dt>
+    <dd> Verbmobil-I? VM-I was the first integrated system to perform spontaneous speech to speech translation/transcoding</dd>
+<dl>
 
 People
 ------
 
-Dong Yu -- fixed hard-coded 1250 limit on 4-bit symbols in the encoder.
-Peter Orbans -- network theory
-John Hopfield -- went to University of Toronto  
+* Dong Yu -- fixed hard-coded 1250 limit on 4-bit symbols in the encoder.
+* Peter Orbans -- network theory
+* John Hopfield -- went to University of Toronto  
 [Geoffrey (Geoff) Hinton](http://www.cs.toronto.edu/~hinton) -- researcher at University of Toronto 
-Alex Graves -- using RNN for for a language model
-Russ Salakhutdinov -- colaborated with Geof and George Dahl on the Merck challenge
-[Abdel-rahman Mohamed](http://www.cs.toronto.edu/~asamir/) -- collaborator with George Dahl on neural nets in speech recognition
+* Alex Graves -- using RNN for for a language model
+* Russ Salakhutdinov -- colaborated with Geof and George Dahl on the Merck challenge
+* [Abdel-rahman Mohamed](http://www.cs.toronto.edu/~asamir/) -- collaborator with George Dahl on neural nets in speech recognition
 
