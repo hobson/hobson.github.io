@@ -18,12 +18,12 @@ Katherine Gorman and Kyle Adams answered a caller's question about selecting a m
 Then there are two main forks in the "decision tree" when you encounter a one of the two main classes of "difficult problems."
 
 1. Significant nonlinearities (logistic Regrssion will fail)
-    a. Try adding nonlinearities (kernels or transformations) to your LR, SVM
-    b. Pursue neural nets or other nonlinear techniques
+    1. Try adding nonlinearities (kernels or transformations) to your LR, SVM
+    2. Pursue neural nets or other nonlinear techniques
 2. High dimensionality
-    a. If you need all the dimensions (e.g. image processing), use convolutional neural nets to segment the dimensions
-    b. If your data is sparsely influentual (e.g. bioinformatics) -- shrink most weights down to zero to extract strongest influencers 
-    c.  Use probabilistic matrix factorization and SVD extract latent features. 
+    1. If you need all the dimensions (e.g. image processing), use convolutional neural nets to segment the dimensions
+    2. If your data is sparsely influentual (e.g. bioinformatics) -- shrink most weights down to zero to extract strongest influencers 
+    3.  Use probabilistic matrix factorization and SVD extract latent features. 
 
 Neural Nets for Speech
 ----------------------
