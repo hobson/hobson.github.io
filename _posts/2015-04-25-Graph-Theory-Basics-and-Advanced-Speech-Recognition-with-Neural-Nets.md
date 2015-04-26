@@ -44,61 +44,38 @@ Bayesean Neural Nets useful on large datasets as opposed to conventional multila
 Alphabet Soup
 -------------
 
-<dl>
-  <dt><strong>FMLLR</strong><dt>
-    <dd> ? ? Linear Logistic Regression</dd>
-<dl>
-  <dt><strong>GBRBM</strong><dt>
-    <dd> Gaussian Bernouli Restricted Boltzman machine</dd>
+FMLLR
+:   ? ? Linear Logistic Regression</dd>
+GBRBM
+:   Gaussian Bernouli Restricted Boltzman machine</dd>
 <dl>
 <dl>
   <dt><strong>GMM</strong><dt>
     <dd> Gaussian Mixture Model, first step in speech recognition, creates training set</dd>
-<dl>
-<dl>
   <dt><strong>HMM</strong><dt>
     <dd> Hidden Markhov Model (equivalent to an N-gram language model?)</dd>
-<dl>
-<dl>
   <dt><strong>LR</strong><dt>
     <dd> Logistic Regression
-<dl>
   <dt><strong>LVCSR</strong><dt>
     <dd> Large Vocabulary Continuous Speech Recognition</dd>
-<dl>
-<dl>
   <dt><strong>MCMC</strong><dt>
     <dd> Markov Chain Monte Carlo</dd>
-<dl>
-<dl>
   <dt><strong>MCRBM</strong><dt>
     <dd> Monte Carlo Restricted Boltzman Machine</dd>
-<dl>
-<dl>
   <dt><strong>NNLM</strong><dt>
     <dd> Neural Net Language Models, N-gram Language Model?</dd>
-<dl>
-<dl>
   <dt><strong>QSAR</strong><dt>
     <dd> Quantitative Structural Activity Relation prediction (the Merck Kaggle challenge)</dd>
-<dl>
-<dl>
   <dt><strong>RNN</strong><dt>
     <dd> Recurrent Neural Net</dd>
-<dl>
-<dl>
   <dt><strong>SVM</strong><dt>
     <dd> Support Vector Machines</dd>
-<dl>
-<dl>
   <dt><strong>[TIMIT](https</strong><dt>
     <dd>//en.wikipedia.org/wiki/TIMIT)</strong><dt>
     <dd> Texas Instruments and Mass. Inst. Tech, speech recognition data set and problem</dd>
-<dl>
-<dl>
   <dt><strong>VMI?</strong><dt>
     <dd> Verbmobil-I? VM-I was the first integrated system to perform spontaneous speech to speech translation/transcoding</dd>
-<dl>
+</dl>
 
 People
 ------
