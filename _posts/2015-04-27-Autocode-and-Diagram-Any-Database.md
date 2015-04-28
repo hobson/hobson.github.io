@@ -37,7 +37,9 @@ graph = create_schema_graph(metadata=MetaData(connection), show_datatypes=False,
 graph.write_png('database_schema_diagram.png')
 {% endhighlight %}
 
+I'll post an example once I have need to model an open-data database.  They are really quite well-done. The layout optimizer leaves just enough white space and the edges/relationships are untangled into a presentable/readable form.
+
 Glossary
 --------
 
-**ERD**: Entity-Relationship Diagram -- a block diagram of your DB tables and their relationships through foreign keys
+**ERD**: Entity-Relationship Diagram -- a block diagram of your DB tables and their connections (relationships)
