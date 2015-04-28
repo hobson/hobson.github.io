@@ -3,7 +3,9 @@ layout: post
 title: Model and Diagram Any Database Using SQLAlchemy
 ---
 
-I needed to model and diagram (ERD) a client's database schema in order to understand their machine learning task. They don't use Django, so I can't just `manage.py inspectdb` and [`manage.py graph_models`](http://django-extensions.readthedocs.org/en/latest/graph_models.html). But fortunately, sqlalchemy makes both of these tasks easy. And it will work on any database that sqlalchemy knows how to deal with (many more [supported databases](http://docs.sqlalchemy.org/en/latest/core/engines.html#others) than Django's ORM).
+I needed to model and diagram (ERD) a client's database schema in order to understand their machine learning task. They don't use Django, so I can't just `manage.py inspectdb` and [`manage.py graph_models`](http://django-extensions.readthedocs.org/en/latest/graph_models.html). But fortunately, sqlalchemy makes both of these tasks easy. 
+
+It will work on any database that sqlalchemy knows how to deal with (many more [supported databases](http://docs.sqlalchemy.org/en/latest/core/engines.html#others) than Django's ORM). Look, Ma, no Django!
 
 Autocoding Your SQLAlchemy Models (`inspectdb`)
 -----------------------------------------------
