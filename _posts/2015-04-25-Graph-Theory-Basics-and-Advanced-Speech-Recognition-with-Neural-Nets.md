@@ -17,12 +17,12 @@ Katherine Gorman and Kyle Adams answered a caller's question about selecting a m
 
 Then there are two main forks in the "decision tree" when you encounter a one of the two main classes of "difficult problems."
 
-1. Significant nonlinearities (logistic Regrssion will fail)
+1. Significant nonlinearities (logistic Regression will fail)
     1. Try adding nonlinearities (kernels or transformations) to your LR, SVM
     2. Pursue neural nets or other nonlinear techniques
 2. High dimensionality
     1. If you need all the dimensions (e.g. image processing), use convolutional neural nets to segment the dimensions
-    2. If your data is sparsely influentual (e.g. bioinformatics) -- shrink most weights down to zero to extract strongest influencers 
+    2. If your data is sparsely influential (e.g. bioinformatics) -- shrink most weights down to zero to extract strongest influencers 
     3.  Use probabilistic matrix factorization and SVD extract latent features. 
 
 Neural Nets for Speech
@@ -30,27 +30,27 @@ Neural Nets for Speech
 
 In the second half they got to the meat of the podcast, an interview with George Dahl. Dr. Dahl (just defended) shook up the world of speech recognition by employing neural nets in place of Gaussian Mixture Models. He used this technique to win the Kaggle challenge posed by Merck. He later employed this technique to improve upon speech recognition algorithms in Bing at Microsoft.
 
-The open source package [Kaldi](http://kaldi.sourceforge.net/about.html) has recently incorporated neural nets into its speech recognition algorithm. This was the only open source impelementation of Dahl's approach that he mentioned. The others are at Microsoft, IBM, and Google.
+The open source package [Kaldi](http://kaldi.sourceforge.net/about.html) has recently incorporated neural nets into its speech recognition algorithm. This was the only open source implementation of Dahl's approach that he mentioned. The others are at Microsoft, IBM, and Google.
 
-[Abdel-rahman Mohamed](http://www.cs.toronto.edu/~asamir/) and [George Dahl](http://www.cs.toronto.edu/~gdahl/) at Torronto worked on phone recognition for [TIMIT](https://en.wikipedia.org/wiki/TIMIT).
-Lee Dang at Microsoft understood TIMIT, a dataset of only a few hours of speech segmented into phones. Phones are actual uterances of phonemes. Lee hired Abdel and George on an internship to try their technique on large vocabularies (Bing searches). It continued to work well once they solved a low level bug in the code, a hardcoded symbol/phone(?) limit of 1250 or 4000 bits.
+[Abdel-rahman Mohamed](http://www.cs.toronto.edu/~asamir/) and [George Dahl](http://www.cs.toronto.edu/~gdahl/) at Toronto worked on phone recognition for [TIMIT](https://en.wikipedia.org/wiki/TIMIT).
+Lee Dang at Microsoft understood TIMIT, a dataset of only a few hours of speech segmented into phones. Phones are actual utterances of phonemes. Lee hired Abdel and George on an internship to try their technique on large vocabularies (Bing searches). It continued to work well once they solved a low level bug in the code, a hard-coded symbol/phone(?) limit of 1250 or 4000 bits.
 
 "The biggest problems with the current pipeline are the GMM, HMM, N-gram language model." Basically, everything except the beam search decoder part of the pipeline "which is pretty good."
 
 Bioinformatics ignored neural nets until George Dahl and Ruslan (Rus) Salakhutdinov won the Merck challenge on Kaggle.
 Russ Sulukudena 15% improvement on baseline by Merck
-Bayesean Neural Nets useful on large datasets as opposed to conventional multilayer perceptron Neural Nets.
+Bayesian Neural Nets useful on large datasets as opposed to conventional multilayer perceptron Neural Nets.
 
 Alphabet Soup
 -------------
 
 **FMLLR**: Linear Logistic Regression
 
-**GBRBM**: Gaussian Bernouli Restricted Boltzman machine
+**GBRBM**: Gaussian Bernoulli Restricted Boltzmann machine
 
 **GMM**: Gaussian Mixture Model, first step in speech recognition, creates training set
 
-**HMM**: Hidden Markhov Model (equivalent to an N-gram language model?)
+**HMM**: Hidden Markov Model (equivalent to an N-gram language model?)
 
 **LR**: Logistic Regression
 
@@ -58,7 +58,7 @@ Alphabet Soup
 
 **MCMC**: Markov Chain Monte Carlo
 
-**MCRBM**: Monte Carlo Restricted Boltzman Machine
+**MCRBM**: Monte Carlo Restricted Boltzmann Machine
 
 **NNLM**: Neural Net Language Models, N-gram Language Model?
 
@@ -80,6 +80,6 @@ People
 * John Hopfield -- went to University of Toronto  
 [Geoffrey (Geoff) Hinton](http://www.cs.toronto.edu/~hinton) -- researcher at University of Toronto 
 * Alex Graves -- using RNN for for a language model
-* Russ Salakhutdinov -- colaborated with Geof and George Dahl on the Merck challenge
+* Russ Salakhutdinov -- collaborated with Geof and George Dahl on the Merck challenge
 * [Abdel-rahman Mohamed](http://www.cs.toronto.edu/~asamir/) -- collaborator with George Dahl on neural nets in speech recognition
 
