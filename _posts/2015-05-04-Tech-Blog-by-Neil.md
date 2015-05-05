@@ -6,7 +6,7 @@ title: Mind Sustenance
 Keeping Up
 ----------
 
-If you want to keep up with the latest in tech, [N]eil's blog](http://www.brazilostrich.com/) isn't a bad place to check out now and then, the slides [section in particular](http://www.brazilostrich.com/?p=346). Thanks for mentioning my Python User Group talk slides. I really have to update the slides.com ones I built with the GUI so that they can be easily embedded in blogs like Neil's. Remind me to cancel my slides.com subscription and rewrite them in raw reveal.js code.
+If you want to keep up with the latest in tech, [Neil's blog](http://www.brazilostrich.com/) isn't a bad place to check out now and then, the slides [section in particular](http://www.brazilostrich.com/?p=346). Thanks for mentioning my Python User Group talk slides. I really have to update the slides.com ones I built with the GUI so that they can be easily embedded in blogs like Neil's. Remind me to cancel my slides.com subscription and rewrite them in raw reveal.js code.
 
 Getting Perspective
 -------------------
