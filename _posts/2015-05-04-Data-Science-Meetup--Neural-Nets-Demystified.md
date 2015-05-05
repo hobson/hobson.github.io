@@ -1,7 +1,6 @@
 ---
 layout: post
-title: Mind Sustenance
----
+title: Data Science Group Talk -- Neural Nets Demystified
 
 [Portia](https://twitter.com/pkafei) [Burton](http://www.plbanalytics.com/) asked me to speak about Neural Nets at the next [Data Science Group](http://www.meetup.com/Portland-Data-Science-Group/) meetup. So here's the abstract... 
 
