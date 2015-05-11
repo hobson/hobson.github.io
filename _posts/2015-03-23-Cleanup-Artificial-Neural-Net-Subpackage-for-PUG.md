@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Use Artificial Neural Net to Predict Weather
+title: Cleanup of Artificial Neural Net Subpackage (Module) for PUG
 ---
 
-For February's Python User Group I did a lightning talk live demo using [`pybrain`](http://pybrain.org/) to [predict the weather](http://slides.com/hobsonlane/pybrain#/). It took a whole weekend to pay off the code quality debt from the hacking  I was doing during Kyle Gorman's awesome NLP talk. 
+For February's Python User Group I did a lightning talk and live demo using [`pybrain`](http://pybrain.org/) to [predict the weather](http://slides.com/hobsonlane/pybrain#/). It took a whole weekend to pay off the code quality debt from the hacking  I was doing during Kyle Gorman's awesome NLP talk. 
 
 ## Debt repaid
 

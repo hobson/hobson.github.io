@@ -15,6 +15,7 @@ I've used neural nets to...
 1. predict building energy consumption (e.g. to turn on Tesla battery packs at the right time)
 2. [predict the weather in Portland](http://hobsonlane.com/PyCon-2015-Lightning-Talk-Video-and-Attribution/), so your thermostat can tell when to pack an umbrella
 3. sentence segmentation (Kyle Gorman's [DetectorMorse](https://github.com/cslu-nlp/DetectorMorse))
+4. [predict product classifications](https://www.kaggle.com/c/otto-group-product-classification-challenge) like electronics vs clothing based on feature counts... looks like bags-of-words to me
 
 And neural nets have been applied recently in fields where they've not been considered before
 

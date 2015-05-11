@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Installing Mongo DB for the Ubiqity UniFi servor on Fedora
+title: Install Mongo DB on Fedora 20 for the Ubiqity UniFi Access Point
 ---
 
 [Chick](thewells.org) swears by his new Ubiquity WiFi access point. So I purchased the High Power version from Amazon using Prime and it arrived in only 36 hours on a Saturday! Maybe having the Ubiqity HQ here in Portland helped. 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Mind Sustenance
+title: Dev Resources
 ---
 
 Keeping Up
