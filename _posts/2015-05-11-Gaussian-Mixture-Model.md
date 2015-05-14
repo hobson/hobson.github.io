@@ -3,7 +3,7 @@ layout: post
 title: Gaussian Mixture Model
 ---
 
-Working on this Kaggle challenge (Otto Product Categorization), it's becoming clear that the most appropriate hard-coded model is a Bayesian Classifier. And you don't need the "gamification" clues to tell you that. Though the clues helped. "I'm a strict Bayesian, you know" was the acknowledgment message I received last week with my first benchmark-range submission. Clever.
+Working on this Kaggle challenge (Otto Product Categorization), it's becoming clear that the most appropriate hard-coded model is a Bayesian Classifier. And you don't need the "gamification" clues to tell you that. Though the clues helped. "I'm a strict Bayesian, you know" was the acknowledgment message I received last week with my first decision-tree submission (within spitting distance of the benchmark). Clever. I love [Kaggle](http://kaggle.com) for this! For the same reason I love stack overflow... they use influence techniques for the TotalGood rather than their focusing on monetization (their own financial gain).
 
 Anyway you've got counts of 93 discrete events (binary dimensions). These are most likely words, but could be anything, I guess, like counts of user types that purchase each product in the Otto inventory. I'm guessing they just found the 93 words with the most entropy in their short product descriptions and want us to do NLP to identify their category accurately.
 
