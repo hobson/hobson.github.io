@@ -3,37 +3,176 @@ layout: post
 title: Neural Nets Demystified
 ---
 
-Here are some thoughts about the upcoming PDX Data Science talk ["Neural Nets Demystified."](/Data-Science-Meetup--Neural-Nets-Demystified/)
+Here are some thoughts about the upcoming [PDX Data Science Meetup](http://www.meetup.com/Portland-Data-Science-Group/events/222322211/) talk, ["Neural Nets Demystified."](/Data-Science-Meetup--Neural-Nets-Demystified/)
 
 ---------
 
-Advantages
+Agenda
+
+1. Demystify
+2. Dig Deeper
+
+---------
+
+The most basic machine learning task is classification.
+
+NN textbooks call this "association".
+
+If you know the classification for some set of examples...
+
+Supervised classification
+
+----------
+
+All supervised classification problems can be simplified
+
+Split into a binary classification problems... 
+
+-----------
+
+# [*Perceptron*])(https://en.wikipedia.org/wiki/Perceptron)
+
+Sounds mysterious, like a "flux capacitor" or something...
+
+It's just a multiply and threshold check:
+
+{% highlight python %}
+if (weights * inputs) > 0:
+    output = 1
+else:
+    output = 0
+{% endhighlight %}
+
+---------
+
+(Diagram of a perceptron)
+
+---------
+
+# Need something a little better than that
+
+That would work fine for "using" (*[activating](https://en.wikipedia.org/wiki/Activation_function)*) your NN
+
+But for learning (*(backpropagation)[https://en.wikipedia.org/wiki/Backpropagation]*) you need it to be predictable...
+
+* doesn't change direction on you: *[monotonic](https://en.wikipedia.org/wiki/Monotonic_function)*
+* doesn't jump around: *[smooth](https://en.wikipedia.org/wiki/Smoothness)*
+
+----------
+
+# [*Sigmoid*])(https://en.wikipedia.org/wiki/Perceptron)
+
+Again, sounds mysterious... like a transcendental function
+
+It is a transcendental function, but the word just means
+
+Curved, smooth like the letter "C"
+
+-------------
+
+What Greek letter do you think of when you hear me say Sigma?
+
+What Roman (English letter does it most look like)?
+
+-----------
+
+# [Sigma](https://en.wikipedia.org/wiki/Sigma)
+
+Σ (uppercase)
+σ (lowercase)
+ς (last letter in word)
+c (alternatively)
+
+But in English when you hear Sigma you think of an S.
+So the meaning has evolved to mean S-shaped.
+
+------------
+
+That's what we want, something smooth, shaped like an "S"
+
+The trainer (*(backpropagator)[https://en.wikipedia.org/wiki/Backpropagation]*) can predict the change in `weights` required
+Wants to nudge the `output` closer to the `target`
+
+`target`: known classification for training examples
+`output`: predicted classification your network spits out
+
+-------------
+
+# But just a nudge.
+
+Don't get greedy and push all the way to the answer
+Because your linear sloper predictions are wrong
+And there may be nonlinear interactions between the weights (multiply layers)
+
+So set the learning rate (\alpha) to somthething less than 1
+the portion of the predicted nudge you want to "dial back" to
+
+----------
+
+# Example: Predict Rain in Portland
+
+* PyBrain
+* pug-ann (helper functions TBD PyBrain2)
+
+-----------
+
+Get historical weather for Portland then ...
+
+1. Backpropagate: train a perceptron
+2. Activate: predict the weather for tomorrow!
+
+-----------
+
+NN Advantages
 
 * Easy
-    * You don't need to know math!
+    * No math!
+    * No tuning!
+    * Just plug and chug.
 * General
     * One model can apply to many problems
 * Advanced
-    * They achieve the best results
+    * They often beat all other "tuned" approaches
 
 ---------
 
 Disadvantage #1: Slow training
 
-* 24+ hr for Kaggle example on laptop
+* 24+ hr for complex Kaggle example on laptop
 * 90x30x20x10 model degrees freedom
     + 90 input dimensions (regressors)
-    + 30 "hidden" nodes for layer 1
-    + 20 nodes for layer 2
+    + 30 nodes for *hidden layer* 1
+    + 20 nodes for *hidden layer* 2
     + 10 output dimensions (predicted values)
 
 ----------
 
 Disadvantage #2: They don't scale (unparallelizable)
 
-* Fully-connected NNs can't be hyper-parallelized (GPU)
+* Fully-connected NNs can't be *easily* hyper-parallelized (GPU)
     * Large matrix multiplications
     * Layers depend on all elements of previous layers
+
+----------
+
+Scaling Workaround
+
+At Kaggle workshop we discussed paralleling linear algebra
+
+  * Split matrices up and work on "tiles"
+  * Theano for python
+  * [PLASMA](http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf) for BLAS
+
+----------
+
+Scaling Workaround Limitations
+
+But tiles must be shared/consolidated and theirs redundancy
+
+  * Data flow: Main -> CPU -> GPU -> GPU cache (and back)
+  * Data com (RAM xfer) is limiting
+  * Data RAM size (at each stage) is limiting 
+  * [Each GPU is equivalent to 16 core node](http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf)
 
 ----------
 
