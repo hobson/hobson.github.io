@@ -49,6 +49,11 @@ baseurl: ""
 # !! You don't need to change any of the configuration flags below !!
 #
 
+site:
+  - reveal_path: "/"
+  - reveal_theme_path: "/css/theme/"
+  - reveal_theme: "black.css"
+
 markdown: kramdown
 highlighter: pygments
 permalink: /:title/
