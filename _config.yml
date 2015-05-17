@@ -50,7 +50,7 @@ reveal_theme: "moon.css"
 reveal_transition: default
 reveal_theme_path: "/css/theme/"
 # Embed Server-side speaker notes?
-reveal_notes_server: true
+reveal_notes_server: false
 # Additional reveal.js options
 reveal_options: 
 # Additional reveal.js dependencies
