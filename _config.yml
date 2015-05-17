@@ -45,14 +45,21 @@ url: http://www.hobsonlane.com
 # then add in the baseurl here, like this: "/repository-name"
 baseurl: ""
 
+reveal_path: "/"
+reveal_theme: "moon.css"
+reveal_transition: default
+reveal_theme_path: /css/theme/ 
+# Embed Server-side speaker notes?
+reveal_notes_server: false
+# Additional reveal.js options
+reveal_options: 
+# Additional reveal.js dependencies
+reveal_dependencies: 
+# Reveal.js subdirectory
+reveal_path: /
 #
 # !! You don't need to change any of the configuration flags below !!
 #
-
-site:
-  - reveal_path: "/"
-  - reveal_theme_path: "/css/theme/"
-  - reveal_theme: "black.css"
 
 markdown: kramdown
 highlighter: pygments
