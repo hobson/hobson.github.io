@@ -37,7 +37,7 @@ google_analytics:
 
 # Your website URL (e.g. http://barryclark.github.io or http://www.barryclark.co)
 # Used for Sitemap.xml and your RSS feed
-url: http://totalgood.com
+url: http://www.hobsonlane.com
 
 # If you're hosting your site at a Project repository on GitHub pages 
 # (http://yourusername.github.io/repository-name)
@@ -72,3 +72,5 @@ exclude:
     - Gemfile.lock
     - LICENSE
     - README.md
+
+google_analytics: UA-63029775-1
