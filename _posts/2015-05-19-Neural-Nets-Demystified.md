@@ -77,14 +77,14 @@ else:
 
 Works fine for "using" (*[activating](https://en.wikipedia.org/wiki/Activation_function)*) your NN
 
-But for learning (*(backpropagation)[https://en.wikipedia.org/wiki/Backpropagation]*) you need it to be predictable...
+But for learning (*[backpropagation](https://en.wikipedia.org/wiki/Backpropagation)*) you need it to be predictable...
 
 * doesn't change direction on you: *[monotonic](https://en.wikipedia.org/wiki/Monotonic_function)*
 * doesn't jump around: *[smooth](https://en.wikipedia.org/wiki/Smoothness)*
 
 ---
 
-## [*Sigmoid*])(https://en.wikipedia.org/wiki/Perceptron)
+## [*Sigmoid*](https://en.wikipedia.org/wiki/Perceptron)
 
 Again, sounds mysterious... like a transcendental function
 
@@ -94,15 +94,15 @@ Curved, smooth like the letter "C"
 
 ---
 
-What Greek letter do you think of when you hear me say Sigma? {% fragment %}
+## What Greek letter do you think of when I say "Sigma"?
 
-## "Σ" {% fragment %}
+### "Σ"
 
-What Roman (English letter does it most look like)? {% fragment %}
+What Roman (English) character?
 
-* "E"? {% fragment %}
-* "S"? {% fragment %}
-* "C"? {% fragment %}
+* "E"?
+* "S"?
+* "C"?
 
 ---
 
@@ -233,6 +233,7 @@ Not so fast, big O...
 3600
 {% endhighlight %}
 
+
 ---
 
 Rule of thumb 
@@ -313,4 +314,27 @@ I'm a crackpot!
 Resources
 
 * [keras.io](http://keras.io/): Scalable Python NNs
-* 
+* [Neural Network Design](http://hagan.okstate.edu/NNDesign.pdf): Free NN Textbook!
+* [pug-ann](https://github.com/hobson/pug-ann): Helpers for PyBrain and Wunderground
+* [PyBrain2](https://github.com/pybrain2/pybrain2): We're working on it
+
+---
+
+Code highlighting test
+
+{% highlight javascript %}
+function linkify( selector ) {
+  if( supports3DTransforms ) {
+ 
+    var nodes = document.querySelectorAll( selector );
+ 
+    for( var i = 0, len = nodes.length; i &lt; len; i++ ) {
+      var node = nodes[i];
+ 
+      if( !node.className ) {
+        node.className += ' roll';
+      }
+    }
+  }
+}
+{% endhighlight %}
