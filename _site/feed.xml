@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hobson&#39;s Code Blog</title>
+    <description>software development &amp; data science</description>
+    <link>http://totalgood.com</link>
+    <atom:link href="http://totalgood.com/feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>Finally a Decent Open Source Blog Framework</title>
+        <description>&lt;p&gt;I’m loving this &lt;a href=&quot;https://github.com/jekyll&quot;&gt;Jekyll&lt;/a&gt; thing. You won’t see many pull requests from me, but this thing sure is an efficient blogging tool.&lt;/p&gt;
+
+&lt;p&gt;And thank you &lt;a href=&quot;https://github.com/barryclark&quot;&gt;Barry Clark&lt;/a&gt;! Your &lt;a href=&quot;https://github.com/barryclark/Jekyll-Now&quot;&gt;Jekyll-Now&lt;/a&gt; example made it a cinch to get started. You should have a lot more forks coming soon as my friends and mentees start using it.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 10 Nov 2014 00:00:00 -0800</pubDate>
+        <link>http://totalgood.com/Jekyll-+-github-=-Unbeatable-Blog-CMS-for-Coders/</link>
+        <guid isPermaLink="true">http://totalgood.com/Jekyll-+-github-=-Unbeatable-Blog-CMS-for-Coders/</guid>
+      </item>
+    
+      <item>
+        <title>Love Python? Interested in NLP?</title>
+        <description>&lt;p&gt;Here are the highlights of a &lt;a href=&quot;http://www.hobsonlane.com/pug/&quot;&gt;tutorial on Natural Language Processing&lt;/a&gt; that I gave at the &lt;a href=&quot;http://www.meetup.com/pdxpython/&quot;&gt;PDX python user group&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/word-doc-graph.png&quot; alt=&quot;Force-directed-graph-of-word-document-connections&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;At this tutorial we learned how to quickly &lt;a href=&quot;http://www.hobsonlane.com/pug/pug/docs/slidedeck-pdxpy/index.html#9&quot;&gt;count up all the words&lt;/a&gt; in the US presidential inaugural speeches from an NLTK data set. Thank you, &lt;a href=&quot;http://web.mit.edu/lizhong/www/&quot;&gt;Lizhong&lt;/a&gt; for introducing me to this interesting historical corpus (set of documents).&lt;/p&gt;
+
+&lt;p&gt;Then the fun begins, for both the mathematician and visualization enthusiast. The word counts can be organized into a large, but sparse matrix called an &lt;a href=&quot;http://www.hobsonlane.com/pug/pug/docs/slidedeck-pdxpy/index.html#11&quot;&gt;occurrence matrix&lt;/a&gt; (or &lt;a href=&quot;http://stanford.edu/~rjweiss/public_html/IRiSS2013/text2/notebooks/tfidf.html&quot;&gt;TFIDF&lt;/a&gt;, in NLTK terminology). Python’s &lt;a href=&quot;http://www.numpy.org/&quot;&gt;numpy&lt;/a&gt; library has plenty of SVD and other matrix manipulation functions that can help you pair this down to the most important terms and documents. &lt;/p&gt;
+
+&lt;p&gt;For this demo, and per the advice of Lizhong, I kept it simple and merely &lt;a href=&quot;https://github.com/hobson/pug/blob/master/pug/nlp/inaugural.py&quot;&gt;computed the entropy&lt;/a&gt; (randomness) of the word frequency distributions across the speeches, to select the most interesting words. This approach leaves a lot of interesting information behind. &lt;/p&gt;
+
+&lt;p&gt;Search for…&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Latent_semantic_analysis&quot;&gt;“Latent Semantic Indexing”&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Principal_component_analysis&quot;&gt;“Principal Component Analysis”&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Singular_value_decomposition&quot;&gt;“Singular Value Decomposition”&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;…if you want to try a more sophisticated approach. Hint: 3 of these are the same thing.&lt;/p&gt;
+
+&lt;p&gt;You can visualize this a lot of different ways, but two approaches of (Mike Bostock)[http://bl.ocks.org/mbostock] that I like are his &lt;a href=&quot;http://www.hobsonlane.com/pug/pug/miner/static/occurrence_force_graph.html&quot;&gt;“force directed graph”&lt;/a&gt; and just a plain old &lt;a href=&quot;http://www.hobsonlane.com/pug/pug/miner/static/doc_cooccurrence.html&quot;&gt;colorized matrix&lt;/a&gt;. Click around and see what you think. Can you guess which US Presidents will be the “outliers” in each of these visualizations? Hint: he’s Tricky.&lt;/p&gt;
+</description>
+        <pubDate>Thu, 30 Jan 2014 00:00:00 -0800</pubDate>
+        <link>http://totalgood.com/Natural-Language-Processing-with-Python/</link>
+        <guid isPermaLink="true">http://totalgood.com/Natural-Language-Processing-with-Python/</guid>
+      </item>
+    
+  </channel>
+</rss>
