@@ -94,15 +94,15 @@ Curved, smooth like the letter "C"
 
 -----
 
-What Greek letter do you think of when you hear me say Sigma? {% fragment %}
+What Greek letter do you think of when you hear me say Sigma? 
 
-## "Σ" {% fragment %}
+## "Σ"
 
-What Roman (English letter does it most look like)? {% fragment %}
+What Roman (English letter does it most look like)? 
 
-* "E"? {% fragment %}
-* "S"? {% fragment %}
-* "C"? {% fragment %}
+* "E"?
+* "S"?
+* "C"?
 
 ---
 
