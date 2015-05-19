@@ -3,19 +3,20 @@ layout: post
 title: Neural Nets Demystified
 ---
 
-## Neural Nets Demystified
+## [Neural Nets Demystified](hobson.github.io/talks/Neural-Nets-Demystified.html)
 
 1. Demystify
 2. Dig Deeper
 
-
+<div>
 <aside class="notes">
-First I'll suck you in with a simple example (predicting Portland Weather)
-Then I'll show you how to play around at the frontier of the state of the art
-
-* Thoughts about the upcoming [PDX Data Science Meetup](http://www.meetup.com/Portland-Data-Science-Group/events/222322211/)
-* ["Neural Nets Demystified."](/Data-Science-Meetup--Neural-Nets-Demystified/)
+      <aside class="notes">
+      <p>First I’ll show you a simple example (predicting Portland Weather).</p>
+      <p>Then I’ll show you how to play around at the frontier of the state of the art</p>
+<p>Thoughts about the upcoming [PDX Data Science Meetup](http://www.meetup.com/Portland-Data-Science-Group/events/222322211/)<p>
+<p>["Neural Nets Demystified."](/Data-Science-Meetup--Neural-Nets-Demystified/)<p>
 </aside>
+</div>
 
 ---
 
