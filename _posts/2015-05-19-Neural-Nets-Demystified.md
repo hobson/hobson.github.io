@@ -3,7 +3,11 @@ layout: post
 title: Neural Nets Demystified
 ---
 
-## [Neural Nets Demystified](hobson.github.io/talks/Neural-Nets-Demystified.html)
+## [Neural Nets Demystified](http://hobsonlane.com/talks/Neural-Nets-Demystified.html)
+
+See the [reveal.js slides](http://hobsonlane.com/talks/Neural-Nets-Demystified.html) for the latest
+
+## [Intro](http://hobsonlane.com/talks/Neural-Nets-Demystified.html)
 
 1. Demystify
 2. Dig Deeper
