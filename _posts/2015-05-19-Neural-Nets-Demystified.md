@@ -1,5 +1,5 @@
 ---
-layout: reveal
+layout: post
 title: Neural Nets Demystified
 ---
 
@@ -8,13 +8,14 @@ title: Neural Nets Demystified
 1. Demystify
 2. Dig Deeper
 
-Note:
 
+<aside class="notes">
 First I'll suck you in with a simple example (predicting Portland Weather)
 Then I'll show you how to play around at the frontier of the state of the art
 
 * Thoughts about the upcoming [PDX Data Science Meetup](http://www.meetup.com/Portland-Data-Science-Group/events/222322211/)
 * ["Neural Nets Demystified."](/Data-Science-Meetup--Neural-Nets-Demystified/)
+</aside>
 
 ---
 

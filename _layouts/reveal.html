@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>{{ site.title }}</title>
+		<title>{{ page.title }}</title>
 
 		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
 		<meta name="author" content="Hakim El Hattab">
@@ -35,7 +35,8 @@
 		<div class="reveal">
 
             <div class="slides">
-
+<!-- Need to iterate through the slides and insert <section> tags between slides -->
+<!-- Or include the content in markdown format and let reveal.js do the rendering to html -->
                 {{ content }}
 
             </div>
