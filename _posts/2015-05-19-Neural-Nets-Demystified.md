@@ -10,7 +10,6 @@ title: Neural Nets Demystified
 
 <div>
 <aside class="notes">
-      <aside class="notes">
       <p>First I’ll show you a simple example (predicting Portland Weather).</p>
       <p>Then I’ll show you how to play around at the frontier of the state of the art</p>
 <p>Thoughts about the upcoming [PDX Data Science Meetup](http://www.meetup.com/Portland-Data-Science-Group/events/222322211/)<p>
