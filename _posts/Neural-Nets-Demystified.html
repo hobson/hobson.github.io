@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>Neural Nets Demystified</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="reveal.js/css/reveal.min.css"/>
+    <style type="text/css">code{white-space: pre;}</style>
+    <link rel="stylesheet" href="reveal.js/css/theme/simple.css" id="theme">
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+    <!--[if lt IE 9]>
+    <script src="reveal.js/lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Neural Nets Demystified</h1>
+    <h3 class="date"></h3>
+</section>
+
+<section id="neural-nets-demystified" class="slide level2">
+<h1>Neural Nets Demystified</h1>
+<ol type="1">
+<li>Demystify</li>
+<li>Dig Deeper</li>
+</ol>
+<p>Note:</p>
+<p>First I'll suck you in with a simple example (predicting Portland Weather) Then I'll show you how to play around at the frontier of the state of the art</p>
+<ul>
+<li>Thoughts about the upcoming <a href="http://www.meetup.com/Portland-Data-Science-Group/events/222322211/">PDX Data Science Meetup</a></li>
+<li><a href="/Data-Science-Meetup--Neural-Nets-Demystified/">&quot;Neural Nets Demystified.&quot;</a></li>
+</ul>
+</section>
+<section id="classification" class="slide level2">
+<h1>Classification</h1>
+<p>The most basic ML task is classification</p>
+<p>In NN lingo, this is called &quot;association&quot;</p>
+<p>So lets predict &quot;rain&quot; (1) &quot;no rain&quot; (0) for PDX tomorrow</p>
+</section>
+<section id="supervised-learning" class="slide level2">
+<h1>Supervised Learning</h1>
+<p>We have historical &quot;examples&quot; of rain and shine</p>
+<p><a href="http://wunderground.org">Weather Underground</a></p>
+<p>Since we know the classification (training set)...</p>
+<p>Supervised classification (association)</p>
+</section>
+<section id="rain-shine-partly-cloudy" class="slide level2">
+<h1>Rain, Shine, Partly-Cloudy ?</h1>
+<p>Wunderground lists several possible &quot;conditions&quot; or classes</p>
+<p>If we wanted to predict them all</p>
+<p>We would just make a binary classifier for each one</p>
+<p>All classification problems can be reduced a binary classification</p>
+</section>
+<section id="perceptron" class="slide level2">
+<h1><a href="https://en.wikipedia.org/wiki/Perceptron"><em>Perceptron</em></a></h1>
+<p>Sounds mysterious, like a &quot;flux capacitor&quot; or something...</p>
+<p>It's just a multiply and threshold check:</p>
+<p>{% highlight python %} if (weights * inputs) &gt; 0: output = 1 else: output = 0 {% endhighlight %}</p>
+</section>
+<section id="perceptron-1" class="slide level2">
+<h1>Perceptron</h1>
+<p>(Diagram of a perceptron)</p>
+</section>
+<section id="need-something-a-little-better" class="slide level2">
+<h1>Need something a little better</h1>
+<p>Works fine for &quot;using&quot; (<em><a href="https://en.wikipedia.org/wiki/Activation_function">activating</a></em>) your NN</p>
+<p>But for learning (<em><a href="https://en.wikipedia.org/wiki/Backpropagation">backpropagation</a></em>) you need it to be predictable...</p>
+<ul>
+<li>doesn't change direction on you: <em><a href="https://en.wikipedia.org/wiki/Monotonic_function">monotonic</a></em></li>
+<li>doesn't jump around: <em><a href="https://en.wikipedia.org/wiki/Smoothness">smooth</a></em></li>
+</ul>
+</section>
+<section id="sigmoid" class="slide level2">
+<h1><a href="https://en.wikipedia.org/wiki/Perceptron"><em>Sigmoid</em></a></h1>
+<p>Again, sounds mysterious... like a transcendental function</p>
+<p>It is a transcendental function, but the word just means</p>
+<p>Curved, smooth like the letter &quot;C&quot;</p>
+</section>
+<section id="what-greek-letter-do-you-think-of-when-i-say-sigma" class="slide level2">
+<h1>What Greek letter do you think of when I say &quot;Sigma&quot;?</h1>
+<h3 id="σ">&quot;Σ&quot;</h3>
+<p>What Roman (English) character?</p>
+<ul>
+<li>&quot;E&quot;?</li>
+<li>&quot;S&quot;?</li>
+<li>&quot;C&quot;?</li>
+</ul>
+</section>
+<section id="sigma" class="slide level2">
+<h1><a href="https://en.wikipedia.org/wiki/Sigma">Sigma</a></h1>
+<p>You didn't know this was a Latin/Greek class, did you...</p>
+<p>Σ (uppercase) σ (lowercase) ς (last letter in word) c (alternatively)</p>
+<p>Most English speakers think of an &quot;S&quot; when they hear &quot;Sigma&quot; you think of an S. So the meaning has evolved to mean S-shaped.</p>
+</section>
+<section class="slide level2">
+
+<p>That's what we want, something smooth, shaped like an &quot;S&quot;</p>
+<p>The trainer (<em>(backpropagator)[https://en.wikipedia.org/wiki/Backpropagation]</em>) can predict the change in <code>weights</code> required Wants to nudge the <code>output</code> closer to the <code>target</code></p>
+<p><code>target</code>: known classification for training examples <code>output</code>: predicted classification your network spits out</p>
+</section>
+<section id="but-just-a-nudge." class="slide level2">
+<h1>But just a nudge.</h1>
+<p>Don't get greedy and push all the way to the answer Because your linear sloper predictions are wrong And there may be nonlinear interactions between the weights (multiply layers)</p>
+<p>So set the learning rate () to somthething less than 1 the portion of the predicted nudge you want to &quot;dial back&quot; to</p>
+</section>
+<section id="example-predict-rain-in-portland" class="slide level2">
+<h1>Example: Predict Rain in Portland</h1>
+<ul>
+<li>PyBrain</li>
+<li>pug-ann (helper functions TBD PyBrain2)</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Get historical weather for Portland then ...</p>
+<ol type="1">
+<li>Backpropagate: train a perceptron</li>
+<li>Activate: predict the weather for tomorrow!</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<p>NN Advantages</p>
+<ul>
+<li>Easy
+<ul>
+<li>No math!</li>
+<li>No tuning!</li>
+<li>Just plug and chug.</li>
+</ul></li>
+<li>General
+<ul>
+<li>One model can apply to many problems</li>
+</ul></li>
+<li>Advanced
+<ul>
+<li>They often beat all other &quot;tuned&quot; approaches</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Disadvantage #1: Slow training</p>
+<ul>
+<li>24+ hr for complex Kaggle example on laptop</li>
+<li>90x30x20x10 model degrees freedom
+<ul>
+<li>90 input dimensions (regressors)</li>
+<li>30 nodes for <em>hidden layer</em> 1</li>
+<li>20 nodes for <em>hidden layer</em> 2</li>
+<li>10 output dimensions (predicted values)</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Disadvantage #2: They don't scale (unparallelizable)</p>
+<ul>
+<li>Fully-connected NNs can't be <em>easily</em> hyper-parallelized (GPU)
+<ul>
+<li>Large matrix multiplications</li>
+<li>Layers depend on all elements of previous layers</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Scaling Workaround</p>
+<p>At Kaggle workshop we discussed paralleling linear algebra</p>
+<ul>
+<li>Split matrices up and work on &quot;tiles&quot;</li>
+<li>Theano, <a href="">Keras</a> for python</li>
+<li><a href="http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf">PLASMA</a> for BLAS</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Scaling Workaround Limitations</p>
+<p>But tiles must be shared/consolidated and theirs redundancy</p>
+<ul>
+<li>Data flow: Main -&gt; CPU -&gt; GPU -&gt; GPU cache (and back)</li>
+<li>Data com (RAM xfer) is limiting</li>
+<li>Data RAM size (at each stage) is limiting</li>
+<li><a href="http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf">Each GPU is equivalent to 16 core node</a></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Disadvantage #3: They overfit</p>
+<ul>
+<li>Too manu nodes = overfitting</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>What is the big O?</p>
+<ul>
+<li>Degrees of freedom grow with number of nodes &amp; layers</li>
+<li>Each layer's nodes connected to each previous layer's</li>
+<li>That a lot of wasted &quot;freedom&quot;</li>
+</ul>
+</section>
+<section id="on2" class="slide level2">
+<h1>O(N^2)</h1>
+</section>
+<section class="slide level2">
+
+<p>Not so fast, big O...</p>
+<p>{% highlight python %} &gt;&gt;&gt; np.prod([30, 20, 10]) 6000 &gt;&gt;&gt; np.sum([30, 20, 10])**2 3600 {% endhighlight %}</p>
+</section>
+<section class="slide level2">
+
+<p>Rule of thumb</p>
+<p>NOT <code>N**2</code></p>
+<p>But <code>M * N**2</code></p>
+<p>N: number of nodes M: number of layers</p>
+</section>
+<section class="slide level2">
+
+<p><code>assert(M * N**2 &lt; len(training_set) / 10.)</code></p>
+<p>I'm serious... put this into your code. I wasted a lot of time training models for Kaggle that overfitted.</p>
+</section>
+<section class="slide level2">
+
+<p>You do need to know math!</p>
+<ul>
+<li>To imprint your net with the structure (math) of the problem
+<ul>
+<li>Feature analysis or transformation (conventional ML)</li>
+<li>Choosing the activation function and segmenting your NN</li>
+</ul></li>
+<li>Prune and evolve your NN</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>This is a virtuous cycle!</p>
+<ul>
+<li>More structure (no longer fully connected)
+<ul>
+<li>Each independent path (segment) is parallelizable!</li>
+</ul></li>
+<li>Automatic tuning, pruning, evolving is all parallelizable!
+<ul>
+<li>Just train each NN separately</li>
+<li>Check back in with Prefrontal to &quot;compete&quot;</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Structure you can play with (textbook)</p>
+<ul>
+<li>limit connections</li>
+</ul>
+<p>jargon: <em>receptive fields</em></p>
+<ul>
+<li>limit weights</li>
+</ul>
+<p>jargon: <em>weight sharing</em></p>
+<p>All the rage: <em>convolutional networks</em></p>
+</section>
+<section class="slide level2">
+
+<p>Unconventional structure to play with</p>
+<p>New ideas, no jargon yet, just crackpot names</p>
+<ul>
+<li>limit weight ranges (e.g. -1 to 1, 0 to 1, etc)</li>
+<li>weight &quot;snap to grid&quot; (snap learning)</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Joke: &quot;What's the difference between a scientist and a crackpot?&quot;</p>
+</section>
+<section class="slide level2">
+
+<p>Ans: &quot;P-value&quot;</p>
+<ul>
+<li>High-<strong>P</strong>robability null hypothesis</li>
+<li>Not <strong>P</strong>ublished</li>
+<li>Not <strong>P</strong>eer-reviewed</li>
+<li>No <strong>P</strong>yPi <strong>p</strong>ackage</li>
+</ul>
+<p>I'm a crackpot!</p>
+</section>
+<section class="slide level2">
+
+<p>Resources</p>
+<ul>
+<li><a href="http://keras.io/">keras.io</a>: Scalable Python NNs</li>
+<li><a href="http://hagan.okstate.edu/NNDesign.pdf">Neural Network Design</a>: Free NN Textbook!</li>
+<li><a href="https://github.com/hobson/pug-ann">pug-ann</a>: Helpers for PyBrain and Wunderground</li>
+<li><a href="https://github.com/pybrain2/pybrain2">PyBrain2</a>: We're working on it</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p>Code highlighting test</p>
+<p>{% highlight javascript %} function linkify( selector ) { if( supports3DTransforms ) {</p>
+<pre><code>var nodes = document.querySelectorAll( selector );
+
+for( var i = 0, len = nodes.length; i &amp;lt; len; i++ ) {
+  var node = nodes[i];
+
+  if( !node.className ) {
+    node.className += &#39; roll&#39;;
+  }
+}</code></pre>
+<p>} } {% endhighlight %}</p>
+</section>
+    </div>
+  </div>
+
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.min.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        theme: 'moon', // available themes are in /css/theme
+        transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: 'reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: 'reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>
