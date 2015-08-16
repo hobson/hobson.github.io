@@ -7,8 +7,6 @@ title: Neural Nets Demystified
 
 See the [reveal.js slides](http://hobsonlane.com/talks/Neural-Nets-Demystified.html) for the latest
 
----
-
 ## [Intro](http://hobsonlane.com/talks/Neural-Nets-Demystified.html)
 
 1. Demystify
@@ -22,6 +20,65 @@ See the [reveal.js slides](http://hobsonlane.com/talks/Neural-Nets-Demystified.h
     <p>["Neural Nets Demystified."](/Data-Science-Meetup--Neural-Nets-Demystified/)<p>
   </aside>
 </div>
+
+---
+
+## Brain Research
+
+We've accurately simulated a [whole brain](http://openbrain.org)
+
+...of a nematode worm
+~300 neurons
+~200 in central nervous system
+
+---
+
+## McCulloch Pitts Neuron"
+
+Modeled after biological neurons.
+Can be combined to perform any logical or mathematical operation.
+
+Binary output: (**0** or 1)
+Any Number of **binary** inputs
+Inhibitory input with "veto" power
+
+---
+
+## Rosenblatt's Perceptron
+
+Designed to be "trainable"
+Rosenblatt provided a training algorithm
+
+Binary output: -1 or +1
+Any number of real inputs
+Threshold = 0
+Weights and inputs can be real-valued
+
+---
+
+## Modern Neurons
+
+---
+
+## Home Turf
+
+Neural Nets were "made" for
+
+- Hyperdimensionality
+  - Images (object recognition)
+  - Sound (speech recognition)
+  - Time series (weather prediction)
+- Simplifying "features" unknown
+  - FFT, DCT, Waveletts, PCA, RFE not working
+- "Physics" model expensive noninvertable
+  - Can't raytrace flat image to determine object from image
+  - Multiple camera angles reduces advantage of NN
+- Structured noise
+  - occlusion in images/sound
+  - rotation/translation/warping of images/sound
+- Lots of examples/data to learn from
+- CPU/GPU cycles to burn
+  - Google speech recognition doesn't run on your phone...yet
 
 ---
 
