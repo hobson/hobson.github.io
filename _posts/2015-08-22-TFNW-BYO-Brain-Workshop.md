@@ -1,16 +1,23 @@
 ---
 layout: post
-title: Neural Nets Demystified
+title: TFNW Workshop -- BYOB
+lang: en
+revealjs-url: ''  # for absolute path to lib/ and css/ folders use '/'
+transition: fade  # none/fade/slide/convex/concave/zoom
+center: false
 ---
 
-## [Neural Nets Demystified](http://hobsonlane.com/talks/Neural-Nets-Demystified.html)
+## [BYOB](http://hobsonlane.com/talks/Neural-Nets-Demystified.html) (**B**rain not **B**eer)
 
-See the [reveal.js slides](http://hobsonlane.com/talks/Neural-Nets-Demystified.html) for the latest
+See the [reveal.js slides](http://hobsonlane.com/talks/TFNW-BYO-Brain.html) for the latest
+
+---
 
 ## [Intro](http://hobsonlane.com/talks/Neural-Nets-Demystified.html)
 
-1. Demystify
-2. Dig Deeper
+> 1. Neurons
+> 2. Layers
+> 3. Code
 
 <div>
   <aside class="notes">
@@ -23,13 +30,49 @@ See the [reveal.js slides](http://hobsonlane.com/talks/Neural-Nets-Demystified.h
 
 ---
 
+# Neurons
+
+---
+
 ## Brain Research
 
-We've accurately simulated a [whole brain](http://openbrain.org)
+Neuroscientists simulated a [whole brain](http://openbrain.org)
 
-...of a nematode worm
+. . .
+
+... of a nematode worm
+
 ~300 neurons
 ~200 in central nervous system
+
+---
+
+## Animal Intelligence
+
+Artificial brains aren't at all like human brains,
+
+. . .
+
+or even a worm brain
+
+Neuron simulations are broad abstractions/simplifications
+    - pulses in time not modeled
+    - chemistry
+    - neuron internal feedback loops
+
+---
+
+## Math
+
+- You don't need to know Linear Algebra, just...
+    - multiply
+    - add
+    - check thresholds
+- Equation/code is short (in python)
+- 100s of neurons
+    - Not billions
+- Train for minutes
+    - Not decades
 
 ---
 
@@ -38,7 +81,7 @@ We've accurately simulated a [whole brain](http://openbrain.org)
 Modeled after biological neurons.
 Can be combined to perform any logical or mathematical operation.
 
-Binary output: (**0** or 1)
+Binary output: 0 or +1
 Any Number of **binary** inputs
 Inhibitory input with "veto" power
 
@@ -49,36 +92,101 @@ Inhibitory input with "veto" power
 Designed to be "trainable"
 Rosenblatt provided a training algorithm
 
-Binary output: -1 or +1
+Binary output: **-1** or +1
 Any number of real inputs
 Threshold = 0
 Weights and inputs can be real-valued
 
 ---
 
-## Modern Neurons
+## Modern Neuron
+
+## Activation functions
+
+- sigmoid
+- saturation
+- threshold
+- linear
+- sync
+- tanh
+
 
 ---
 
-## Home Turf
+## Modern
 
-Neural Nets were "made" for
+## Layers
 
-- Hyperdimensionality
-  - Images (object recognition)
-  - Sound (speech recognition)
-  - Time series (weather prediction)
-- Simplifying "features" unknown
-  - FFT, DCT, Waveletts, PCA, RFE not working
-- "Physics" model expensive noninvertable
-  - Can't raytrace flat image to determine object from image
-  - Multiple camera angles reduces advantage of NN
-- Structured noise
-  - occlusion in images/sound
-  - rotation/translation/warping of images/sound
-- Lots of examples/data to learn from
+- Many layers (6+ for)
+- Many neurons/layer
+- Sophisticated Connection Architectures
+    - fully-connected
+    - convolutional
+    - recursive
+    - sparse
+    - random
+    - scale-free
+
+---
+
+## Neural Nets were "made" for ...
+
+## Hyperdimensionality
+
+- Images (object recognition)
+- Sound (speech recognition)
+- Time series (weather prediction)
+
+## Neural Nets help when ...
+
+---
+
+## Conventional feature generators fail
+
+- FFT
+- DCT
+- Waveletts
+- PCA/SVD
+- RFE
+- Statistics (mean, std, diff, polynomial)
+- LPF/BPF/HPF
+- Resampling/Interpolation/Extrapolation
+
+---
+
+## Neural Nets can help invert "Physics" models
+
+- Infer reflectance despite shaddow/glare/haze
+- 2-D image -> 3-D object
+- When direct measurement of 3-D not possible
+    - stereoscopic vision
+    - structured light
+    - lidar
+    - radar
+    - sonar
+    - Kinect or RealSense
+
+---
+
+## Neural Nets can "see" through structure noise
+
+Both images and sound often suffer from
+
+- occlusion
+- obsucration/haze/fog/fade
+- rotation/translation/warping
+
+---
+
+## Neural Nets need data and power
+
+- Lots of examples to learn from
 - CPU/GPU cycles to burn
-  - Google speech recognition doesn't run on your phone...yet
+    - Google speech recognition doesn't run on your phone...yet
+
+---
+
+# Layers
 
 ---
 
@@ -160,7 +268,7 @@ Curved, smooth like the letter "C"
 
 ## What Greek letter do you think of when I say "Sigma"?
 
-### "Σ"
+## "Σ"
 
 What Roman (English) character?
 
@@ -202,6 +310,11 @@ And there may be nonlinear interactions between the weights (multiply layers)
 
 So set the learning rate (\alpha) to somthething less than 1
 the portion of the predicted nudge you want to "dial back" to
+
+
+---
+
+# Code
 
 ---
 
