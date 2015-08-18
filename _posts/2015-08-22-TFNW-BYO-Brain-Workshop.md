@@ -80,29 +80,6 @@ Neuroscientists simulated a [whole brain](http://openbrain.org)
 
 ---
 
-## Priorities Matter
-
-- Neanderthals' big eyes likely drove them to extinction[^2]
-- Too much brainpower on high-res visual processing
-- Less imagination
-- Less brain horsepower for being social
-
-![Neanderthals' large eyes may have hurt their chances](image/BYOB-Kermanshah_Pal_Museum-Neanderthal.jpg)
-
-[^2]: http://www.bbc.com/news/science-environment-21759233
-
----
-
-## Lesson: Depth Wins
-
-A deeper brain may be better
-
-than
-
-High resolution sensing
-
----
-
 ## Animal Intelligence
 
 Artificial brains aren't at all like human brains,
@@ -163,6 +140,18 @@ Weights and inputs can be real-valued
 
 ---
 
+## Let's Build One
+
+<script src="https://gist.github.com/hobson/910f915910147d1ba9c0.js"></script>
+
+---
+
+## [iPython Notebook](https://github.com/totalgood/talks/blob/master/notebooks/BYOB-Learn-to-be-Logical.ipynb)
+
+![Learned Logic](https://totalgood.github.io/talks/notebooks/BYOB-Learn-to-be-Logical.ipynb)
+
+---
+
 ## Modern Neurons
 
 ---
@@ -176,6 +165,28 @@ Weights and inputs can be real-valued
 - sync
 - tanh
 
+---
+
+## Priorities Matter
+
+- Neanderthals' big eyes likely drove them to extinction[^2]
+- Too much brainpower on high-res visual processing
+- Less imagination
+- Less brain horsepower for being social
+
+![Neanderthals' large eyes may have hurt their chances](image/BYOB-Kermanshah_Pal_Museum-Neanderthal.jpg)
+
+[^2]: http://www.bbc.com/news/science-environment-21759233
+
+---
+
+## Lesson: Depth Wins
+
+A deeper brain may be better
+
+than
+
+High resolution sensing
 
 ---
 
