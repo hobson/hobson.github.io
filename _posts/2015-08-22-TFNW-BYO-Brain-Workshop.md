@@ -1,6 +1,6 @@
 ---
 layout: post
-title: TFNW Workshop -- BYOB
+title: TFNW BYO Brains Workshop
 lang: en
 revealjs-url: ''  # for absolute path to lib/ and css/ folders use '/'
 transition: fade  # none/fade/slide/convex/concave/zoom
@@ -15,7 +15,7 @@ See the [reveal.js slides](http://totalgood.github.io/talks/2015-08-22-TFNW-BYO-
 
 ---
 
-## This workshop developed for [Total Good](http://totalgood.com)
+## Workshop developed for<br>[Total Good](http://totalgood.com)
 
 by
 
@@ -109,7 +109,7 @@ Neuron simulations are broad abstractions
 
 ---
 
-## McCulloch Pitts Neuron"
+## McCulloch Pitts Neuron (MCP)
 
 Modeled after biological neurons.
 Can be combined to perform any logical or mathematical operation.
@@ -132,7 +132,9 @@ Weights and inputs can be real-valued
 
 ---
 
-## Modern Neuron
+## Modern Neurons
+
+---
 
 ## Activation functions
 
@@ -145,8 +147,6 @@ Weights and inputs can be real-valued
 
 
 ---
-
-## Modern
 
 ## Layers
 
@@ -162,9 +162,7 @@ Weights and inputs can be real-valued
 
 ---
 
-## Neural Nets were "made" for ...
-
-## Hyperdimensionality
+## Neural Nets were "made" for ...<br>Hyperdimensionality
 
 - Images (object recognition)
 - Sound (speech recognition)
@@ -195,7 +193,7 @@ except for images
 
 ---
 
-## You don't know what to look for (feature engineering)
+## You don't know what to look for<br>(feature engineering)
 
 - FFT
 - DCT
@@ -205,8 +203,6 @@ except for images
 - Statistics (mean, std, diff, polynomial)
 - LPF/BPF/HPF
 - Resampling/Interpolation/Extrapolation
-
-all fail
 
 ---
 
