@@ -68,19 +68,19 @@ Neuroscientists simulated a [whole brain](http://openbrain.org)
 
 ---
 
-![C Elegans<br>Most photographed organism of all time?](images/BYOB-CelegansGoldsteinLabUNC.jpg)
+![C Elegans<br>Most photographed organism of all time?](/images/BYOB-CelegansGoldsteinLabUNC.jpg)
 
 ---
 
-![C Elegans' brain is shaped like a donut or our pharynx](images/BYOB-C_elegans_male.svg)
+![C Elegans' brain is shaped like a donut or our pharynx](/images/BYOB-C_elegans_male.svg)
 
 ---
 
-![Typical animal neuron](images/BYOB-biology-gray.png)
+![Typical animal neuron](/images/BYOB-biology-gray.png)
 
 ---
 
-![Math mirrors life](images/BYOB-biology-and-math.png)
+![Math mirrors life](/images/BYOB-biology-and-math.png)
 
 ---
 
@@ -178,7 +178,7 @@ Weights and inputs can be real-valued
 - Less imagination
 - Less brain horsepower for being social
 
-![Neanderthals' large eyes may have hurt their chances](images/BYOB-Kermanshah_Pal_Museum-Neanderthal.jpg)
+![Neanderthals' large eyes may have hurt their chances](/images/BYOB-Kermanshah_Pal_Museum-Neanderthal.jpg)
 
 [^2]: http://www.bbc.com/news/science-environment-21759233
 
