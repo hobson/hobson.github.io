@@ -31,17 +31,17 @@ by
 
 ## [Intro](http://hobsonlane.com/talks/Neural-Nets-Demystified.html)
 
-> 1. Neurons
+> 1. Neuron
 > 2. Layers
 > 3. Code
 
 <div>
-  <aside class="notes">
-      <p>First I’ll show you a simple example (predicting Portland Weather).</p>
-      <p>Then I’ll show you how to play around at the frontier of the state of the art</p>
-    <p>Thoughts about the upcoming [PDX Data Science Meetup](http://www.meetup.com/Portland-Data-Science-Group/events/222322211/)<p>
-    <p>["Neural Nets Demystified."](/Data-Science-Meetup--Neural-Nets-Demystified/)<p>
-  </aside>
+<aside class="notes">
+    <p>We'll start with a single neuron cell, just like biology.</p>
+    <p>We'll talk about the invention of artificial neurons (perceptrons) and how they can be be combined to produce interesting "brains."</p>
+    <p>Then we'll add a second neuron and talk about how that evolution cost a decade of thinking before scientists figured out what to do with additional neuron "layers."
+    <p>Then I'll show you how to leverage others' code to build a real brain</p>
+</aside>
 </div>
 
 ---
