@@ -7,9 +7,25 @@ transition: fade  # none/fade/slide/convex/concave/zoom
 center: false
 ---
 
-## [BYOB](http://hobsonlane.com/talks/Neural-Nets-Demystified.html) (**B**rain not **B**eer)
+## [BYOB](http://totalgood.github.io/talks/2015-08-22-TFNW-BYO-Brain-Workshop)
 
-See the [reveal.js slides](http://hobsonlane.com/talks/TFNW-BYO-Brain.html) for the latest
+**B**rains not **B**eer
+
+See the [reveal.js slides](http://totalgood.github.io/talks/2015-08-22-TFNW-BYO-Brain-Workshop) for the latest
+
+---
+
+## This workshop developed for [Total Good](http://totalgood.com)
+
+by
+
+[Hobson](mailto:hobs@totalgood.com?Subject=BYO%20Brain%20Workshop)
+
+[Chick](mailto:chick@thewells.org?Subject=BYO%20Brain%20Slides)
+
+[Thunder](mailto:melange.au.bleu@gmail.com?Subject=BYO%20Brain%20Hyperopt%20Talk)
+
+[Zeke](mailto:me@ze6ke.com?Subject=BYO%20Brain%20Workshop)
 
 ---
 
@@ -40,10 +56,19 @@ Neuroscientists simulated a [whole brain](http://openbrain.org)
 
 . . .
 
-... of a nematode worm
+... of a nematode worm (C Elegans)
 
 ~300 neurons
+
 ~200 in central nervous system
+
+---
+
+![C Elegans<br>Most photographed organism of all time?](image/BYOB-CelegansGoldsteinLabUNC.jpg)
+
+---
+
+![C Elegans' brain is shaped like a donut or our pharynx](image/BYOB-C_elegans_male.svg)
 
 ---
 
@@ -55,10 +80,18 @@ Artificial brains aren't at all like human brains,
 
 or even a worm brain
 
-Neuron simulations are broad abstractions/simplifications
+Neuron simulations are broad abstractions
     - pulses in time not modeled
     - chemistry
     - neuron internal feedback loops
+
+---
+
+## Getting abstractions right reveals the truth
+
+* In the 18th century, the planets and stars were nested spheres
+* Copernicus revealed put the Earth at the center
+* Now we can forecast the position of satellites and planets to centimeters
 
 ---
 
@@ -135,28 +168,64 @@ Weights and inputs can be real-valued
 
 - Images (object recognition)
 - Sound (speech recognition)
-- Time series (weather prediction)
+- Time series (weather, finance, election prediction)
+
+---
+
+## Pattern Recognition
+
+> - Prediction
+> - Segmentation (sound, image)
+> - Feature detection
+> - Fraud detection
+> - Intrusion detection
+> - Game cheating detection
+. . .
+
+But often they can produce useful features
+that seemingly don't make sense
+
+. . .
+
+except for images
+
+---
 
 ## Neural Nets help when ...
 
 ---
 
-## Conventional feature generators fail
+## You don't know what to look for (feature engineering)
 
 - FFT
 - DCT
-- Waveletts
+- Wavelets
 - PCA/SVD
-- RFE
+- RF
 - Statistics (mean, std, diff, polynomial)
 - LPF/BPF/HPF
 - Resampling/Interpolation/Extrapolation
+
+all fail
+
+---
+
+## And when ...
+
+---
+
+## Conventional control laws fail
+
+- shooting a basketball
+- kicking a soccer ball
+- stabilizing an inverted pendulum
+- helicopter stunts
 
 ---
 
 ## Neural Nets can help invert "Physics" models
 
-- Infer reflectance despite shaddow/glare/haze
+- Infer reflectance despite shadow/glare/haze
 - 2-D image -> 3-D object
 - When direct measurement of 3-D not possible
     - stereoscopic vision
@@ -287,12 +356,17 @@ You didn't know this was a Latin/Greek class, did you...
 ς (last letter in word)
 c (alternatively)
 
-Most English speakers think of an "S" when they hear "Sigma" you think of an S.
+---
+
+Most English speakers think of an "S"
+
+when they hear "Sigma".
+
 So the meaning has evolved to mean S-shaped.
 
 ---
 
-That's what we want, something smooth, shaped like an "S"
+## Shaped like an "S"
 
 The trainer (*(backpropagator)[https://en.wikipedia.org/wiki/Backpropagation]*) can predict the change in `weights` required
 Wants to nudge the `output` closer to the `target`
@@ -311,7 +385,6 @@ And there may be nonlinear interactions between the weights (multiply layers)
 So set the learning rate (\alpha) to somthething less than 1
 the portion of the predicted nudge you want to "dial back" to
 
-
 ---
 
 # Code
@@ -325,14 +398,14 @@ the portion of the predicted nudge you want to "dial back" to
 
 ---
 
-Get historical weather for Portland then ...
+## Get historical weather for Portland then ...
 
 1. Backpropagate: train a perceptron
 2. Activate: predict the weather for tomorrow!
 
 ---
 
-NN Advantages
+## NN Advantages
 
 * Easy
     * No math!
@@ -345,10 +418,17 @@ NN Advantages
 
 ---
 
-Disadvantage #1: Slow training
+## Disadvantage #1: Slow to Learn
+
+* cubic to learn
+    + quadratic to activate
+
+---
+
+## Example
 
 * 24+ hr for complex Kaggle example on laptop
-* 90x30x20x10 model degrees freedom
+* 90x30x20x10 ~= 1M DOF
     + 90 input dimensions (regressors)
     + 30 nodes for *hidden layer* 1
     + 20 nodes for *hidden layer* 2
@@ -356,7 +436,7 @@ Disadvantage #1: Slow training
 
 ---
 
-Disadvantage #2: They don't scale (unparallelizable)
+## Disadvantage #2: They don't often scale (difficult to parallelize)
 
 * Fully-connected NNs can't be *easily* hyper-parallelized (GPU)
     * Large matrix multiplications
@@ -364,7 +444,7 @@ Disadvantage #2: They don't scale (unparallelizable)
 
 ---
 
-Scaling Workaround
+## Scaling Workaround
 
 At Kaggle workshop we discussed paralleling linear algebra
 
@@ -374,7 +454,7 @@ At Kaggle workshop we discussed paralleling linear algebra
 
 ---
 
-Scaling Workaround Limitations
+## Scaling Workaround Limitations
 
 But tiles must be shared/consolidated and theirs redundancy
 
@@ -385,23 +465,25 @@ But tiles must be shared/consolidated and theirs redundancy
 
 ---
 
-Disadvantage #3: They overfit
+## Disadvantage #3: They overfit
 
 * Too manu nodes = overfitting
 
 ---
 
-What is the big O?
+## What is the big O?
 
 * Degrees of freedom grow with number of nodes & layers
 * Each layer's nodes connected to each previous layer's
 * That a lot of wasted "freedom"
+* Many weights are randomly zeroed/ignored (Random Dropout)
 
-## O(N^2)
+## O(N^2) to activate
+## O(N^3) to learn
 
 ---
 
-Not so fast, big O...
+## Not so fast, big O...
 
 {% highlight python %}
 >>> np.prod([30, 20, 10])
@@ -427,7 +509,7 @@ M: number of layers
 `assert(M * N**2 < len(training_set) / 10.)`
 
 I'm serious... put this into your code.
-I wasted a lot of time training models for Kaggle that overfitted.
+I wasted a lot of time training models for Kaggle that was overfit.
 
 ---
 
