@@ -72,6 +72,37 @@ Neuroscientists simulated a [whole brain](http://openbrain.org)
 
 ---
 
+![Typical animal neuron](image/BYOB-biology-gray.png)
+
+---
+
+![Math mirrors life](image/BYOB-biology-and-math.png)
+
+---
+
+## Priorities Matter
+
+- Neanderthals' big eyes likely drove them to extinction[^2]
+- Too much brainpower on high-res visual processing
+- Less imagination
+- Less brain horsepower for being social
+
+![Neanderthals' large eyes may have hurt their chances](image/BYOB-Kermanshah_Pal_Museum-Neanderthal.jpg)
+
+[^2]: http://www.bbc.com/news/science-environment-21759233
+
+---
+
+## Lesson: Depth Wins
+
+A deeper brain may be better
+
+than
+
+High resolution sensing
+
+---
+
 ## Animal Intelligence
 
 Artificial brains aren't at all like human brains,
@@ -233,7 +264,7 @@ except for images
 
 ---
 
-## Neural Nets can "see" through structure noise
+## NNs "see" through structured noise
 
 Both images and sound often suffer from
 
@@ -243,7 +274,7 @@ Both images and sound often suffer from
 
 ---
 
-## Neural Nets need data and power
+## NNs need data and power
 
 - Lots of examples to learn from
 - CPU/GPU cycles to burn
@@ -394,6 +425,23 @@ the portion of the predicted nudge you want to "dial back" to
 
 ---
 
+## Visualizing a Brain[^3]
+
+- watch the weights evolve
+- activate with examples and watch intermediate layers
+
+[^3]: http://cs231n.github.io/understanding-cnn/
+
+---
+
+![Output column heatmap]BYOB-W_output_column.png)
+
+---
+
+![Input row heatmap]BYOB-W_output_column.png)
+
+---
+
 ## Get historical weather for Portland then ...
 
 1. Backpropagate: train a perceptron
@@ -491,7 +539,7 @@ But tiles must be shared/consolidated and theirs redundancy
 
 ---
 
-Rule of thumb
+## Rule of thumb
 
 NOT `N**2`
 
@@ -501,6 +549,8 @@ N: number of nodes
 M: number of layers
 
 ---
+
+## Automated Architecture Limits
 
 `assert(M * N**2 < len(training_set) / 10.)`
 
