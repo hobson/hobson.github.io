@@ -150,9 +150,9 @@ Weights and inputs can be real-valued
 
 ---
 
-## [iPython Notebook](https://github.com/totalgood/talks/blob/master/notebooks/BYOB-Learn-to-be-Logical.ipynb)
+## [iPython Notebook](https://github.com/totalgood/talks/blob/master/notebooks/1948-BYOB-Learn-to-be-Logical.ipynb)
 
-![Learned Logic](https://totalgood.github.io/talks/notebooks/BYOB-Learn-to-be-Logical.ipynb)
+![Learned Logic](https://totalgood.github.io/talks/notebooks/1948-BYOB-Learn-to-be-Logical.ipynb)
 
 ---
 
