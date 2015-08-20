@@ -174,9 +174,9 @@ Weights and inputs can be real-valued
 ## Priorities Matter
 
 - Neanderthals' big eyes likely drove them to extinction[^2]
-- Too much brainpower on high-res visual processing
-- Less imagination
-- Less brain horsepower for being social
+- Too much of a good thing
+    - Less room for imagination
+    - Less neurons for social interaction
 
 ![Neanderthals' large eyes may have hurt their chances](/images/BYOB-Kermanshah_Pal_Museum-Neanderthal.jpg)
 
