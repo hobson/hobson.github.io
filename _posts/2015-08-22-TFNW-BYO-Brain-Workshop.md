@@ -11,29 +11,22 @@ center: false
 
 **B**rains not **B**eer
 
-See the [reveal.js slides](http://totalgood.github.io/talks/2015-08-22-TFNW-BYO-Brain-Workshop) for the latest
+---
+
+## Contributors to [Total Good](http://totalgood.com)
+
+* [Hobson](mailto:hobs@totalgood.com?Subject=BYO%20Brain%20Workshop)
+* [Chick](mailto:chick@thewells.org?Subject=BYO%20Brain%20Slides)
+* [Thunder](mailto:melange.au.bleu@gmail.com?Subject=BYO%20Brain%20Hyperopt%20Talk)
+* [Zeke](mailto:me@ze6ke.com?Subject=BYO%20Brain%20Workshop)
 
 ---
 
-## Workshop developed for<br>[Total Good](http://totalgood.com)
-
-by
-
-[Hobson](mailto:hobs@totalgood.com?Subject=BYO%20Brain%20Workshop)
-
-[Chick](mailto:chick@thewells.org?Subject=BYO%20Brain%20Slides)
-
-[Thunder](mailto:melange.au.bleu@gmail.com?Subject=BYO%20Brain%20Hyperopt%20Talk)
-
-[Zeke](mailto:me@ze6ke.com?Subject=BYO%20Brain%20Workshop)
-
----
-
-## [Intro](http://hobsonlane.com/talks/Neural-Nets-Demystified.html)
-
-> 1. Neuron
-> 2. Layers
-> 3. Code
+> * 1943 MCP neuron (binary logic)
+> * 1948 Hebbian Learning
+> * 1958 Resenblatt Perceptron
+> * 1964 Kernel Perceptron
+> * 1969 XOR fail
 
 <div>
   <aside class="notes">
@@ -50,7 +43,13 @@ by
 
 ---
 
-# Neurons
+> * 1980 Lisa
+> * multilayer FFNN
+> * 1990 robotics and games
+> * 2000 sports (basketball)
+> * 2010? Deep learning
+> * 2012? convolutional
+> * 2013 hyperopt
 
 ---
 
@@ -150,9 +149,9 @@ Weights and inputs can be real-valued
 
 ---
 
-## [iPython Notebook](https://github.com/totalgood/talks/blob/master/notebooks/1948-BYOB-Learn-to-be-Logical.ipynb)
+## [iPython Notebook](https://github.com/totalgood/talks/blob/master/notebooks/BYOB-1948-Learn-to-be-Logical.ipynb)
 
-![Learned Logic](https://totalgood.github.io/talks/notebooks/1948-BYOB-Learn-to-be-Logical.ipynb)
+![Learned Logic](https://totalgood.github.io/talks/notebooks/BYOB-1948-Learn-to-be-Logical.ipynb)
 
 ---
 
