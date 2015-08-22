@@ -3,6 +3,7 @@ layout: post
 title: TFNW BYO Brains Workshop
 lang: en
 revealjs-url: ''  # for absolute path to lib/ and css/ folders use '/'
+theme: black
 transition: fade  # none/fade/slide/convex/concave/zoom
 center: false
 ---
