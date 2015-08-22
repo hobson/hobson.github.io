@@ -28,6 +28,38 @@ center: false
 
 ---
 
+## Topics
+
+| BC              | AD           |
+| ----------------|:------------:|
+| Turing Computer | Layers
+| Logic Gate | Biology |
+| Neuron | Images |
+| Learning | Time Series |
+| Automata |  |
+| XOR Fail |  |
+
+<div><asside class="notes">
+  AI: "Artificial" intelligence -> "machine" intelligence
+  Think of "artificial" as "pretend".
+  or model.
+  Like the model you have for how society works.
+  If you are nice people will be nice to you.
+  If you work hard, you'll get paid by your boss.
+</asside></div>
+
+---
+
+## Advanced Topics
+
+- Feedback/Recursion
+- Optimization
+- Reinforcement
+- Dropout
+- Hyperopt
+
+---
+
 # History
 
 ---
