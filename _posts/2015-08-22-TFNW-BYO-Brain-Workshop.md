@@ -31,8 +31,9 @@ center: false
 
 ## Topics
 
-| BC              | AD           |
-| ----------------|:------------:|
+| **BC** | **AD** |
+| **B**efore P**C**s | **A**fter **D**igital |
+| :---------------| :-------------|
 | Turing Computer | Layers
 | Logic Gate | Biology |
 | Neuron | Images |
@@ -41,12 +42,12 @@ center: false
 | XOR Fail |  |
 
 <div><asside class="notes">
-  AI: "Artificial" intelligence -> "machine" intelligence
-  Think of "artificial" as "pretend".
-  or model.
-  Like the model you have for how society works.
-  If you are nice people will be nice to you.
-  If you work hard, you'll get paid by your boss.
+  AI: "Artificial" intelligence -> "machine" intelligence<br>
+  Think of "artificial" as "pretend".<br>
+  or model.<br>
+  Like the model you have for how society works.<br>
+  If you are nice people will be nice to you.<br>
+  If you work hard, you'll get paid by your boss.<br>
 </asside></div>
 
 ---
@@ -202,6 +203,10 @@ In a computer.
 
 ---
 
+# Logic
+
+---
+
 ## McCulloch Pitts Neuron (MCP)
 
 Modeled after biological neurons.
@@ -210,6 +215,33 @@ Can be combined to perform any logical or mathematical operation.
 Binary output: 0 or +1
 Any Number of **binary** inputs
 Inhibitory input with "veto" power
+
+---
+
+## Let's Simulate
+
+* raise your hand if:
+    * either of your neighbors raises her hand
+* put your hand down:
+    * either if both of your neighbors are same "state"
+
+---
+
+## XOR
+
+![Cellular Automata, Wolfram Rule 82 = XOR](/images/BYOB-WolframRule82.png)
+
+---
+
+## Complexity
+
+![Cellular Automata, Wolfram Rule 110 = Complex](/images/BYOB-File-CA_rule110_x3200_y3200_single.png)
+
+---
+
+## Game of Life
+
+![Game of Life gliders](/images/BYOB-File-Gospers_glider_gun.gif)
 
 ---
 
@@ -436,17 +468,19 @@ else:
 ---
 
 <section class="right-align-all lightest-body-text" data-background="images/neural-nets-demystified.png">
-
   <h2 id="perceptron">Perceptron</h2><br><br><br><br><br><br><br><br><br><br><br><br>
+</section>
 
-</section><section class="right-align-all lightest-body-text" data-background="images/regression.png">
+---
 
+<section class="right-align-all lightest-body-text" data-background="images/regression.png">
   <h2 id="regression">Linear</h2><br><br><br><br><br><br><br><br><br><br><br><br>
+</section>
 
-</section><section class="right-align-all lightest-body-text" data-background="images/time-series.png">
+---
 
+<section class="right-align-all lightest-body-text" data-background="images/time-series.png">
   <h2 id="regression">Time Series</h2><br><br><br><br><br><br><br><br><br><br><br><br>
-
 </section>
 
 ---
