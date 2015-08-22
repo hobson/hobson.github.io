@@ -62,8 +62,6 @@ center: false
 
 # History
 
----
-
 ## AI Dies
 
 > * 1943 MCP neuron (binary logic)
@@ -99,13 +97,7 @@ center: false
 
 ---
 
----
-
 # Biological Brains
-
----
-
-## Brain Research
 
 Neuroscientists simulated a [whole brain](http://openbrain.org)
 
@@ -440,7 +432,21 @@ else:
 
 ## Perceptron
 
-(Diagram of a perceptron)
+---
+
+<section class="right-align-all lightest-body-text" data-background="images/neural-nets-demystified.png">
+
+  <h2 id="perceptron">Perceptron</h2><br><br><br><br><br><br><br><br><br><br><br><br>
+
+</section><section class="right-align-all lightest-body-text" data-background="images/regression.png">
+
+  <h2 id="regression">Linear</h2><br><br><br><br><br><br><br><br><br><br><br><br>
+
+</section><section class="right-align-all lightest-body-text" data-background="images/time-series.png">
+
+  <h2 id="regression">Time Series</h2><br><br><br><br><br><br><br><br><br><br><br><br>
+
+</section>
 
 ---
 
