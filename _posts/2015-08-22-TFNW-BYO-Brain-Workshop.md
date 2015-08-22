@@ -168,7 +168,6 @@ In a computer.
 
 ---
 
-
 ![C Elegans' brain is shaped like a donut or our pharynx](/images/BYOB-C_elegans_male.svg)
 
 
@@ -177,11 +176,16 @@ In a computer.
   And it won't act in the physical world (except the light emitted from)<br>
   It can't even slither through the dirt like this nematode worm<br>
 </asside></div>
+
 ---
+
+## Neuron
 
 ![Typical animal neuron](/images/BYOB-biology-gray.png)
 
 ---
+
+## "Pretend" Neuron
 
 ![Math mirrors life](/images/BYOB-biology-and-math.png)
 
