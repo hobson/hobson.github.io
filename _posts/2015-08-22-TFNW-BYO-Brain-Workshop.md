@@ -31,7 +31,6 @@ center: false
 
 ## Topics
 
-| **BC** | **AD** |
 | **B**efore P**C**s | **A**fter **D**igital |
 | :---------------| :-------------|
 | Turing Computer | Layers
