@@ -8,24 +8,21 @@ transition: fade  # none/fade/slide/convex/concave/zoom
 center: false
 ---
 
----
-
-# Introduction
-
----
-
 ## [BYOB](http://totalgood.github.io/talks/2015-08-22-TFNW-BYO-Brain-Workshop)
 
 **B**rains not **B**eer
 
 ---
 
-## Contributors to [Total Good](http://totalgood.com)
+# Introduction
+
+## Contributors
 
 * [Hobson](mailto:hobs@totalgood.com?Subject=BYO%20Brain%20Workshop)
 * [Chick](mailto:chick@thewells.org?Subject=BYO%20Brain%20Slides)
 * [Thunder](mailto:melange.au.bleu@gmail.com?Subject=BYO%20Brain%20Hyperopt%20Talk)
 * [Zeke](mailto:me@ze6ke.com?Subject=BYO%20Brain%20Workshop)
+* [Total Good](//totalgood.com)
 
 ---
 
@@ -40,14 +37,17 @@ center: false
 | Automata |  |
 | XOR Fail |  |
 
-<div><asside class="notes">
-  AI: "Artificial" intelligence -> "machine" intelligence<br>
-  Think of "artificial" as "pretend".<br>
-  or model.<br>
-  Like the model you have for how society works.<br>
-  If you are nice people will be nice to you.<br>
-  If you work hard, you'll get paid by your boss.<br>
-</asside></div>
+
+<div>
+  <asside class="notes">
+    <p>AI: "Artificial" intelligence -> "machine" intelligence</p>
+    <p>Think of "artificial" as "pretend".</p>
+    <p>or model.</p>
+    <p>Like the model you have for how society works.</p>
+    <p>If you are nice people will be nice to you.</p>
+    <p>If you work hard, you'll get paid by your boss.</p>
+  </asside>
+</div>
 
 ---
 
@@ -131,12 +131,11 @@ Neuron simulations are broad abstractions
 
 <div><asside class="notes">
   The "artificial" in AI is being replaced by "Machine"<br>
-  Or you can think of artifical as "pretend".
-  Or a model.
+  Or you can think of artifical as "pretend".<br>
+  Or a model.<br>
   Like the model you have in your head for how the economy or the world works.<br>
-  If you are nice people will be nice to you.
-  If you work hard, you'll get paid by your boss.
-  <br>
+  If you are nice people will be nice to you.<br>
+  If you work hard, you'll get paid by your boss.<br>
 </asside></div>
 
 ---
@@ -285,14 +284,14 @@ Weights and inputs can be real-valued
 
 ## Priorities Matter
 
-- Neanderthals' big eyes likely drove them to extinction[^2]
+- Neanderthals' big eyes likely drove them to extinction[^*]
 - Too much of a good thing
     - Less room for imagination
     - Less neurons for social interaction
 
 ![Neanderthals' large eyes may have hurt their chances](/images/BYOB-Kermanshah_Pal_Museum-Neanderthal.jpg)
 
-[^2]: http://www.bbc.com/news/science-environment-21759233
+[^*]: http://www.bbc.com/news/science-environment-21759233
 
 ---
 
@@ -563,25 +562,27 @@ the portion of the predicted nudge you want to "dial back" to
 
 ## Example: Predict Rain in Portland
 
-* PyBrain
-* pug-ann (helper functions TBD PyBrain2)
+- [PyBrain2](//github.com/pybrain2/pybrain2)
+  - `pip install pybrain2`
+- [pug-ann](//github.com/totalgood/pug-ann)
+  - `pip install pug-ann`
 
 ---
 
-## Visualizing a Brain[^3]
+## Visualizing a Brain[^*]
 
 - watch the weights evolve
 - activate with examples and watch intermediate layers
 
-[^3]: http://cs231n.github.io/understanding-cnn/
+[^*]: http://cs231n.github.io/understanding-cnn/
 
 ---
 
-![Output column heatmap]BYOB-W_output_column.png)
+![Output column heatmap](BYOB-W_output_column.png)
 
 ---
 
-![Input row heatmap]BYOB-W_output_column.png)
+![Input row heatmap](BYOB-W_output_column.png)
 
 ---
 
