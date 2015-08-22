@@ -7,6 +7,12 @@ transition: fade  # none/fade/slide/convex/concave/zoom
 center: false
 ---
 
+---
+
+# Introduction
+
+---
+
 ## [BYOB](http://totalgood.github.io/talks/2015-08-22-TFNW-BYO-Brain-Workshop)
 
 **B**rains not **B**eer
@@ -21,6 +27,12 @@ center: false
 * [Zeke](mailto:me@ze6ke.com?Subject=BYO%20Brain%20Workshop)
 
 ---
+
+# History
+
+---
+
+## AI Dies
 
 > * 1943 MCP neuron (binary logic)
 > * 1948 Hebbian Learning
@@ -43,13 +55,21 @@ center: false
 
 ---
 
-> * 1980 Lisa
+## It's Alive!
+
+> * 1980 Lisa, Life
 > * multilayer FFNN
 > * 1990 robotics and games
 > * 2000 sports (basketball)
 > * 2010? Deep learning
 > * 2012? convolutional
 > * 2013 hyperopt
+
+---
+
+---
+
+# Biological Brains
 
 ---
 
@@ -71,19 +91,7 @@ Neuroscientists simulated a [whole brain](http://openbrain.org)
 
 ---
 
-![C Elegans' brain is shaped like a donut or our pharynx](/images/BYOB-C_elegans_male.svg)
-
----
-
-![Typical animal neuron](/images/BYOB-biology-gray.png)
-
----
-
-![Math mirrors life](/images/BYOB-biology-and-math.png)
-
----
-
-## Animal Intelligence
+## Pretend Brains
 
 Artificial brains aren't at all like human brains,
 
@@ -96,13 +104,62 @@ Neuron simulations are broad abstractions
     - chemistry
     - neuron internal feedback loops
 
+<div><asside class="notes">
+  The "artificial" in AI is being replaced by "Machine"<br>
+  Or you can think of artifical as "pretend".
+  Or a model.
+  Like the model you have in your head for how the economy or the world works.<br>
+  If you are nice people will be nice to you.
+  If you work hard, you'll get paid by your boss.
+  <br>
+</asside></div>
+
 ---
 
-## Getting abstractions right reveals the truth
+## Brain? Really?
 
-* In the 18th century, the planets and stars were nested spheres
-* Copernicus revealed put the Earth at the center
-* Now we can forecast the position of satellites and planets to centimeters
+No, not *really*.
+Just pretend.
+In a computer.
+
+
+<div><asside class="notes">
+  Zeke pointed out that we're not building a brain, but an approximate model of a brain, an abstraciton<br>
+  What you build today won't be able to have a conversation with you, but it might be able to tell you whether to bring your umbrella to work on Monday.<br>
+  And it won't act in the physical world (except the light emitted from your laptop LEDs)<br>
+</asside></div>
+
+---
+
+## Abstraction
+
+* 18th century: stars modeled as crystal spheres
+* Copernicus: Earth at the center
+
+<div><asside class="notes">
+  Too much complexity can hide the truth.<br>
+  In the middle ages they could predict the motions of the stars to a few degrees<br>
+  Now we can predict satellites, planets, stars to microradians (millimeters for satellites)
+</asside></div>
+
+---
+
+
+![C Elegans' brain is shaped like a donut or our pharynx](/images/BYOB-C_elegans_male.svg)
+
+
+<div><asside class="notes">
+  What you build today won't be able to have a conversation with you, but it might be able to tell you whether to bring your umbrella to work on Monday.<br>
+  And it won't act in the physical world (except the light emitted from)<br>
+  It can't even slither through the dirt like this nematode worm<br>
+</asside></div>
+---
+
+![Typical animal neuron](/images/BYOB-biology-gray.png)
+
+---
+
+![Math mirrors life](/images/BYOB-biology-and-math.png)
 
 ---
 
