@@ -255,7 +255,7 @@ Inhibitory input with "veto" power
 
 ## Complexity
 
-![Cellular Automata, Wolfram Rule 110 = Complex](/images/BYOB-File-CA_rule110_x3200_y3200_single.png)
+![Cellular Automata Wolfram Rule 110](/images/BYOB-File-CA_rule110_x3200_y3200_single.png)
 
 ---
 
