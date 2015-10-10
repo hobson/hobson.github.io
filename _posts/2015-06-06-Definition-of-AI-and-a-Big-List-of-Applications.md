@@ -1,3 +1,8 @@
+---
+layout: post
+title: AI Solves Problems for Which there are No Known Efficient Solutions
+---
+
 I'm not a huge fan of the "Daisy AI Podcast" but he often rattles off a lot of interesting information quickly, like in his [2013 podcast](https://daisypodcast.wordpress.com/2013/12/31/artificial-intelligence-introduction-podcast-1/).
 
 A definition he quoted (but I can't find the source) really struck home for me:
