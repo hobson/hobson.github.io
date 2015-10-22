@@ -9,6 +9,8 @@ A definition he quoted (but I can't find the source) really struck home for me:
 
   > Branch of Computer Sciences that solves problems for which there are no known efficient solutions but which we know are efficiently solvable because [something] with intelligence can solve them.
 
+Doing the impossible is always fun!
+
 I like this definition because it bypasses a lot of controversy about various tests for AI and debates regarding the nature of consciousness or sentience. And it makes the AI singularity a fuzzy boundary rather than a breakthrough occurring at a moment in time when we throw the switch on a particularly advanced computer system.
 
 If AI is just another Computer Science technique for solving problems, then measuring the ability of a computer system to mimic the behavior of something intelligent (usually a human) is not the best metric. A better metric might be the number and breadth of these problems a system can solve. And that seems to me to be more like what progress in Machine Intelligence looks like these days, an exponential growth in the types of problems computers can solve. AI is just an advanced form of Machine Learning. And contributing to this field only required developing algorithms to solve hard problems, which basically all developers do every day.
