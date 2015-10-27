@@ -10,7 +10,7 @@ center: false
 
 # [Hacking Oregon's Hidden Political Connections](http://totalgood.github.io/talks/2015-10-27-Hacking-Oregon-Hidden-Political-Connections.html)
 
-- iPython Notebooks: bit.ly/[totalgood](https://github.com/totalgood/hackor/tree/master/data/)
+- iPython Notebooks: [bit.ly/hackor-notebooks](https://github.com/totalgood/hackor/tree/master/)
 - by [Hobs](mailto:hobs@totalgood.com?Subject=Hack%20Oregon)
 
 
