@@ -2,10 +2,6 @@
 layout: post
 title: Hacking Oregon's Hidden Political Connections
 lang: en
-revealjs-url: ''  # for absolute path to lib/ and css/ folders use '/'
-theme: black
-transition: fade  # none/fade/slide/convex/concave/zoom
-center: false
 ---
 
 # [Hacking Oregon's Hidden Political Connections](http://totalgood.github.io/talks/2015-10-27-Hacking-Oregon-Hidden-Political-Connections.html)
