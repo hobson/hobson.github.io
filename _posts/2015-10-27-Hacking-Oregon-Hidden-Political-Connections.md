@@ -3,7 +3,7 @@ layout: post
 title: Hacking Oregon's Hidden Political Connections
 lang: en
 revealjs-url: ''  # for absolute path to lib/ and css/ folders use '/'
-theme: moon
+theme: black.css
 transition: fade  # none/fade/slide/convex/concave/zoom
 center: false
 ---
