@@ -66,7 +66,7 @@ TFIDF to detect similarity between records
 
 - cluster Oregon PACs by their "mission"
 - d3 force-directed graph of PAC similarity
-- compare to DAG of financial transactions
+- compare to DG of financial transactions
 
 ---
 
@@ -145,23 +145,26 @@ Vector distances
 
 ---
 
-cluster Oregon PACs by their "mission"
+# 5. Similarity Similarity
+
+Cluster Oregon PACs by their "mission"
+
 - d3 force-directed graph of PAC similarity
-- compare to DAG of financial transactions
+- compare to DG of financial transactions
 
 ---
 
 # Thank You!
 
-- [Thunder](mailto:melange.au.bleu@gmail.com?Subject=Hack%20Oregon)
-- [Hack Oregon](http://hackoregon.org)
+- [Thunder](http://github.com/ThunderShiviah)
+- [Grimm](https://github.com/TheGrimmScientist)
+- [Cat](https://github.com/catnik/) and [Hack Oregon](http://hackoregon.org)
     - Pizza, data, and a cause!
 - [Jeremey Tanner](http://jeremytanner.com/)
-    - Awesome [PyDx](pydx.org) talk on "Python for Evil"
-- [Grimm](mailto:allen@grimmscience.com?Subject=Hack%20Oregon)
+    - [PyDx](pydx.org) talk "Python for Evil"
 - [Total Good](http://totalgood.com)
     - Summer 2015 grant
-    - [RFP for Winter 2016](http://totalgood.com/blog/invitation-for-machine-intelligence-grant-proposals-winter-2016/)!
+    - [Open RFP](http://totalgood.com/blog/invitation-for-machine-intelligence-grant-proposals-winter-2016/)!
 
 ---
 
