@@ -10,23 +10,36 @@ center: false
 
 # [Hacking Oregon's Hidden Political Connections](http://totalgood.github.io/talks/2015-10-27-Hacking-Oregon-Hidden-Political-Connections.html)
 
-- iPython Notebooks: bit.ly/[totalgood](https://github.com/totalgood/talks/tree/master/notebooks)
+- iPython Notebooks: bit.ly/[totalgood](https://github.com/totalgood/hackor/tree/master/data/)
 - by [Hobs](mailto:hobs@totalgood.com?Subject=Hack%20Oregon)
+
+
+<sub><sup>v0.0.3</sup></sub>
 
 ---
 
-## Agenda
+# Agenda:
 
-1. Pandas as a relational DB
+For Hack Oregon we explored the data in unusual ways
+
+1. Pandas as a DB
+2. Find Connections (FKs, PKs, *other* DBs)
+3. TFIDF on a DB table
+4. TFIDF similarity
+5. Similarity Similarity
+
+# Intro: 1
+
+Pandas as a relational DB
 
 - Identify foreign keys automatically
 - Use FKs to do join SQL-like queries
 
 ---
 
-## Agenda
+# Intro: 2
 
-2. Intersect large sets
+Intersect large sets
 
 - AM emails in BehindTheCurtain DB?
 - 10 GB mysql dump >> dozens of CSVs
@@ -35,9 +48,9 @@ center: false
 
 ---
 
-# Agenda
+# Intro: 3
 
-3. Destructure and Restructure DB
+Restructure a DB
 
 - Why?
 - How?
@@ -47,9 +60,9 @@ center: false
 
 ---
 
-# Agenda
+# Intro: 4
 
-4. TFIDF to detect similarity between records
+TFIDF to detect similarity between records
 
 - cluster Oregon PACs by their "mission"
 - d3 force-directed graph of PAC similarity
@@ -57,22 +70,26 @@ center: false
 
 ---
 
-# Agenda
+# Intro: 5
 
-5. Measure similarity between similarity matrices
+Similarity between similarity matrices
 
-Say: NLP Similarity
+**SAY**
+(TFIDF)
 
 vs.
 
-Do: Financial Transactions
+**DO**
+(Transactions)
 
 ---
 
-# 3. Why Destructure a DB: Why?
+# 3. Restructure DB
 
-- Why squish multiple fields into a string?
-- You will vectorize later anyway, right?
+## Why?
+
+- Squish fields into a string?
+- Vectorizing later anyway, right?
 
 ## Because
 
@@ -81,7 +98,7 @@ Do: Financial Transactions
 
 ---
 
-# 3. Destructure a DB: How?
+# 3. Restructure DB: How?
 
 1. Ignore numbers/dates
 2. Stringify each field
@@ -91,10 +108,11 @@ Do: Financial Transactions
 6. Split
 7. Vectorize/Count
 
-# 3. Restructure the DB: TFIDF
+# 3. Restructure DB: TFIDF
 
-Compute sparse TFIDF
+## TFIDF
 
+- Must be sparse to fit in memory
 - Explicit python builtins: `Counter`, `defaultdict`
 - sklearn
 
