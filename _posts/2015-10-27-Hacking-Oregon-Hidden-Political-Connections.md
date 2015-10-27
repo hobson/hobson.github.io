@@ -74,12 +74,12 @@ TFIDF to detect similarity between records
 
 Similarity between similarity matrices
 
-**SAY**
+**SAY**  
 (TFIDF)
 
 vs.
 
-**DO**
+**DO**  
 (Transactions)
 
 ---
@@ -109,8 +109,6 @@ vs.
 7. Vectorize/Count
 
 # 3. Restructure DB: TFIDF
-
-## TFIDF
 
 - Must be sparse to fit in memory
 - Explicit python builtins: `Counter`, `defaultdict`
