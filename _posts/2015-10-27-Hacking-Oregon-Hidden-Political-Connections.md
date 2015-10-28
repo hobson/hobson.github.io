@@ -10,8 +10,15 @@ center: false
 
 # [Hacking Oregon's Hidden Political Connections](http://totalgood.github.io/talks/2015-10-27-Hacking-Oregon-Hidden-Political-Connections.html)
 
-- iPython Notebooks: [bit.ly/hackor-notebooks](https://github.com/totalgood/hackor/tree/master/)
-- by [Hobs](mailto:hobs@totalgood.com?Subject=Hack%20Oregon)
+- [Data](http://totalgood.github.io/hackor)
+- Code: [bit.ly/hackor-notebooks](https://github.com/totalgood/hackor/tree/master/)
+- [RFP](http://totalgood.com/blog/invitation-for-machine-intelligence-grant-proposals-winter-2016/)
+- [Hack Oregon](http://hackoregon.com) by [Cat](http://www.zoominfo.com/p/Catherine-Nikolovski/-2111007541)
+- [Behind the Curtain](http://behindthecurtain.hackoregon.com) by [Ken](https://www.linkedin.com/in/kwhaler)
+- [Force Directed Graph](http://hobsonlane.com/pug/pug/miner/static/pac_nlp_force_graph.html)
+
+
+by [Hobs](http://totalgood.com)
 
 
 <sub><sup>v0.0.3</sup></sub>
