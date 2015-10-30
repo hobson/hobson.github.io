@@ -147,8 +147,18 @@ Keras
 DeepDist (works on Spark)
 Deeplearnign4J (Java + Scala, Hadoop and Spark)
 
-
 # References
 
-- memkite.com has best reference for NLP NNs
+- [Word2Vec using CBOW, skipgrams, GLoVe](http://arxiv.org/pdf/1301.3781.pdf)
+- [SVMs for NLP](http://en.wikipedia.org/wiki/File:Svm_max_sep_hyperplane_with_margin.png)
+- [Unsupervised sentiment analysis](http://www.keepcalm-o-matic.co.uk/p/keep-calm-theres-no-training-today/)
+    - Latent Semantic Indexing (LSI)
+    - Latent Dirichlet allocation (LDA)
+- ["Probabilistic Topic Models"](http://yosinski.com/mlss12/MLSS-2012-Blei-Probabilistic-Topic-Models/)
+- [Neural Nets for NLP using Gradient Descent](http://u.cs.biu.ac.il/~yogo/nnlp.pdf)
+- [Improved (stochastic) Gradient Descent](http://blog.datumbox.com/tuning-the-learning-rate-in-gradient-descent/)
+- [Deep Learning Resources](http://memkite.com/deep- learning-bibliography/)
+- [Deep Learning Reading List](http://deeplearning.net/reading-list/)
+- [extracting semantics](http://www.nltk.org/book_1ed/ch08.html)
+
 
