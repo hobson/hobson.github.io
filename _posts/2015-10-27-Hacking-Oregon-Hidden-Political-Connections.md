@@ -119,11 +119,15 @@ vs.
 6. Split
 7. Vectorize/Count
 
+---
+
 # 3. Restructure DB: TFIDF
 
 - Must be sparse to fit in memory
 - Explicit python builtins: `Counter`, `defaultdict`
 - sklearn
+
+---
 
 # 4. TFIDF Similarity
 

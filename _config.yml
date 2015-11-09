@@ -85,4 +85,11 @@ exclude:
     - LICENSE
     - README.md
 
+defaults:
+  -
+    scope:
+      path: "" # an empty string here means all files in the project
+    values:
+      layout: "default"
+
 google_analytics: UA-63029775-1
