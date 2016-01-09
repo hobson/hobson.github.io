@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Notes from Data UG Meetup -- Text Mining Meets Neural Nets
+title: Notes from Data User Group Meetup -- Text Mining Meets Neural Nets
 ---
 
 Here are my notes from the Data User Group and PDX Data Engineering Meetup presentation titled "Text Mining Meets Neural Nets: Mining the Bio-medical Literature", presented by [Dan Sullivan](https://www.linkedin.com/in/dansullivanpdx), the enterprise architect for Cambria Health and Ph.D. student at Virginia Tech (the Biomed Institute).
