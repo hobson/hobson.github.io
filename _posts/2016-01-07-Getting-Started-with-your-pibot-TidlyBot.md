@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Getting Started with your pibot TiddlyBot.md
+title: Getting Started with your PiBot TiddlyBot
 ---
 
 I helped my preteen nephew get started on his kickstarter [TiddlyBot](http://www.pibot.org/tiddlybot/) Christmas Present over the holidays. We a linux laptop (Ubuntu) and recorded all the tedious setup steps so you can spend more time programming your bot and less time getting set up.
@@ -15,8 +15,7 @@ If you received preloaded 8GB SD card, you can skip this section. But if you rem
 
 If you try to run vanilla Raspbian on the Tiddly bot, you won't be able to `import RPIO` in python without raising the exception "SystemError: This module can only be run on a Raspberry Pi!"
 
-flavor of Raspbian (Linux OS) 
-**IMPORTANT:** Manually verify that this command finds your rPi SDCard path with this command, otherwise you may overrite the wrong drive with the Raspbian OS and render that drive unusuable!
+**IMPORTANT:** Manually verify that this command finds your rPi SDCard path with this command, otherwise you may overwrite the wrong drive with the Raspbian OS and render that drive unusuable!
 
 {% highlight bash %}
 DEV_SDCARD=$(mount | grep -F vfat | grep -E -o '^/dev/[a-zA-Z0-9/]+')
@@ -62,7 +61,7 @@ ssh-copy-id -oStrictHostKeyChecking=no pi
 
 Now you can ssh into your pi and configure it for you locale (keyboard especially). It can be frustrating and even render your pi unusuable if your filesystem isn't fully expanded and your keyboard driver is not configured to match your keyboard layout and locale.
 
-So ssh into your pi with `ssh pi`, then type `sudo raspi-config`. This will bring up an ASCII menu. The first option is to expand the filesystem. Hit `[Enter]` to select it and answer "yes" to any confirmation prompts. Exit raspi-config by tabbing down to the Exit button and  answer "yes" to the "Reboot Now?" propmpt. If you get to the shell prompt without a reboot just type `sudo reboot` to make sure your pi is ready to roll.
+So ssh into your pi with `ssh pi`, then type `sudo raspi-config`. This will bring up an ASCII menu. The first option is to expand the file system. Hit `[Enter]` to select it and answer "yes" to any confirmation prompts. Exit raspi-config by tabbing down to the Exit button and  answer "yes" to the "Reboot Now?" prompt. If you get to the shell prompt without a reboot just type `sudo reboot` to make sure your pi is ready to roll.
 
 SSH into you pi again and run raspi-config once more. This time use the arrow keys to select the configure keyboard and work your way through the menus (usually the US layout is hidden behind the "other" option) to set the keyboard to match yours. This doesn't matter if you only SSH onto the pi, but it may come in handy if you ever have to plug a USB keyboard and HDMI monitor directly into the pi.
 
@@ -70,7 +69,7 @@ SSH into you pi again and run raspi-config once more. This time use the arrow ke
 
 Finally the fun part, teaching TiddlyBot to make itself useful ;)
 
-Download and edit the example code from pibot.org. You may find this command helpful whenever you want to programatically extract a code block from an HTML file when you're only interested in the stuff between the `<code>` tags.
+Download and edit the example code from pibot.org. You may find this command helpful whenever you want to programmatically extract a code block from an HTML file when you're only interested in the stuff between the `<code>` tags.
 
 {% highlight bash %}
 wget http://www.pibot.org/tiddlybot/code -O - | grep -E '<code[^>]*>' -A99999 | grep -E '<\/code[^>]*>' -B999999 | sed '1d' | sed '$d' > tiddlybot_example.py
