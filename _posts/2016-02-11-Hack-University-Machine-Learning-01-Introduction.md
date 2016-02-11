@@ -17,12 +17,14 @@ center: false
 
 ---
 
-# Each Class Split into 6 Lessons
+# 1 Day
 
-- Talk for 25 minutes
-- 5 minute Break
-- Work on something for 25 minutes
-- 5 minute Break
+## 6 Lessons
+
+- 25 min talk
+- 5 min break
+- 25 min project
+- 5 minute break
 
 - Repeat 
 
@@ -53,11 +55,12 @@ You signed up for this, what do you think?
 
 ---
 
-In some ways, machine learning is automated data science.  
-But you can't automate all of Data Science.  
-Machine's need a lot of help from humans.  
-In future sessions we'll learn about [generative models](0X-NLP-generative-models.md)  
-But, for now, Data Scientists still have jobs.
+- Machine learning is like automated Data Science  
+- But you can't automate it all  
+- Machine's need a lot of help
+
+- In future sessions we'll learn about [generative models](0X-NLP-generative-models.md)  
+- For now, Data Scientists still have jobs
 
 ---
 
@@ -97,17 +100,46 @@ Machine Learning expert:
 
 ## Data Science
 
-Data Science is using data to create representations or abstractions of data.
+> Using data to create representations or abstractions of data.
 
-Sometimes representations are useful for performing prediction.
+---
+
+## Prediction
+
+- Sometimes representations are useful for predicting
 
 This is what most experts think of when they think of Machine Learning...
 
 ---
 
-## Automated prediction
+## AI
+
+- Machines interacting with the world based on predictions
+- Agents trying to 
+  - achieve a goal
+  - optimize something
 
 ---
+
+## Deep Blue
+
+- Chess
+
+## Watson
+
+- Jeopardy
+
+---
+
+## Deep Mind 
+
+- playing Breakout
+- playing Galaga
+- playing Go
+
+---
+
+## Automated prediction
 
 Predicting the future is what humans spend their lives learning how to do. It's why children perform "experiments" by pushing their food of the table and onto the floor. They are testing their "hypothesis" that a caregiver will put it back on the table or clean up the mess. They are also testing their hypothesis that the food won't just disappear, or transform into something different (like icecream), or become unedible.
 
