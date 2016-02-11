@@ -3,7 +3,7 @@ layout: post
 title: Getting Started with your PiBot TiddlyBot
 ---
 
-I helped my preteen nephew get started on his kickstarter [TiddlyBot](http://www.pibot.org/tiddlybot/) Christmas Present over the holidays. We a linux laptop (Ubuntu) and recorded all the tedious setup steps so you can spend more time programming your bot and less time getting set up.
+I helped my teenage nephew get started on his kickstarter [TiddlyBot](http://www.pibot.org/tiddlybot/) Christmas Present over the holidays. We a linux laptop (Ubuntu) and recorded all the tedious setup steps so you can spend more time programming your bot and less time getting set up.
 
 ## First Things
 
