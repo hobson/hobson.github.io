@@ -28,37 +28,24 @@ center: false
 
 # GitHub Niceness 
 
-## Hosts static websites for free
-
-- no database
-- no python
-- nothing `persistent`
-
----
-
-# GitHub Niceness 
-
-## Renders popular file formats natively
-
+- Hosts static websites for free
+  - no database
+  - no python
+  - nothing `persistent`
+- Renders popular file formats natively
   - iPython notebooks 
   - Markdown
   - JPG, PNG
   - not PDF?
+- Pull Requests!
 
 ---
 
-# GitHub Niceness 
+# Pull Requests
 
-## Pull Requests!
-
-- E-mail `diff` to team and have them `patch` ?!!! 
-- **No Longer!!**: Use GitHub API or website
-- Comment on changes within code!
-- Best/only way to do *code review*
-
+- a `diff` file sent to 
 ---
-
-# The "Back Story" of `git`
+# The Story
 
 - Linus upset with `hg` (Mercurial) and bitbucket (Atlassian)
     - Started inching up his "subscription" plan for Linux
