@@ -54,3 +54,11 @@ Turns out the problem was that I was trying to preserver, owner, group, device a
 ```bash
 rsync -rgvz --delete-before --fake-super --exclude-from=data/excludes.txt ftp@ftp.ibiblio.org::gutenberg /media/$USER/nas/guten/
 ```
+
+But that didn't work either. In the end, I just dumbed down rsync by limitting it to DOS capabilities:
+
+```bash
+rsync -rvz --delete-during --exclude-from=data/excludes.txt ftp@ftp.ibiblio.org::gutenberg /media/$USER/nas/guten/
+```
+
+Now the machines are finally working together to give me some human text in machine-readable form!
