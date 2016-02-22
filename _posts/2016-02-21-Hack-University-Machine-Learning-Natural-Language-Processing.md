@@ -1,14 +1,10 @@
 ---
 layout: post
-title: Natural Language Processing
+title: HUML Day 4: Natural Language Processing
 lang: en
-revealjs-url: ''  # for absolute path to lib/ and css/ folders use '/'
-theme: black
-transition: fade  # none/fade/slide/convex/concave/zoom
-center: false
 ---
 
-## Finally Rolling
+# Finally Rolling
 
 So we're having a lot of fun, finally. The students are all able to run python, ipython notebooks, and install python packages, even on Windows! Thank you [Anaconda](http://anaconda.org)! And we worked on a project to mine the Hack University slack channels for conversation text. We even got a simple generative model working, comparable to the one in Grus's _Data_Science_from_Scratch_, Chapter 20.
 
