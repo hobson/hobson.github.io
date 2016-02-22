@@ -1,7 +1,6 @@
 ---
 layout: post
-title: HUML Day 4: Natural Language Processing
-lang: en
+title: HUML Day 4 -- Natural Language Processing
 ---
 
 # Finally Rolling
@@ -47,3 +46,11 @@ rsync: failed to set times on "/media/$USER/nas/guten/2/2/2/5/22255": Operation 
 ```
 
 I hope it's OK to use the `-z` option with Gutenberg's ftp server. I guess I'll know in the morning.
+
+## Morning After
+
+Turns out the problem was that I was trying to preserver, owner, group, device and other linux file properties. I only want the text, so I revised the recommended rsync for my CIFS FAT32 drive:
+
+```bash
+rsync -rgvz --delete-before --fake-super --exclude-from=data/excludes.txt ftp@ftp.ibiblio.org::gutenberg /media/$USER/nas/guten/
+```
