@@ -62,3 +62,33 @@ rsync -rvz --delete-during --exclude-from=data/excludes.txt ftp@ftp.ibiblio.org:
 ```
 
 Now the machines are finally working together to give me some human text in machine-readable form!
+
+## Evening After
+
+```bash
+...
+etext97/3babb10.txt
+etext97/brnte10.txt
+etext97/bstjg10.txt
+etext97/grybr10.txt
+etext97/morem10.txt
+etext97/svyrd10.txt
+etext97/wtrbs10.txt
+etext98/.message
+etext98/allyr10.txt
+etext98/mspcd10.txt
+etext98/sesli10.txt
+etext99/.message
+images/README
+pg/articles/kushalbio
+pg/dev/.htaccess
+pg/hartinfo/annual95
+pg/hartinfo/savenet994
+
+sent 1,950,622 bytes  received 37,220,139,399 bytes  911,066.81 bytes/sec
+total size is 37,232,866,927  speedup is 1.00
+```
+
+All done! Thank you [fibersphere](http://fibersphere.com) for the 8 Mbit/s download rate for continuous download of 37GB! And thank you, [Gutenberg Project](http://gutenbergproject.org) most of all, for maintaining a reliable connection and consistently high bandwidth. 
+
+Now, shall I try out some  Julia or stick with Python (really Cython}?
