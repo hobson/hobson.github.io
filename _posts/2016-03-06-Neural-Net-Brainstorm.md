@@ -1,68 +1,22 @@
 ---
 layout: post
-title: Smaller than Baby Steps with Julia
+title: Neural Net Brainstorm
 ---
 
-Julia has some impressive performance stats, so I gave it a whirl, or half a whirl.
+Cole's class on neural nets inpsired some "out of the box" thinking about how brains work and how we train neural nets. Students asked about the performance of regularization vs random dropout, and the computational bottlenecks for random dropout.
 
-Since I now have a lot of text to mine I need to at least be able to segment strings into tokens and count occurrences of those words in sentences, phrases, paragraphs, chapters, and books. Unfortunately Julia can't match the human compiler performance of python for this simple task that for python is simply a matter of `split`, `Counter` and a generator or two. I couldn't get Julia to even concatenate an array of strings together:
- split or join a string using the weird Perl syntax:
+Cole revealed that random-dropout is much 
+That got us thinking about the way worm, ant, and human brains accomplish generalization (regularization or random dropout). Because it's the one big challenge of AI right now. Generalizing from a few examples to many. Some thoughts:
 
-```julia
-$ julia
-               _
-   _       _ _(_)_     |  A fresh approach to technical computing
-  (_)     | (_) (_)    |  Documentation: http://docs.julialang.org
-   _ _   _| |_  __ _   |  Type "help()" for help.
-  | | | | | | |/ _` |  |
-  | | |_| | | | (_| |  |  Version 0.3.11
- _/ |\__'_|_|_|\__'_|  |  
-|__/                   |  x86_64-linux-gnu
+  1. dreaming in REM sleep
+      - waves of synchronized activation/deactivation cycles
+  2. day-dreaming (planning, worrying, reminiscing)
+  3. environmental/cultural regularization 
+      - alcohol rewires brains with something like random dropout
+      - emotional trauma permanently rewires brains (PTSD) 
 
-julia> s = ["this", "is", "an", "array", "of", "strings"]
-6-element Array{ASCIIString,1}:
- "this"   
- "is"     
- "an"     
- "array"  
- "of"     
- "strings"
+All of these seem to reinforce or destroy connections randomly in a way similar to random dropout. Regularization might be more more like the "global" brain chemical soup, the overall brain biochemistry, that prevents runaway neuron firing (epilepsy, schizophrenia, etc).
 
-julia> " ".join(s)
-ERROR: type ASCIIString has no field join
+So Deep Learning might learn from these biological learning approaches. Perhaps models would train/converge more quickly, and with greater generality from fewer examples if there were structure in the random dropouts. One expedient option is to not spend precious processing cycles trying to squeeze random numbers out of a random number generator. Another might be to have a greater portion of dropouts but a fewer permutations of the dropout mask, rotating through those masks in a repeatable way, but in a way that allows each training example to "experience" each mask, like a wrapping rolling window where the data set size is one more than a multiple of the window width.
 
-julia> " $s"
-" ASCIIString[\"this\",\"is\",\"an\",\"array\",\"of\",\"strings\"]"
-
-julia> 
-```
-
-Or split a sentence into tokens using the cool built in Perl regex capability:
-
-```julia
-julia> ismatch(r"^\s*(?:#|$)", "# a comment")
-true
-
-julia> match(r"^\s*(?:#|$)", "# a comment")
-RegexMatch("#")
-
-julia> regex = r"[^ ]+"
-r"[^ ]+"
-
-julia> captures(regex, "This is an sentence of workds (tokens).")
-ERROR: captures not defined
-
-julia> m = match(regex, "This is an sentence of workds (tokens).")
-RegexMatch("This")
-
-julia> m.captures
-0-element Array{Union(SubString{UTF8String},Nothing),1}
-
-julia> m = match(regex, "This is an sentence of workds (tokens).")
-RegexMatch("This")
-
-julia> m.captures
-0-element Array{Union(SubString{UTF8String},Nothing),1}
-```
-
-I'm affraid Python is too deeply engrained in my thinking. So it's back to Python and gensim for the total `guten` literature mining work.
+Also, would it make sense to combine regularization with semi-random or almost-cyclical dropout?
