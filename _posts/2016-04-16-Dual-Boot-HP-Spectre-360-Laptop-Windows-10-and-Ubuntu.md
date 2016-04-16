@@ -177,3 +177,25 @@ Ubuntu should boot fromo grub as the default and you're away!
 
 Enjoy your powerful new development environment!
 
+### Configure
+
+- Keyboard shortcuts will welcome you, just ignore them and they'll go away as you click on another icon or launch another program
+- {Meta] then type "display" and set your resolution to 2048x1152 (16:9)
+    - this worked for the 15" Spectre
+    - make sure your new resolution has the same "Ratio" as the default
+    - The ratio is 16:9 for the 15" Spectre
+    - You can choose a higher resolution but you'll probably want to change the "scale for menu and title bars" to 1.25 to make them legible
+    - unlock all the bloatware from your toolbar (whatever you don't need)
+
+Get the most important stuff installed:
+
+    $ sudo apt-get update
+    $ sudo apt-get upgrade -y
+    $ sudo apt-get install nautilus-dropbox efibootmgr
+
+my 98.5 GB ubuntu partition now has 62 MB used and 93.4 GB free on /media/hobs
+
+Here's my `df -h`
+
+udev 7.8G
+
