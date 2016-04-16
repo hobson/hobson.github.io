@@ -63,3 +63,117 @@ Now you can install the efi boot manager to see what your boot table says and ed
 
     sudo apt-get install efibootmgr -y
 
+
+## Install Ubuntu!
+
+
+### Dialog Box: Preparing to install Ubuntu
+
+Check the checkboxes for 
+
+[x] Download update during install
+[x] Install this third-party
+
+click **Continue**
+
+### Dialog Box: Unmount partitions that are in use?
+
+/dev/sda is mounted
+
+Do you want the installer to try to unmount...
+
+click **Yes**
+
+### Dialog Box: Installation type
+
+The default is what you want, right?
+
+[x] Install Ubuntu longside Windows Boot Manager
+[ ] Erase disk...
+
+Grayed out (not possible unless you wipe the disk first):
+
+[ ] Encrypt the new Ubuntu installation for security
+[ ] Use LVM witht he new Ubuntu installation
+
+---
+
+[ ] Something Else: You can create or resize...
+
+You can safely accept the default if your Windows installation and partitions were detected.
+
+click **Continue**
+
+### Dialog Box: Install Ubuntu alongside Windows Boot Manager
+
+Allocate drive space by dragging the divider below:
+
+     Files (3.0 GB)             Ubuntu
+    /dev/sda6 (ext4)        /dev/sda7 (ext4)
+         87.3 GB                88.1 GB
+
+I adjusted the slider to be
+
+     Files (3.0 GB)             Ubuntu
+    /dev/sda6 (ext4)        /dev/sda7 (ext4)
+         100.2 GB                75.2 GB
+
+
+Click **Install Now**
+
+### Confirmation Dialog: Write previous changes...
+
+Before you can select a new partition size ...
+
+You cannot undo this operation.
+
+Please note that... take a long time.
+
+Click **Continue**
+
+It'll show you the new partition labels sda6 and sda7 for the swap.
+
+### Install
+
+Where are you?
+
+**LA**
+
+Keyboard layout
+
+**English (US)**
+
+### Who are you?
+
+The first few fields are harmless, but pay close attention to the radio buttons at the bottom.
+
+Your name: Hobson Lane
+Your computer's name: spectre-laptop
+Pick a username: hobs
+Choose a password: really-secure-password 
+Confirm password: really-secure-password
+
+If you plan to do anything remotely private on the laptop (banking, online shopping, etc), you really don't want to check the first box, but rather the next two. The home folder encryption is software-based so much slower than the full-drive encryption built into the kernel... but you have to have it. Otherwise all your data is available to anyone with access to your laptop in a matter of seconds (search "recover Ubuntu password" if you don't believe me).
+
+[ ] Log in automatically
+[x] Require my password to log in
+[x] Encrypt my home folder
+
+### Dialog: Installation Complete
+
+Click **Restart Now**
+
+When it boots back up to your USB stick just 
+
+1. hit Esc to get to the Grub menu
+2. unplug usb stick (it's not being used anymore by grub)
+3. ctrl-alt-del to reboot
+
+### Ubuntu!
+
+The grub menu should show Ubuntu and your Windows Boot manager both listed!
+
+Ubuntu should boot fromo grub as the default and you're away!
+
+Enjoy your powerful new development environment!
+
