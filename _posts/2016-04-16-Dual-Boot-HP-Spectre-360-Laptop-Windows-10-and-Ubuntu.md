@@ -212,3 +212,17 @@ Here's my `df -h`
     /dev/sda3             49G   36G   14G  72% /media/hobs/Windows
 
 So it looks like my split between "Files" and "Ubuntu" was off. To have a bigger home folder you want the "Ubuntu" side to be bigger. I may wipe and reinstall to get this right, it's critical. I need the space for DropBox, etc.
+
+### Reference: UEFI Boot Order
+
+Just for reference, my UEFI boot list stayed pretty simple... need to reboot to se if it still works ;)
+
+    hobs@spectre-laptop:~$ sudo efibootmgr
+    [sudo] password for hobs: 
+    BootCurrent: 0000
+    Timeout: 0 seconds
+    BootOrder: 0000,0006,0007,9999
+    Boot0000* ubuntu
+    Boot0006* Windows Boot Manager
+    Boot0007* Solid State Disk
+    Boot9999* USB Drive (UEFI)
