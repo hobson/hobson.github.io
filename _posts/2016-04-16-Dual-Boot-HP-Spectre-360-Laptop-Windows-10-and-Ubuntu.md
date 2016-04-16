@@ -197,5 +197,18 @@ my 98.5 GB ubuntu partition now has 62 MB used and 93.4 GB free on /media/hobs
 
 Here's my `df -h`
 
-udev 7.8G
+    hobs@spectre-laptop:~$ df -h
+    Filesystem           Size  Used Avail Use% Mounted on
+    udev                 7.8G  4.0K  7.8G   1% /dev
+    tmpfs                1.6G  1.5M  1.6G   1% /run
+    /dev/sda8             69G  4.5G   61G   7% /
+    none                 4.0K     0  4.0K   0% /sys/fs/cgroup
+    none                 5.0M     0  5.0M   0% /run/lock
+    none                 7.8G  156K  7.8G   1% /run/shm
+    none                 100M   84K  100M   1% /run/user
+    /dev/sda1            256M   65M  192M  26% /boot/efi
+    /home/hobs/.Private   69G  4.5G   61G   7% /home/hobs
+    /dev/sda6             92G   60M   88G   1% /media/hobs/ubuntu
+    /dev/sda3             49G   36G   14G  72% /media/hobs/Windows
 
+So it looks like my split between "Files" and "Ubuntu" was off. To have a bigger home folder you want the "Ubuntu" side to be bigger. I may wipe and reinstall to get this right, it's critical. I need the space for DropBox, etc.
