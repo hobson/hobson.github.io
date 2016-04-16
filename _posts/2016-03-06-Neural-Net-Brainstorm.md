@@ -3,7 +3,7 @@ layout: post
 title: Neural Net Brainstorm
 ---
 
-Cole's class on neural nets inpsired some "out of the box" thinking about how brains work and how we train neural nets. Students asked about the performance of regularization vs random dropout, and the computational bottlenecks for random dropout.
+Cole's class on neural nets inspired some "out of the box" thinking about how brains work and how we train neural nets. Students asked about the performance of regularization vs random dropout, and the computational bottlenecks for random dropout.
 
 Cole revealed that random-dropout is much 
 That got us thinking about the way worm, ant, and human brains accomplish generalization (regularization or random dropout). Because it's the one big challenge of AI right now. Generalizing from a few examples to many. Some thoughts:
