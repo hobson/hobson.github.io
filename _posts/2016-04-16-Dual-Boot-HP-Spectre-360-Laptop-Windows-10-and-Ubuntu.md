@@ -192,6 +192,8 @@ Get the most important stuff installed:
     $ sudo apt-get update
     $ sudo apt-get upgrade -y
     $ sudo apt-get install nautilus-dropbox efibootmgr
+    $ sudo dropbox update
+    $ sudo dropbox autostart y
 
 my 98.5 GB ubuntu partition now has 62 MB used and 93.4 GB free on /media/hobs
 
