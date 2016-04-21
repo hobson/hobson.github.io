@@ -1,0 +1,41 @@
+---
+layout: post
+title: Upgrading 14.04 to 15.10 on a Dual-Boot HP Spectre Laptop
+---
+
+## Tune Down the Trackpad
+
+	xinput list
+    xinput get-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger"
+    xinput list-props "SynPS/2 Synaptics TouchPad"
+    xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 40 60 128
+
+The default trackpad settings will cause a lot of ghost clicking and typing all over the place... not great when you're editing system config files. But I recorded the settings in my .profile file for reference
+
+   # # default touchpad sensivity: release-sensitivity touch-sensitivity click-sensitivity
+   # xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 15 30 0
+
+And then I added a line to set them to senistivity levels that worked well for me.
+
+   echo 'xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 35 65 256' >> ~/.profile
+
+And to get a bit more GUI control of your trackpad...
+
+   sudo apt-get install gpointing-device-settings 
+
+
+## The GUI Upgrade Fails
+
+So I went through the normal AutoUpdater process to upgrade my distro to 15.10, but that terminalized my Ubuntu. It dropped me to tty console. Fortunately my sudo user was still there and logging in was not a problem. So I thought I'd need to manually install gnome:
+
+	sudo apt-get install ubuntu-gnome-desktop
+
+But that complained about the installus-interuptus, and politely recommended...
+
+	sudo dpkg --configure -a
+
+And that worked great. I had to accept the package manager's override of the grub conf file, but all went smoothly till the very end, where some other command borked. So I just dhut 'er down and hoped for the best.
+
+	sudo shutdown -h now
+
+I was delighted to see the Ubuntu GUI welcome me back, and I was away. Dropbox and my other apps were still installed and all was well with the world.
