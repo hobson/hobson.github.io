@@ -5,19 +5,28 @@ title: Upgrading 14.04 to 15.10 on a Dual-Boot HP Spectre Laptop
 
 ## Tune Down the Trackpad
 
-	xinput list
-    xinput get-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger"
-    xinput list-props "SynPS/2 Synaptics TouchPad"
-    xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 40 60 128
+The default trackpad settings will cause a lot of ghost clicking and typing all over the place... not great when you're editing system config files.
 
-The default trackpad settings will cause a lot of ghost clicking and typing all over the place... not great when you're editing system config files. But I recorded the settings in my .profile file for reference
+Here's how to find your trackpad
+
+	xinput list
+
+Mine was a Synaptics TouchPad and this will list it's properties
+
+	xinput list-props "SynPS/2 Synaptics TouchPad"
+
+And the one you want to set is the "Finger" setting
+
+    xinput get-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger"
+
+Record this original/default value in your .profile file in a comment
 
    # # default touchpad sensivity: release-sensitivity touch-sensitivity click-sensitivity
    # xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 15 30 0
 
-And then I added a line to set them to senistivity levels that worked well for me.
+And then add a line to set the values to senistivity levels like these
 
-   echo 'xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 35 65 256' >> ~/.profile
+   echo 'xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 35 65 128' >> ~/.profile
 
 And to get a bit more GUI control of your trackpad...
 
