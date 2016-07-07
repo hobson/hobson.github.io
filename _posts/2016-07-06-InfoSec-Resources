@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Infosec Meetup Fun
+title: PenTesting Peanut Gallery
 ---
 
 Really enjoyed getting a crash course in InfoSec and PenTesting by [Dean](http://deanpierce.net) at the Ctrl-H HackerSpace meetup. Here's how to get some tools for easy, ethical hacking.
@@ -25,7 +25,7 @@ curl -O -L http://downloads.sourceforge.net/project/wapiti/wapiti/wapiti-2.3.0/w
 tar xvzf wapiti-2.3.0.tar.gz
 ```
 
-An enterprise (Windoze) security expert showed up late and talked about following infosec since the opensource, CLI BackTrack days. He mentioned Nessus's open source fork, [OpenVAS](http://openvas.org/). He says it fizzled as the community deflated as they went closed source as Nessus. But here's how to get by sourceforge click-traps and snag it:
+An enterprise (Windoze) security expert showed up late and talked about following infosec since the opensource, CLI BackTrack days. BackTrack is a linux distro with a lot of pen testing tools installed/configured. They mentioned a newer version with a different name. He mentioned Nessus's open source fork, [OpenVAS](http://openvas.org/). He says it fizzled as the community deflated as they went closed source as Nessus. But here's how to get by sourceforge click-traps and snag it:
 
   
 ```bash
