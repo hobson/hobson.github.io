@@ -32,6 +32,23 @@ And to get a bit more GUI control of your trackpad...
 
    sudo apt-get install gpointing-device-settings 
 
+And for fine-grained cli control use `synclient`. Here's my latest .profile:
+
+    xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Finger" 20 50 180
+    # keep this small so even if your palm is barely touching the corner...
+    synclient PalmMinWidth=10
+    # minimum pressure to be considered a palm
+    synclient PalmMinZ=120
+    synclient MaxTapMove=200
+    synclient MaxSpeed=8.0
+    synclient AccelFactor=0.09
+    synclient PalmDetect=1
+    synclient VertTwoFingerScroll=1
+    # "natural" scrolling so that down is up and up is down ;)
+    synclient VertScrollDelta=-109
+    synclient HorizScrollDelta=-109
+
+
 
 ## The GUI Upgrade Fails
 
