@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Now THAT's Open Data -- Google Books Corpus
+title: Now THAT's Open Data -- The Google NGram Viewer Corpus
 ---
 
-Now THAT's [open data](http://storage.googleapis.com/books/ngrams/books/datasetsv2.html)!
+Now THAT's [Open Data](http://storage.googleapis.com/books/ngrams/books/datasetsv2.html)!
 
 ```bash
 FINISHED --2016-08-18 15:30:00--
@@ -12,7 +12,7 @@ Downloaded: 6833 files, 3.2T in 3d 14h 55m 31s (10.7 MB/s)
 Converted links in 0 files in 0 seconds.
 ```
 
-15% of all the books ever published on on (*large*) harddrive.
+It's 10% of [all the books published up until 2008](https://en.wikipedia.org/wiki/Google_Ngram_Viewer), on one (*large*) harddrive. It's only the N-grams, rather than full text with punctuation, like Gutenberg. But N = 5. So you could reconstruct a lot of the books from that, if it weren't for that pesky minimum document (book) frequency threshold of 40 books...
 
 For those less hordy than me, you can just query the data through the slick API for fun things like officiating a "race" between [Python, Ruby, C/C++, and Perl](https://books.google.com/ngrams/graph?content=Python+development%2CRuby+development%2CC+development%2CPerl+development&year_start=1800&year_end=2008&corpus=15&smoothing=2&share=&direct_url=t1%3B%2CPython%20development%3B%2Cc0%3B.t1%3B%2CRuby%20development%3B%2Cc0%3B.t1%3B%2CC%20development%3B%2Cc0%3B.t1%3B%2CPerl%20development%3B%2Cc0):
 
