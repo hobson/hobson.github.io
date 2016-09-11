@@ -12,14 +12,12 @@ Here's the docs. TLDR: skip to the bottom of this post.
 <html>
 <dt id="random.seed">
 <code class="descclassname">random.</code><code class="descname">seed</code><span class="sig-paren">(</span><span class="optional">[</span><em>x</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#random.seed" title="Permalink to this definition">¶</a></dt>
-<dd><p font-size: "75%"">Initialize the basic random number generator. Optional argument <em>x</em> can be any
-<a class="reference internal" href="../glossary.html#term-hashable"><span class="xref std std-term">hashable</span></a> object. If <em>x</em> is omitted or <code class="docutils literal"><span class="pre">None</span></code>, current system time is used;
-current system time is also used to initialize the generator when the module is
-first imported.  If randomness sources are provided by the operating system,
-they are used instead of the system time (see the <a class="reference internal" href="os.html#os.urandom" title="os.urandom"><code class="xref py py-func docutils literal"><span class="pre">os.urandom()</span></code></a> function
-for details on availability).</p>
-</dd>
 </html>
+
+    Initialize the basic random number generator. Optional argument <em>x</em> can be any
+    [hashable](https://docs.python.org/2/glossary.html#term-hashable) object. If <em>x</em> is omitted or <code class="docutils literal"><span class="pre">None</span></code>, current system time is used; current system time is also used to initialize the generator when the module is
+    first imported.  If randomness sources are provided by the operating system,
+    they are used instead of the system time. See the [`os.urandom()`](https://docs.python.org/2/os.html#os.urandom) function for details on availability.</p>
 
 The "birthday paradox" is what it's called when these collisions happen more often than you expect, like when generating an random integer between 1 and 365. So it doesn't apply here. And it's not really a paradox (nor is the Birthday Paradox). But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn't trick tmux into doing it, and the stack overflow answers seemed broken to me. But here's my quick fail at repro:
 
