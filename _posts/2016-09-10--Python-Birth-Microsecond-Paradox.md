@@ -5,7 +5,7 @@ title: Python-Birth-Microsecond-Paradox
 
 [Cole](http://uglyboxer.github.io/) got bit by the Birthday Paradox when using python `random.randint()` and `time.time()` to generate a random number to tag a DB record with a unique ID. I think [Hannes](http://hanneshapke.github.io/) does something similar to ensure user-provided files are all unique, even a user uploads the exact same file twice.
 
-I [read the docs](https://docs.python.org/2/library/random.html) and found that python uses system time (`time.time()` has microsecond resolution, hence the title of this post) to seed their random number generator on some machines during import. If the machine has a random number source, it'll use that instead. The servers where this happened must not have a random source, so appending a random number from python's `random` package to a microsecond-resolution timestamp won't add any randomness at all. If the two processes happen to start at the same microsecond they'll produce the same answer. I couldn't force the collision on my machine.
+I [read the docs](https://docs.python.org/2/library/random.html) and found that python uses system time, and `time.time()` has microsecond resolution (hence the title of this post) to seed the random number generator on some machines during `import random`. If the machine and OS provides a random number source, it'll use that instead. The servers where this happened must not have a random source, so appending a random number from python's `random` package to a microsecond-resolution timestamp won't add any randomness at all. If the two processes happen to start at the same microsecond they'll produce the same answer. I couldn't force the collision on my machine.
 
 Here's the docs. TLDR: skip to the bottom of this post.
 
