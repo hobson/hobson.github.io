@@ -13,7 +13,7 @@ Here's the docs. TLDR: skip to the bottom of this post.
 
 #### random.seed(*x*)
 
-Initialize the basic random number generator. Optional argument, *x*, can be any [hashable](https://docs.python.org/2/glossary.html#term-hashable) object. If *x* is omitted or `None`, current system time is used; current system time is also used to initialize the generator when the module is first imported.  If randomness sources are provided by the operating system, they are used instead of the system time. See the [`os.urandom()`](https://docs.python.org/2/os.html#os.urandom) function for details on availability.</p>
+Initialize the basic random number generator. Optional argument, *x*, can be any [hashable](https://docs.python.org/2/glossary.html#term-hashable) object. If *x* is omitted or `None`, current system time is used; current system time is also used to initialize the generator when the module is first imported.  If randomness sources are provided by the operating system, they are used instead of the system time. See the [`os.urandom()`](https://docs.python.org/2/os.html#os.urandom) function for details on availability.
 
 ---------------------------
 
