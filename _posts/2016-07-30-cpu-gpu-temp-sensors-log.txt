@@ -1,0 +1,200 @@
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes "noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff"
+write: hannes is not logged in on noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +62.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +64.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +64.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +65.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes < `sensors` 
+-bash: `sensors`: ambiguous redirect
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors | write hannes
+write: hannes is logged in more than once; writing to pts/9
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes "Nothing to worry about yet, but CPU is getting hot. Type `sensors` to see status"
+write: hannes is not logged in on Nothing to worry about yet, but CPU is getting hot. Type coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +81.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +78.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM to see status
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes "Nothing to worry about yet, but CPU is getting hot. Type 'sensors' to see status"
+write: hannes is not logged in on Nothing to worry about yet, but CPU is getting hot. Type 'sensors' to see status
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes "I have $2 CPU cooler/radiator from free geek without any thermal paste, etc"
+write: hannes is not logged in on I have  CPU cooler/radiator from free geek without any thermal paste, etc
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes "So probably need to get a water-cooled radiator if you are going to run it continuously for long periods"
+write: hannes is not logged in on So probably need to get a water-cooled radiator if you are going to run it continuously for long periods
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +86.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +78.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +79.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +81.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +77.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +84.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +79.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +81.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +80.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +80.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +66.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +60.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +62.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +65.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +59.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +60.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensorsensor
+sensorsensor: command not found
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +63.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +52.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +52.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ htop
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +64.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
