@@ -5,7 +5,21 @@ title: Python-Birth-Microsecond-Paradox
 
 [Cole](http://uglyboxer.github.io/) got bit by the Birthday Paradox when using python `random.randint()` and `time.time()` to generate a random number to tag a DB record with a unique has[Open Data](http://storage.googleapis.com/books/ngrams/books/datasetsv2.html)!
 
-Read the docs and found that python uses system time (`time.time() has microsecond resolution) to seed their random number generator on some machines. If the machine has a random number source, it'll use that instead. The servers where this happened must not have a random source, so appending a random number from python's `random` package to a microsecond-resolution timestamp won't add any randomness at all. If the two processes happen to start at the same microsecond they'll produce the same answer. I couldn't force the collision on my machine.
+I [read the docs](https://docs.python.org/2/library/random.html) and found that python uses system time (`time.time() has microsecond resolution) to seed their random number generator on some machines. If the machine has a random number source, it'll use that instead. The servers where this happened must not have a random source, so appending a random number from python's `random` package to a microsecond-resolution timestamp won't add any randomness at all. If the two processes happen to start at the same microsecond they'll produce the same answer. I couldn't force the collision on my machine.
+
+Here's the docs. TLDR: skip to the bottom of this post.
+
+<html>
+<dt id="random.seed">
+<code class="descclassname">random.</code><code class="descname">seed</code><span class="sig-paren">(</span><span class="optional">[</span><em>x</em><span class="optional">]</span><span class="sig-paren">)</span><a class="headerlink" href="#random.seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the basic random number generator. Optional argument <em>x</em> can be any
+<a class="reference internal" href="../glossary.html#term-hashable"><span class="xref std std-term">hashable</span></a> object. If <em>x</em> is omitted or <code class="docutils literal"><span class="pre">None</span></code>, current system time is used;
+current system time is also used to initialize the generator when the module is
+first imported.  If randomness sources are provided by the operating system,
+they are used instead of the system time (see the <a class="reference internal" href="os.html#os.urandom" title="os.urandom"><code class="xref py py-func docutils literal"><span class="pre">os.urandom()</span></code></a> function
+for details on availability).</p>
+</dd>
+</html>
 
 The "birthday paradox" is what it's called when these collisions happen more often than you expect, like when generating an random integer between 1 and 365. So it doesn't apply here. And it's not really a paradox (nor is the Birthday Paradox). But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn't trick tmux into doing it, and the stack overflow answers seemed broken to me. But here's my quick fail at repro:
 
