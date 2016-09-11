@@ -17,7 +17,7 @@ Initialize the basic random number generator. Optional argument, *x*, can be any
 
 ---------------------------
 
-The "birthday paradox" is what it's called when these collisions happen more often than you expect, like when generating an random integer between 1 and 365. So it doesn't apply here. And it's not really a paradox (nor is the Birthday Paradox). But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn't trick tmux into doing it, and the stack overflow answers seemed broken to me. But here's my quick fail at repro:
+The "birthday paradox" is what it's called when these collisions happen more often than you expect, like when generating an random integer between 1 and 365 in a room full of friends and their birthdays. So the concept doesn't apply here. And this collision problem not really a paradox anyway. But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn't trick tmux into doing it, and the stack overflow answers seemed broken to me. But here's my quick fail at repro:
 
 This is the tmux approach I couldn't get working
 
