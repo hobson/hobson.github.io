@@ -17,17 +17,17 @@ Initialize the basic random number generator. Optional argument, *x*, can be any
 
 ---------------------------
 
-The "birthday paradox" is what it's called when these collisions happen more often than you expect, like when generating an random integer between 1 and 365 in a room full of friends and their birthdays. So the concept doesn't apply here. And this collision problem not really a paradox anyway. But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn't trick tmux into doing it, and the stack overflow answers seemed broken to me. But here's my quick fail at repro:
+The "birthday paradox" is what it's called when these collisions happen more often than you expect, like when generating a random integer between 1 and 365 in a room full of friends for their birthdays. So the concept doesn't apply here. And this collision problem is not really a paradox anyway. But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn't trick tmux into doing it, and the stack overflow answers seemed broken to me. But here's my quick fail at repro:
 
 This is the tmux approach I couldn't get working
 
 ```bash
 #!/bin/sh 
-tmux new-session -s collider -d 'python -c "import random; print(random.randint(0,1000000000));"'
+tmux new-session -s collider -d 'python -c "import random; print(random.randint(0,1000000000));"' &
 tmux new-window -s collider 'python -c "import random; print(random.randint(0,1000000000));"'
 ```
 
-So I just loaded up the OS process queue with a bunch of python interpreter tasks in the hopes a few of them would pass through cores at the same time.
+So I just loaded up the OS process queue with a bunch of python interpreter processes in the hopes a few of them would pass through cores at the same time.
 
 ```bash
 for ((i=0; i<100; i++))
@@ -52,7 +52,9 @@ cat /tmp/collider.*.log | sort | uniq -c
 #      1 148685188
 ```
 
-BINGO! The clock did a 2-step for the same microsecond a 3 times out of 100:
+## BINGO!
+
+The clock did a 2-step for the same microsecond, 3 times out of 100:
 
 ```bash
 cat /tmp/collidetime.*.log | sort | uniq -c | grep -e '\b[2-9]\b'
