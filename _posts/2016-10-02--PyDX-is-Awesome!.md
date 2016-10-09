@@ -1,9 +1,9 @@
 ---
 layout: post
-title: PyDX is Awesome!
+title: [PyDX](http://pydx.org) is Awesome!
 ---
 
-Watched a lot of great talks about Python this weekend some of the memeorable ones:
+Watched a lot of great Python talks this weekend. Here are some memorable ones:
 
 - [Portia Burton's Talk](http://lanyrd.com/2016/pydx/sfmtdw/) on the Future of Cryptocurrency
 - [Servo Behind the Scene by E. Dunham](http://edunham.net/pages/talks.html) (Mozilla): How to Automate Your DevOps with Bots
@@ -13,11 +13,15 @@ Watched a lot of great talks about Python this weekend some of the memeorable on
 - "Adding Celery to your Salad" by Hannes Hapke
 - "Wayback Machine" by Barbara Miller
 
-And my talk
+And my talk...
 
 - [There's Hope for Chatbots](http://totalgood.github.io/hope)
 
-Slides and videos will be online soon, I'm sure. So check back for more links.
+My talk was a big disappointment for me and some in the audience because I couldn't get the Django interface to [hope](http://github.com/totalgod/hope) working. The talk is more of an overview of current chatbot tech rather than a *HOWTO*. But Cole's LSTM-brained bot trained on movie dialog was a nice highlight and conclusion for the talk. 
+
+There's a double reversal on [Chatterbot](http://github.com/gunthercox/ChatterBot)'s repsonse.in_response_to self relationship for the `Statement(Model)` through `Response(Model)` asymmetrical relation. And something's going on in the DjangoStorage plugin that sort-of untangles it, but I wasn't able to unmigrate all my training data etc. Cowboy coding **fail** again. Gotta start writing tests first. Will get it going soon.
+
+Slides and videos will be online soon at [PyDX](http://blog.pydx.org/talk-list/), I'm sure. So check back for more links.
 
 Rami and I had a few questions for Nathan but didn't want to ask publicly... so how about an unread blog post about it ;)
 
