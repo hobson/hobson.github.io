@@ -1,1061 +1,874 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Hobson&#39;s Code Blog</title>
-    <description>software development &amp; data science</description>
+    <title>Hobson&#39;s Blog</title>
+    <description>A blog about Data Science, Python, AI, ... basically life.</description>
     <link>http://www.hobsonlane.com</link>
     <atom:link href="http://www.hobsonlane.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>Neural Nets Demystified</title>
-        <description>&lt;h2 id=&quot;neural-nets-demystified&quot;&gt;Neural Nets Demystified&lt;/h2&gt;
+        <title>Hyper-Indexing with LSHash (Locality Sensitive Hashing)</title>
+        <description>&lt;p&gt;Indexing topic vectors from an LSI Model is more difficult than it seems.  My first instinct was to use the 3D indexer plugin for PostgreSQL, &lt;code&gt;PostGIS&lt;/code&gt;. After all that’s the typical example I keep in my head for indexing. You create a discrete “on or off” label for each location based on whether it is present or absent within a grid point. This allows you to efficiently find it (and any nearby points) with a query with a &lt;code&gt;WHERE grid = &#39;A11&#39;&lt;/code&gt; for a letter/int 2D indexing system that you see on old paper road maps from AAA. &lt;/p&gt;
 
-&lt;ol&gt;
-  &lt;li&gt;Demystify&lt;/li&gt;
-  &lt;li&gt;Dig Deeper&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;I assumed this simple approach would extend out to multiple dimensions, but it doesn’t. Turns out, it’s not possible to efficiently index and search on hyperdimensional space (out beyond a few dimensions). But you can push the limits with a python package calls &lt;code&gt;LSHash&lt;/code&gt; which implements Locality Sensitive Hashing. This approach isn’t theoretically as efficent as R*Tree (the current state of the art for multi-dimensional indexing), but it’s pretty darn powerful up to 8 dimensions.&lt;/p&gt;
 
-&lt;p&gt;Note:&lt;/p&gt;
+&lt;p&gt;```python
+import numpy as np
+from lshash import LSHash&lt;/p&gt;
 
-&lt;p&gt;First I’ll suck you in with a simple example (predicting Portland Weather)
-Then I’ll show you how to play around at the frontier of the state of the art&lt;/p&gt;
+&lt;p&gt;tenthclosest = []  # for each test, record distance to the 10th closest point for a random query
+for D in range(2, 11):  # Run tests for 2D through 10D
+    X = np.random.normal(size=(200000, D))  # Fill the N-D space with 200k random vectors
+    lsh = LSHash(hash_size=int(64 / D) + D, input_dim=D, num_hashtables=D)&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;Thoughts about the upcoming &lt;a href=&quot;http://www.meetup.com/Portland-Data-Science-Group/events/222322211/&quot;&gt;PDX Data Science Meetup&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/Data-Science-Meetup--Neural-Nets-Demystified/&quot;&gt;“Neural Nets Demystified.”&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;# query vector
+q = np.random.normal(size=(D,))
+q /= np.linalg.norm(q)
 
-&lt;hr /&gt;
+distances = []
+for x in X:
+    lsh.index(x)
+    x /= np.linalg.norm(x)  # topic vectors are typically normalized
+    distances += [1 - np.sum(x * q)]  # keep track of all the cosine distances to double check
 
-&lt;h2 id=&quot;classification&quot;&gt;Classification&lt;/h2&gt;
+distances = sorted(distances)
+closest = lsh.query(x, distance_func=&#39;cosine&#39;)
+N = len(closest)
+rank = min(10, N)
+tenthclosest += [[D, N - 1, closest[rank - 1][-1] if N else None, distances[rank - 1]]]
+print(tenthclosest[-1]) ```
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The most basic ML task is classification&lt;/p&gt;
+&lt;p&gt;For 8D space and higher you’ll need millions of points in your space to have a chance of finding anything nearby. And the lshash will be less and less useful at these higher dimensions because it won’t be possible to partition the space with a reasonable number of hyperplanes so that the returned points truly are the closest points. &lt;/p&gt;
 
-&lt;p&gt;In NN lingo, this is called “association”&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;python
+&amp;gt;&amp;gt;&amp;gt; tenthclosest
+[
+  [2, 9480, 1.8566308490619576e-09, 1.8566308490619576e-09]
+  [3, 1791, 9.3939812061627492e-05, 9.3939812061738515e-05]
+  [4, 2492, 0.0016495388314403669, 0.0016495388314402559]
+  [5, 1042, 0.0062851055257979738, 0.0062851055257979738]
+  [6, 1161, 0.01919247547800762, 0.01919247547800762]
+  [7, 1298, 0.037779915230408245, 0.037190703103046285]   # the hashes didn&#39;t find them all
+  [8, 932, 0.040481502423105997, 0.040481502423105997]
+  [9, 1230, 0.066732165658179299, 0.066732165658179188]   # the hashes didn&#39;t find them all
+  [10, 835, 0.10840345965900211, 0.095584594509859677]    # the hashes didn&#39;t find them all
+]
+&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;So lets predict “rain” (1) “no rain” (0) for PDX tomorrow&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;supervised-learning&quot;&gt;Supervised Learning&lt;/h2&gt;
-
-&lt;p&gt;We have historical “examples” of rain and shine&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://wunderground.org&quot;&gt;Weather Underground&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Since we know the classification (training set)…&lt;/p&gt;
-
-&lt;p&gt;Supervised classification (association)&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;rain-shine-partly-cloudy-&quot;&gt;Rain, Shine, Partly-Cloudy ?&lt;/h2&gt;
-
-&lt;p&gt;Wunderground lists several possible “conditions” or classes&lt;/p&gt;
-
-&lt;p&gt;If we wanted to predict them all &lt;/p&gt;
-
-&lt;p&gt;We would just make a binary classifier for each one&lt;/p&gt;
-
-&lt;p&gt;All classification problems can be reduced a binary classification&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;perceptronhttpsenwikipediaorgwikiperceptron&quot;&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Perceptron&quot;&gt;&lt;em&gt;Perceptron&lt;/em&gt;&lt;/a&gt;&lt;/h2&gt;
-
-&lt;p&gt;Sounds mysterious, like a “flux capacitor” or something…&lt;/p&gt;
-
-&lt;p&gt;It’s just a multiply and threshold check:&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;weights&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inputs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;perceptron&quot;&gt;Perceptron&lt;/h2&gt;
-
-&lt;p&gt;(Diagram of a perceptron)&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;need-something-a-little-better&quot;&gt;Need something a little better&lt;/h2&gt;
-
-&lt;p&gt;Works fine for “using” (&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Activation_function&quot;&gt;activating&lt;/a&gt;&lt;/em&gt;) your NN&lt;/p&gt;
-
-&lt;p&gt;But for learning (&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Backpropagation&quot;&gt;backpropagation&lt;/a&gt;&lt;/em&gt;) you need it to be predictable…&lt;/p&gt;
+&lt;p&gt;So the lesson here is.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;doesn’t change direction on you: &lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Monotonic_function&quot;&gt;monotonic&lt;/a&gt;&lt;/em&gt;&lt;/li&gt;
-  &lt;li&gt;doesn’t jump around: &lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Smoothness&quot;&gt;smooth&lt;/a&gt;&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;LSH partitions the space with hyperplanes through the origin, so it works best for normalized vectors&lt;/li&gt;
+  &lt;li&gt;As the number of dimensions increases your need more hashtables to ensure you can find points in neighboring grid cells in case some queries lie near the boundary of a grid in one of the hashtables&lt;/li&gt;
+  &lt;li&gt;As the number of dimensions increases the number of hyperplanes you need to slice the space decreases proportionately&lt;/li&gt;
+  &lt;li&gt;As the number of dimensions incrases the distance to the nearest points will increase exponentially, even for dimension-insensitive metrics like cosine distance.&lt;/li&gt;
 &lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;sigmoidhttpsenwikipediaorgwikiperceptron&quot;&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Perceptron&quot;&gt;&lt;em&gt;Sigmoid&lt;/em&gt;&lt;/a&gt;&lt;/h2&gt;
-
-&lt;p&gt;Again, sounds mysterious… like a transcendental function&lt;/p&gt;
-
-&lt;p&gt;It is a transcendental function, but the word just means&lt;/p&gt;
-
-&lt;p&gt;Curved, smooth like the letter “C”&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;what-greek-letter-do-you-think-of-when-i-say-sigma&quot;&gt;What Greek letter do you think of when I say “Sigma”?&lt;/h2&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;“Σ”&lt;/h3&gt;
-
-&lt;p&gt;What Roman (English) character?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;“E”?&lt;/li&gt;
-  &lt;li&gt;“S”?&lt;/li&gt;
-  &lt;li&gt;“C”?&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;sigmahttpsenwikipediaorgwikisigma&quot;&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Sigma&quot;&gt;Sigma&lt;/a&gt;&lt;/h2&gt;
-
-&lt;p&gt;You didn’t know this was a Latin/Greek class, did you…&lt;/p&gt;
-
-&lt;p&gt;Σ (uppercase)
-σ (lowercase)
-ς (last letter in word)
-c (alternatively)&lt;/p&gt;
-
-&lt;p&gt;Most English speakers think of an “S” when they hear “Sigma” you think of an S.
-So the meaning has evolved to mean S-shaped.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;That’s what we want, something smooth, shaped like an “S”&lt;/p&gt;
-
-&lt;p&gt;The trainer (&lt;em&gt;(backpropagator)[https://en.wikipedia.org/wiki/Backpropagation]&lt;/em&gt;) can predict the change in &lt;code&gt;weights&lt;/code&gt; required
-Wants to nudge the &lt;code&gt;output&lt;/code&gt; closer to the &lt;code&gt;target&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;target&lt;/code&gt;: known classification for training examples
-&lt;code&gt;output&lt;/code&gt;: predicted classification your network spits out&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;but-just-a-nudge&quot;&gt;But just a nudge.&lt;/h2&gt;
-
-&lt;p&gt;Don’t get greedy and push all the way to the answer
-Because your linear sloper predictions are wrong
-And there may be nonlinear interactions between the weights (multiply layers)&lt;/p&gt;
-
-&lt;p&gt;So set the learning rate (\alpha) to somthething less than 1
-the portion of the predicted nudge you want to “dial back” to&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;example-predict-rain-in-portland&quot;&gt;Example: Predict Rain in Portland&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;PyBrain&lt;/li&gt;
-  &lt;li&gt;pug-ann (helper functions TBD PyBrain2)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Get historical weather for Portland then …&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Backpropagate: train a perceptron&lt;/li&gt;
-  &lt;li&gt;Activate: predict the weather for tomorrow!&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;NN Advantages&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Easy
-    &lt;ul&gt;
-      &lt;li&gt;No math!&lt;/li&gt;
-      &lt;li&gt;No tuning!&lt;/li&gt;
-      &lt;li&gt;Just plug and chug.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;General
-    &lt;ul&gt;
-      &lt;li&gt;One model can apply to many problems&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Advanced
-    &lt;ul&gt;
-      &lt;li&gt;They often beat all other “tuned” approaches&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Disadvantage #1: Slow training&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;24+ hr for complex Kaggle example on laptop&lt;/li&gt;
-  &lt;li&gt;90x30x20x10 model degrees freedom
-    &lt;ul&gt;
-      &lt;li&gt;90 input dimensions (regressors)&lt;/li&gt;
-      &lt;li&gt;30 nodes for &lt;em&gt;hidden layer&lt;/em&gt; 1&lt;/li&gt;
-      &lt;li&gt;20 nodes for &lt;em&gt;hidden layer&lt;/em&gt; 2&lt;/li&gt;
-      &lt;li&gt;10 output dimensions (predicted values)&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Disadvantage #2: They don’t scale (unparallelizable)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Fully-connected NNs can’t be &lt;em&gt;easily&lt;/em&gt; hyper-parallelized (GPU)
-    &lt;ul&gt;
-      &lt;li&gt;Large matrix multiplications&lt;/li&gt;
-      &lt;li&gt;Layers depend on all elements of previous layers&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Scaling Workaround&lt;/p&gt;
-
-&lt;p&gt;At Kaggle workshop we discussed paralleling linear algebra&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Split matrices up and work on “tiles”&lt;/li&gt;
-  &lt;li&gt;Theano, &lt;a href=&quot;&quot;&gt;Keras&lt;/a&gt; for python&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf&quot;&gt;PLASMA&lt;/a&gt; for BLAS&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Scaling Workaround Limitations&lt;/p&gt;
-
-&lt;p&gt;But tiles must be shared/consolidated and theirs redundancy&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Data flow: Main -&amp;gt; CPU -&amp;gt; GPU -&amp;gt; GPU cache (and back)&lt;/li&gt;
-  &lt;li&gt;Data com (RAM xfer) is limiting&lt;/li&gt;
-  &lt;li&gt;Data RAM size (at each stage) is limiting &lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf&quot;&gt;Each GPU is equivalent to 16 core node&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Disadvantage #3: They overfit&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Too manu nodes = overfitting&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;What is the big O?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Degrees of freedom grow with number of nodes &amp;amp; layers&lt;/li&gt;
-  &lt;li&gt;Each layer’s nodes connected to each previous layer’s&lt;/li&gt;
-  &lt;li&gt;That a lot of wasted “freedom”&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;on2&quot;&gt;O(N^2)&lt;/h2&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Not so fast, big O…&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;prod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;6000&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;3600&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Rule of thumb &lt;/p&gt;
-
-&lt;p&gt;NOT &lt;code&gt;N**2&lt;/code&gt; &lt;/p&gt;
-
-&lt;p&gt;But &lt;code&gt;M * N**2&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;N: number of nodes
-M: number of layers&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;code&gt;assert(M * N**2 &amp;lt; len(training_set) / 10.)&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;I’m serious… put this into your code.
-I wasted a lot of time training models for Kaggle that overfitted.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;You do need to know math!&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;To imprint your net with the structure (math) of the problem
-    &lt;ul&gt;
-      &lt;li&gt;Feature analysis or transformation (conventional ML)&lt;/li&gt;
-      &lt;li&gt;Choosing the activation function and segmenting your NN&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Prune and evolve your NN&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;This is a virtuous cycle!&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;More structure (no longer fully connected) 
-    &lt;ul&gt;
-      &lt;li&gt;Each independent path (segment) is parallelizable!&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Automatic tuning, pruning, evolving is all parallelizable!
-    &lt;ul&gt;
-      &lt;li&gt;Just train each NN separately&lt;/li&gt;
-      &lt;li&gt;Check back in with Prefrontal to “compete”&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Structure you can play with (textbook)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;limit connections &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;jargon: &lt;em&gt;receptive fields&lt;/em&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;limit weights &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;jargon: &lt;em&gt;weight sharing&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;All the rage: &lt;em&gt;convolutional networks&lt;/em&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Unconventional structure to play with&lt;/p&gt;
-
-&lt;p&gt;New ideas, no jargon yet, just crackpot names&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;limit weight ranges (e.g. -1 to 1, 0 to 1, etc)&lt;/li&gt;
-  &lt;li&gt;weight “snap to grid” (snap learning)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Joke: “What’s the difference between a scientist and a crackpot?”&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Ans: “P-value”&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;High-&lt;strong&gt;P&lt;/strong&gt;robability null hypothesis&lt;/li&gt;
-  &lt;li&gt;Not &lt;strong&gt;P&lt;/strong&gt;ublished&lt;/li&gt;
-  &lt;li&gt;Not &lt;strong&gt;P&lt;/strong&gt;eer-reviewed&lt;/li&gt;
-  &lt;li&gt;No &lt;strong&gt;P&lt;/strong&gt;yPi &lt;strong&gt;p&lt;/strong&gt;ackage&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;I’m a crackpot!&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Resources&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://keras.io/&quot;&gt;keras.io&lt;/a&gt;: Scalable Python NNs&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://hagan.okstate.edu/NNDesign.pdf&quot;&gt;Neural Network Design&lt;/a&gt;: Free NN Textbook!&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/hobson/pug-ann&quot;&gt;pug-ann&lt;/a&gt;: Helpers for PyBrain and Wunderground&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/pybrain2/pybrain2&quot;&gt;PyBrain2&lt;/a&gt;: We’re working on it&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Code highlighting test&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;linkify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;selector&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;supports3DTransforms&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
- 
-    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;nodes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;querySelectorAll&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;selector&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
- 
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;nodes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;lt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;node&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;nodes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
- 
-      &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;className&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;className&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39; roll&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-      &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
 </description>
-        <pubDate>Tue, 19 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Neural-Nets-Demystified/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Neural-Nets-Demystified/</guid>
+        <pubDate>Sat, 12 Nov 2016 00:00:00 -0800</pubDate>
+        <link>http://www.hobsonlane.com/-Hyper-Indexing-with-LSHash-Locality-Sensitive-Hashing/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/-Hyper-Indexing-with-LSHash-Locality-Sensitive-Hashing/</guid>
       </item>
     
       <item>
-        <title>Draft of Neural Nets Demystified</title>
-        <description>&lt;h2 id=&quot;neural-nets-demystified&quot;&gt;Neural Nets Demystified&lt;/h2&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Demystify&lt;/li&gt;
-  &lt;li&gt;Dig Deeper&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Note:&lt;/p&gt;
-
-&lt;p&gt;First I’ll suck you in with a simple example (predicting Portland Weather)
-Then I’ll show you how to play around at the frontier of the state of the art&lt;/p&gt;
+        <title>PyDX is Awesome!</title>
+        <description>&lt;p&gt;Watched a lot of great Python talks at &lt;a href=&quot;http://pydx.org&quot;&gt;PyDX&lt;/a&gt; this weekend. Here are some memorable ones:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Thoughts about the upcoming &lt;a href=&quot;http://www.meetup.com/Portland-Data-Science-Group/events/222322211/&quot;&gt;PDX Data Science Meetup&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/Data-Science-Meetup--Neural-Nets-Demystified/&quot;&gt;“Neural Nets Demystified.”&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://lanyrd.com/2016/pydx/sfmtdw/&quot;&gt;Portia Burton’s Talk&lt;/a&gt; on the Future of Cryptocurrency&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://edunham.net/pages/talks.html&quot;&gt;Servo Behind the Scene by E. Dunham&lt;/a&gt; (Mozilla): How to Automate Your DevOps with Bots&lt;/li&gt;
+  &lt;li&gt;“A Gentle Introduction to Python Performance” by Nathaniel Smith&lt;/li&gt;
+  &lt;li&gt;“Machine Learning for Absolute Beginners” by Hailey Buckingham&lt;/li&gt;
+  &lt;li&gt;“Moneyball.py” by Jeremy Tanner (from &lt;a href=&quot;http://sendgrid.com/&quot;&gt;SendGrid&lt;/a&gt;)&lt;/li&gt;
+  &lt;li&gt;“Adding Celery to your Salad” by Hannes Hapke&lt;/li&gt;
+  &lt;li&gt;“Wayback Machine” by Barbara Miller&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;classification&quot;&gt;Classification&lt;/h2&gt;
-
-&lt;p&gt;The most basic ML task is classification&lt;/p&gt;
-
-&lt;p&gt;In NN lingo, this is called “association”&lt;/p&gt;
-
-&lt;p&gt;So lets predict “rain” (1) “no rain” (0) for PDX tomorrow&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;supervised-learning&quot;&gt;Supervised Learning&lt;/h2&gt;
-
-&lt;p&gt;We have historical “examples” of rain and shine&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://wunderground.org&quot;&gt;Weather Underground&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Since we know the classification (training set)…&lt;/p&gt;
-
-&lt;p&gt;Supervised classification (association)&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;rain-shine-partly-cloudy-&quot;&gt;Rain, Shine, Partly-Cloudy ?&lt;/h2&gt;
-
-&lt;p&gt;Wunderground lists several possible “conditions” or classes&lt;/p&gt;
-
-&lt;p&gt;If we wanted to predict them all &lt;/p&gt;
-
-&lt;p&gt;We would just make a binary classifier for each one&lt;/p&gt;
-
-&lt;p&gt;All classification problems can be reduced a binary classification&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;perceptronhttpsenwikipediaorgwikiperceptron&quot;&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Perceptron&quot;&gt;&lt;em&gt;Perceptron&lt;/em&gt;&lt;/a&gt;&lt;/h2&gt;
-
-&lt;p&gt;Sounds mysterious, like a “flux capacitor” or something…&lt;/p&gt;
-
-&lt;p&gt;It’s just a multiply and threshold check:&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;weights&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inputs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;output&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;perceptron&quot;&gt;Perceptron&lt;/h2&gt;
-
-&lt;p&gt;(Diagram of a perceptron)&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;need-something-a-little-better&quot;&gt;Need something a little better&lt;/h2&gt;
-
-&lt;p&gt;Works fine for “using” (&lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Activation_function&quot;&gt;activating&lt;/a&gt;&lt;/em&gt;) your NN&lt;/p&gt;
-
-&lt;p&gt;But for learning (&lt;em&gt;(backpropagation)[https://en.wikipedia.org/wiki/Backpropagation]&lt;/em&gt;) you need it to be predictable…&lt;/p&gt;
+&lt;p&gt;And my talk…&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;doesn’t change direction on you: &lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Monotonic_function&quot;&gt;monotonic&lt;/a&gt;&lt;/em&gt;&lt;/li&gt;
-  &lt;li&gt;doesn’t jump around: &lt;em&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Smoothness&quot;&gt;smooth&lt;/a&gt;&lt;/em&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://totalgood.github.io/hope&quot;&gt;There’s Hope for Chatbots&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;hr /&gt;
+&lt;p&gt;My talk was a big disappointment for me and some in the audience because I couldn’t get the Django interface to &lt;a href=&quot;http://github.com/totalgod/hope&quot;&gt;hope&lt;/a&gt; working. The talk is more of an overview of current chatbot tech rather than a &lt;em&gt;HOWTO&lt;/em&gt;. But Cole’s LSTM-brained bot trained on movie dialog was a nice highlight and conclusion for the talk. &lt;/p&gt;
 
-&lt;h2 id=&quot;sigmoidhttpsenwikipediaorgwikiperceptron&quot;&gt;[&lt;em&gt;Sigmoid&lt;/em&gt;])(https://en.wikipedia.org/wiki/Perceptron)&lt;/h2&gt;
+&lt;p&gt;There’s a double reversal on &lt;a href=&quot;http://github.com/gunthercox/ChatterBot&quot;&gt;Chatterbot&lt;/a&gt;’s repsonse.in_response_to self relationship for the &lt;code&gt;Statement(Model)&lt;/code&gt; through &lt;code&gt;Response(Model)&lt;/code&gt; asymmetrical relation. And something’s going on in the DjangoStorage plugin that sort-of untangles it, but I wasn’t able to unmigrate all my training data etc. Cowboy coding &lt;strong&gt;fail&lt;/strong&gt; again. Gotta start writing tests first. Will get it going soon.&lt;/p&gt;
 
-&lt;p&gt;Again, sounds mysterious… like a transcendental function&lt;/p&gt;
+&lt;p&gt;Slides and videos will be online soon at &lt;a href=&quot;http://blog.pydx.org/talk-list/&quot;&gt;PyDX&lt;/a&gt;, I’m sure. So check back for more links.&lt;/p&gt;
 
-&lt;p&gt;It is a transcendental function, but the word just means&lt;/p&gt;
-
-&lt;p&gt;Curved, smooth like the letter “C”&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;What Greek letter do you think of when you hear me say Sigma? &lt;/p&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;“Σ”&lt;/h2&gt;
-
-&lt;p&gt;What Roman (English letter does it most look like)? &lt;/p&gt;
+&lt;p&gt;Rami and I had a few questions for Nathan but didn’t want to ask publicly… so how about an unread blog post about it ;)&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;“E”?&lt;/li&gt;
-  &lt;li&gt;“S”?&lt;/li&gt;
-  &lt;li&gt;“C”?&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;set&lt;/code&gt;s are &lt;code&gt;dict&lt;/code&gt;s without values, only keys&lt;/li&gt;
+  &lt;li&gt;I don’t think you can depend on any sort order for &lt;code&gt;set&lt;/code&gt;s&lt;/li&gt;
+  &lt;li&gt;appending to&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;hr /&gt;
+&lt;p&gt;One thing that I learned was that you can append tuples like&lt;/p&gt;
 
-&lt;h2 id=&quot;sigmahttpsenwikipediaorgwikisigma&quot;&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Sigma&quot;&gt;Sigma&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;python
+&amp;gt;&amp;gt;&amp;gt; tuple(&#39;ABC&#39;) + tuple(&#39;DEF&#39;)
+(&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;)
+&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;You didn’t know this was a Latin/Greek class, did you…&lt;/p&gt;
-
-&lt;p&gt;Σ (uppercase)
-σ (lowercase)
-ς (last letter in word)
-c (alternatively)&lt;/p&gt;
-
-&lt;p&gt;Most English speakers think of an “S” when they hear “Sigma” you think of an S.
-So the meaning has evolved to mean S-shaped.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;That’s what we want, something smooth, shaped like an “S”&lt;/p&gt;
-
-&lt;p&gt;The trainer (&lt;em&gt;(backpropagator)[https://en.wikipedia.org/wiki/Backpropagation]&lt;/em&gt;) can predict the change in &lt;code&gt;weights&lt;/code&gt; required
-Wants to nudge the &lt;code&gt;output&lt;/code&gt; closer to the &lt;code&gt;target&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;target&lt;/code&gt;: known classification for training examples
-&lt;code&gt;output&lt;/code&gt;: predicted classification your network spits out&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;but-just-a-nudge&quot;&gt;But just a nudge.&lt;/h2&gt;
-
-&lt;p&gt;Don’t get greedy and push all the way to the answer
-Because your linear sloper predictions are wrong
-And there may be nonlinear interactions between the weights (multiply layers)&lt;/p&gt;
-
-&lt;p&gt;So set the learning rate (\alpha) to somthething less than 1
-the portion of the predicted nudge you want to “dial back” to&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;example-predict-rain-in-portland&quot;&gt;Example: Predict Rain in Portland&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;PyBrain&lt;/li&gt;
-  &lt;li&gt;pug-ann (helper functions TBD PyBrain2)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Get historical weather for Portland then …&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Backpropagate: train a perceptron&lt;/li&gt;
-  &lt;li&gt;Activate: predict the weather for tomorrow!&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;NN Advantages&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Easy
-    &lt;ul&gt;
-      &lt;li&gt;No math!&lt;/li&gt;
-      &lt;li&gt;No tuning!&lt;/li&gt;
-      &lt;li&gt;Just plug and chug.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;General
-    &lt;ul&gt;
-      &lt;li&gt;One model can apply to many problems&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Advanced
-    &lt;ul&gt;
-      &lt;li&gt;They often beat all other “tuned” approaches&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Disadvantage #1: Slow training&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;24+ hr for complex Kaggle example on laptop&lt;/li&gt;
-  &lt;li&gt;90x30x20x10 model degrees freedom
-    &lt;ul&gt;
-      &lt;li&gt;90 input dimensions (regressors)&lt;/li&gt;
-      &lt;li&gt;30 nodes for &lt;em&gt;hidden layer&lt;/em&gt; 1&lt;/li&gt;
-      &lt;li&gt;20 nodes for &lt;em&gt;hidden layer&lt;/em&gt; 2&lt;/li&gt;
-      &lt;li&gt;10 output dimensions (predicted values)&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Disadvantage #2: They don’t scale (unparallelizable)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Fully-connected NNs can’t be &lt;em&gt;easily&lt;/em&gt; hyper-parallelized (GPU)
-    &lt;ul&gt;
-      &lt;li&gt;Large matrix multiplications&lt;/li&gt;
-      &lt;li&gt;Layers depend on all elements of previous layers&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Scaling Workaround&lt;/p&gt;
-
-&lt;p&gt;At Kaggle workshop we discussed paralleling linear algebra&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Split matrices up and work on “tiles”&lt;/li&gt;
-  &lt;li&gt;Theano, &lt;a href=&quot;&quot;&gt;Keras&lt;/a&gt; for python&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf&quot;&gt;PLASMA&lt;/a&gt; for BLAS&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Scaling Workaround Limitations&lt;/p&gt;
-
-&lt;p&gt;But tiles must be shared/consolidated and theirs redundancy&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Data flow: Main -&amp;gt; CPU -&amp;gt; GPU -&amp;gt; GPU cache (and back)&lt;/li&gt;
-  &lt;li&gt;Data com (RAM xfer) is limiting&lt;/li&gt;
-  &lt;li&gt;Data RAM size (at each stage) is limiting &lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://icl.cs.utk.edu/news_pub/submissions/plasma-scidac09.pdf&quot;&gt;Each GPU is equivalent to 16 core node&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Disadvantage #3: They overfit&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Too manu nodes = overfitting&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;What is the big O?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Degrees of freedom grow with number of nodes &amp;amp; layers&lt;/li&gt;
-  &lt;li&gt;Each layer’s nodes connected to each previous layer’s&lt;/li&gt;
-  &lt;li&gt;That a lot of wasted “freedom”&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;on2&quot;&gt;O(N^2)&lt;/h2&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Not so fast, big O…&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;prod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;6000&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;3600&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Rule of thumb &lt;/p&gt;
-
-&lt;p&gt;NOT &lt;code&gt;N**2&lt;/code&gt; &lt;/p&gt;
-
-&lt;p&gt;But &lt;code&gt;M * N**2&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;N: number of nodes
-M: number of layers&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;code&gt;assert(M * N**2 &amp;lt; len(training_set) / 10.)&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;I’m serious… put this into your code.
-I wasted a lot of time training models for Kaggle that overfitted.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;You do need to know math!&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;To imprint your net with the structure (math) of the problem
-    &lt;ul&gt;
-      &lt;li&gt;Feature analysis or transformation (conventional ML)&lt;/li&gt;
-      &lt;li&gt;Choosing the activation function and segmenting your NN&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Prune and evolve your NN&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;This is a virtuous cycle!&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;More structure (no longer fully connected) 
-    &lt;ul&gt;
-      &lt;li&gt;Each independent path (segment) is parallelizable!&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Automatic tuning, pruning, evolving is all parallelizable!
-    &lt;ul&gt;
-      &lt;li&gt;Just train each NN separately&lt;/li&gt;
-      &lt;li&gt;Check back in with Prefrontal to “compete”&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Structure you can play with (textbook)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;limit connections &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;jargon: &lt;em&gt;receptive fields&lt;/em&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;limit weights &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;jargon: &lt;em&gt;weight sharing&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;All the rage: &lt;em&gt;convolutional networks&lt;/em&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Unconventional structure to play with&lt;/p&gt;
-
-&lt;p&gt;New ideas, no jargon yet, just crackpot names&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;limit weight ranges (e.g. -1 to 1, 0 to 1, etc)&lt;/li&gt;
-  &lt;li&gt;weight “snap to grid” (snap learning)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Joke: “What’s the difference between a scientist and a crackpot?”&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Ans: “P-value”&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;High-&lt;strong&gt;P&lt;/strong&gt;robability null hypothesis&lt;/li&gt;
-  &lt;li&gt;Not &lt;strong&gt;P&lt;/strong&gt;ublished&lt;/li&gt;
-  &lt;li&gt;Not &lt;strong&gt;P&lt;/strong&gt;eer-reviewed&lt;/li&gt;
-  &lt;li&gt;No &lt;strong&gt;P&lt;/strong&gt;yPi &lt;strong&gt;p&lt;/strong&gt;ackage&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;I’m a crackpot!&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;Resources&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://keras.io/&quot;&gt;keras.io&lt;/a&gt;: Scalable Python NNs&lt;/li&gt;
-  &lt;li&gt;&lt;/li&gt;
-&lt;/ul&gt;
 </description>
-        <pubDate>Wed, 13 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Draft-Neural-Nets-Demystified/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Draft-Neural-Nets-Demystified/</guid>
+        <pubDate>Sun, 02 Oct 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/-PyDX-is-Awesome/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/-PyDX-is-Awesome/</guid>
       </item>
     
       <item>
-        <title>Purchasing Electronics with BitCoin</title>
-        <description>&lt;p&gt;The “withdrawal” option on &lt;a href=&quot;kraken.com&quot;&gt;Kraken&lt;/a&gt; worked well when I used it to purchase a “refurbished” &lt;a href=&quot;https://www.google.com/shopping/product/7194589541084124364?sclient=psy-ab&amp;amp;client=ubuntu&amp;amp;hs=ejj&amp;amp;channel=fs&amp;amp;q=DCP-L2540DW+printer&amp;amp;oq=DCP-L2540DW+printer&amp;amp;pbx=1&amp;amp;bav=on.2,or.r_cp.&amp;amp;bvm=bv.93564037,d.b2w&amp;amp;biw=1591&amp;amp;bih=830&amp;amp;tch=1&amp;amp;ech=1&amp;amp;psi=AppXVav2CoGdsQWVh4GwBg.1431804419195.3&amp;amp;sa=X&amp;amp;ei=DJpXVaODIcXisAWtlIGwBg&amp;amp;ved=0CJYBELkk&quot;&gt;Brother laser printer&lt;/a&gt; on &lt;a href=&quot;http://www.newegg.com/Product/Product.aspx?Item=N82E16828113937&quot;&gt;NewEgg&lt;/a&gt;. All you need to do is&lt;/p&gt;
+        <title>Automation-Safer-Than-Manual</title>
+        <description>&lt;p&gt;Interactive automation is much better than fully manual keyboard &lt;code&gt;bash&lt;/code&gt;ing for a lot of linux tasks. It’s taken decades but many linux distributions have finally made it possible to install linux automatically without too much hassel. But other mundane tasks like adding or swapping out a harddrive are a real bear. And the online instructions (especially at Canonical’s Ubuntu docs site) sound overly protective, cautious, encouraging the user to do everything by hand instead of automating things with a script. And they often get critical steps wrong, endangering your data and your computer.&lt;/p&gt;
 
-&lt;ol&gt;
-  &lt;li&gt;Navigate to the withdrawals page on your Kraken account&lt;/li&gt;
-  &lt;li&gt;Click the add withdrawal account button&lt;/li&gt;
-  &lt;li&gt;On the NewEgg invoice page, copy the account number (bitcoin address) beneath “&lt;a href=&quot;https://bitpay.com/&quot;&gt;BitPay&lt;/a&gt;” and along side the QR code. &lt;/li&gt;
-  &lt;li&gt;Paste the account number into the “add account” field on Kraken&lt;/li&gt;
-  &lt;li&gt;Click the withraw button on Kraken&lt;/li&gt;
-  &lt;li&gt;Paste the amount from the BitPay invoice on NewEgg&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;add the 0.0005 BTC processing fee to the withdrawl amount&lt;/strong&gt;&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;Here’s my first cut at a bash script that could be used to automate the process of adding a new disk (hard drive). It needs some work, but with a little interractivity and less unexpected magic, it could really improve the safety of destructive operations like partitioning and formatting.&lt;/p&gt;
 
-&lt;p&gt;I’m not sure if Kraken or the BTC network or BitPay imposes this half a millicoin transaction fee. Maybe it’s standard, but optional, on the BTC network these days. This is my first transaction in a long while. But if you don’t include it in your payment, BitPay won’t accept your payment. I had to send a second withdrawal for 0.001 (1 millicoin) to cover my 0.0005 BTC shortfall and the 0.0005 BTC transaction fee on that second withdrawal. But all was well in about 10 minutes. Both transactions cleared much faster than the “advertised” 60 minutes on Kraken.&lt;/p&gt;
-
-&lt;p&gt;And these “refurbished” printers are just overstock, from what I can tell. They come double-boxed and packaged with unbroken seals, like a new unit. They don’t have cloud printing (through Google or remote Apple/iTunes-Print). But they work great as a wireless printer (if you have a Windows computer to do the network configuration with). So if you want an economical way to print find a Laser printer refurbishment sale and jump on it. You won’t regret it. Faster, cheaper, better, more reliable… laser is &lt;strong&gt;WAY&lt;/strong&gt; cheaper than inkjet, per page, no matter how cheap the printer is to start out. The InkJet cartridge and printer market is a racket.&lt;/p&gt;
-</description>
-        <pubDate>Tue, 12 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Purchase-Electronics-with-BitCoin-from-Kraken/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Purchase-Electronics-with-BitCoin-from-Kraken/</guid>
-      </item>
-    
-      <item>
-        <title>Gaussian Mixture Model</title>
-        <description>&lt;p&gt;Working on this Kaggle challenge (Otto Product Categorization), it’s becoming clear that the most appropriate hard-coded model is a Bayesian Classifier. And you don’t need the “gamification” clues to tell you that. Though the clues helped. “I’m a strict Bayesian, you know” was the acknowledgment message I received last week with my first decision-tree submission (within spitting distance of the benchmark). Clever. I love &lt;a href=&quot;http://kaggle.com&quot;&gt;Kaggle&lt;/a&gt; for this! For the same reason I love stack overflow… they use influence techniques for the TotalGood rather than their focusing on monetization (their own financial gain).&lt;/p&gt;
-
-&lt;p&gt;Anyway you’ve got counts of 93 discrete events (binary dimensions). These are most likely words, but could be anything, I guess, like counts of user types that purchase each product in the Otto inventory. I’m guessing they just found the 93 words with the most entropy in their short product descriptions and want us to do NLP to identify their category accurately.&lt;/p&gt;
-
-&lt;p&gt;We need to estimate a probability for each of 9 categories (classes) with 63k training set product models (where the category is known) and 200k+ “test” products where the category isn’t provided. The prior probabilities for the categories, p_1 through p_9, can be easily estimated from the training set, but if the sample they provided isn’t representative we’ll need to iterate on the priors based on our predicted categorizations of the much larger “test set” data.&lt;/p&gt;
-
-&lt;p&gt;Now, for a Bayesian classifier, where you have to choose only one category, you’d want to estimate the likelihood ratio for each category and each record (product). According to Simon Haykin’s book “Neural Networks and Learning Machines” the likelihood ratio is &lt;/p&gt;
-
-</description>
-        <pubDate>Mon, 11 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Gaussian-Mixture-Model/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Gaussian-Mixture-Model/</guid>
-      </item>
-    
-      <item>
-        <title>Connect Mac WiFi with Comcast Motorola Surfboard Extreme SBG121 or SBG6580</title>
-        <description>&lt;p&gt;Larissa and house guests are often complaining about sluggish Internet with our Comcast Motorola Router and Modem. So I tried a lot of things. In the end, I think it was the “IP Flooding” filter that was gumming up the works.&lt;/p&gt;
-
-&lt;h1 id=&quot;visiting-in-laws&quot;&gt;Visiting In-Laws&lt;/h1&gt;
-
-&lt;p&gt;Riss and her visiting parents often have trouble using Skype or VPN clients like Blue Jeans with their Mac products or Australia-configured phones and laptops. Last month I installed a new Ubiqity UniFi high power access point &lt;a href=&quot;2015-04-18-Install-Mongo-DB-on-Fedora-for-Ubiqity-UniFi-Access-Point&quot;&gt;last month&lt;/a&gt; to see if maybe it was the WiFi link in the chain, but that didn’t seem to help Larissa much.&lt;/p&gt;
-
-&lt;p&gt;I closed down the network and changed passwords, in case neighbors had hacked us. Still no joy.&lt;/p&gt;
-
-&lt;h1 id=&quot;set-control-channel-between-2-and-12-inclusive&quot;&gt;Set Control Channel Between 2 and 12 (inclusive)&lt;/h1&gt;
-
-&lt;p&gt;A couple weeks ago I installed a Century Link DSL modem and router as backup and for penetration testing on my Comcast modem LAN. I’ve got an “inside man” and I still can’t get through by SSH to my GPUs in the basement. But that’s another story. The key news here is that the technician slipped me some “beta” while he was tracing and reconnecting all the phone lines to our house that Comcast had cut and yarn-balled. In between curses at the previous technicians that had been up the pole, he mentioned that &lt;strong&gt;Apples (Macs) don’t like channel 1 and 13&lt;/strong&gt;, so “you should set your wireless to use channel 2-12 and disable automatic wireless configuration.” If you hit the sync button with automatic connection enabled, the router will override the defaults you set up.&lt;/p&gt;
-
-&lt;h1 id=&quot;disable-ip-flood-detection-in-your-firewall&quot;&gt;Disable IP Flood Detection in Your Firewall&lt;/h1&gt;
-
-&lt;p&gt;I searched online and found others that had blindly stumbled onto this solution for their Comcast modems as well, by not allowing it to automatically select an unoccupied “control channel” and specifying one manually (probably not 1 or 13). Along with those posts I found that people had &lt;strong&gt;turned off IP flooding filters/firewalls&lt;/strong&gt; to help with bandwidth as well. I mean, who really thinks your home network is so important that a script kiddie is going to try to DOS you?&lt;/p&gt;
-
-&lt;p&gt;Both these settings seemed to help me (and my wife and in-laws). But I’m keeping the Century Link network to myself (and my business) in case her laptop or our guests ever get hacked or accidentally key our WiFi password into a phishing dialog box or Google search bar.&lt;/p&gt;
-
-&lt;h1 id=&quot;good-old-ethernet&quot;&gt;Good Old Ethernet&lt;/h1&gt;
-
-&lt;p&gt;When in doubt hard-wire it. As backup, I wired up my office desk with Ethernet (Larissa insisted she’d never need a jack on her side of the room) and put all the routers in the basement. That way they can keep cool and reduce the radio footprint and interference with neighbors. Maybe that’ll help.&lt;/p&gt;
-
-&lt;p&gt;I also wired the DVD player up to Ethernet so that Netflix will no longer stream over the wireless. Hopefully that’ll make everything run more smoothly on WiFi as well as when we’re watching movies. I just hope Samsung and Netflix don’t do a lot of background chirping “phone home” even when we aren’t watching TV. I’m sure that “high priority” Ethernet traffic would bump our WiFi traffic down the bandwidth queue.&lt;/p&gt;
-</description>
-        <pubDate>Sun, 10 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Connect-Motorola-Surfboard-Extreme-SBG121-SBG6580/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Connect-Motorola-Surfboard-Extreme-SBG121-SBG6580/</guid>
-      </item>
-    
-      <item>
-        <title>Data Science Group Talk -- Neural Nets Demystified</title>
-        <description>&lt;p&gt;&lt;a href=&quot;https://twitter.com/pkafei&quot;&gt;Portia&lt;/a&gt; &lt;a href=&quot;http://www.plbanalytics.com/&quot;&gt;Burton&lt;/a&gt; asked me to speak about Neural Nets at the next &lt;a href=&quot;http://www.meetup.com/Portland-Data-Science-Group/&quot;&gt;Data Science Group&lt;/a&gt; meetup. So here’s the abstract… &lt;/p&gt;
-
-&lt;h2 id=&quot;neural-nets-demystified&quot;&gt;Neural Nets Demystified&lt;/h2&gt;
-
-&lt;p&gt;I’ve used neural nets to solve 4 problems recently and I’ll share lessons learned from each of them and try to reveal them for what they are… a blunt, broad tool for any problem that just won’t yield to more targeted data analysis tools.&lt;/p&gt;
-
-&lt;p&gt;I’ve used neural nets to…&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;predict building energy consumption (e.g. to turn on Tesla battery packs at the right time)&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://hobsonlane.com/PyCon-2015-Lightning-Talk-Video-and-Attribution/&quot;&gt;predict the weather in Portland&lt;/a&gt;, so your thermostat can tell when to pack an umbrella&lt;/li&gt;
-  &lt;li&gt;sentence segmentation (Kyle Gorman’s &lt;a href=&quot;https://github.com/cslu-nlp/DetectorMorse&quot;&gt;DetectorMorse&lt;/a&gt;)&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.kaggle.com/c/otto-group-product-classification-challenge&quot;&gt;predict product classifications&lt;/a&gt; like electronics vs clothing based on feature counts… looks like bags-of-words to me&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;And neural nets have been applied recently in fields where they’ve not been considered before&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;George Dahl surpassed existing &lt;a href=&quot;http://hobsonlane.com/Graph-Theory-Basics-and-Advanced-Speech-Recognition-with-Neural-Nets/&quot;&gt;speech recognition&lt;/a&gt; technology by inserting a deep net into the Microsoft Bing speech-processing pipeline to replace Gaussian Mixture Models&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://www.technologyreview.com/news/524026/is-google-cornering-the-market-on-deep-learning/&quot;&gt;Google’s $400M purchase of Deep Mind&lt;/a&gt; whose main demonstration was an video game playing neural net&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;So I’ll discuss all these examples and explain the similarities between the neural network structures (topologies) that solved these problems and comparable models used in the past for these problems (linear regressions and naive Bayes classifiers). In the end, the “forward” model is usually a bunch of weighted terms summed together and then transformed with some nonlinear function before being passed along as new features to another layer of transformation and summing. And it has been proven that a 3-layer neural net with a nonlinear activation function is capable of modeling any nonlinear function, given enough nodes or neurons. The only question is whether you can wait around for it to find its way out of all the local minima that exist in such a nonlinear manifold (multi-dimensional surface).&lt;/p&gt;
-
-&lt;p&gt;I’ll show some color maps of the neuron connection weights as they evolve during back propagation for a simple problem where they values make intuitive sense (sentence segmentation). And then I’ll show what the more inscrutable weight matrices look like for a complicated problem like weather prediction. Finally I share some techniques for structuring and pruning neural nets to match the structure of the problem to improve their solution accuracy and training speed.&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 05 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Data-Science-Meetup--Neural-Nets-Demystified/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Data-Science-Meetup--Neural-Nets-Demystified/</guid>
-      </item>
-    
-      <item>
-        <title>Dev Resources</title>
-        <description>&lt;h2 id=&quot;keeping-up&quot;&gt;Keeping Up&lt;/h2&gt;
-
-&lt;p&gt;If you want to keep up with the latest in tech, &lt;a href=&quot;http://www.brazilostrich.com/&quot;&gt;Neil’s blog&lt;/a&gt; isn’t a bad place to check out now and then, the slides &lt;a href=&quot;http://www.brazilostrich.com/?p=346&quot;&gt;section in particular&lt;/a&gt;. Thanks for mentioning my Python User Group talk slides. I really have to update the slides.com ones I built with the GUI so that they can be easily embedded in blogs like Neil’s. Remind me to cancel my slides.com subscription and rewrite them in raw reveal.js code.&lt;/p&gt;
-
-&lt;h2 id=&quot;getting-perspective&quot;&gt;Getting Perspective&lt;/h2&gt;
-
-&lt;p&gt;If you like a little perspective and art with your tech, then check out Steven Skoczen’s blog and newsletter at &lt;a href=&quot;http://inkandfeet.com&quot;&gt;Ink and Feet&lt;/a&gt;. I’m regularly refreshed with that feeling of being alive when I read his weekly letter… it’s like you feel in those serene moments on travel alone in a foreign country. Only you get to be safe at home on your couch or in bed, which he endures the traveler’s sickness and isolation of living among people whose language he’s yet to learn. &lt;/p&gt;
-</description>
-        <pubDate>Mon, 04 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Tech-Blog-by-Neil/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Tech-Blog-by-Neil/</guid>
-      </item>
-    
-      <item>
-        <title>Soul Food</title>
-        <description>&lt;h2 id=&quot;curry-chicken-sandwiches&quot;&gt;Curry Chicken Sandwiches&lt;/h2&gt;
-
-&lt;p&gt;I made lunch for Stephen, the carpenter working on our house–a curry chicken sandwich. He talked about it so much to his wife that she asked for the recipe. It’s from my Aunt Elizabeth who was born in the south, though, i doubt anyone besides here ever made curried chicken in the 80’s down there. It’s simple. Set the oven to 425 deg F and mix some curry powder into yogurt in a bowl and slop some chicken breasts through the mixture. Put the coated chicken on a baking sheet and spoon what’s left of the yogurt onto the top of them. Then bake at 425 deg F for 20 minutes. You can flip the breasts at about 10 minutes if you want to keep the yogurt on the bottom from carbonizing, but they turn out fine even without a flip.&lt;/p&gt;
-
-&lt;p&gt;If you stock up on chicken breasts when they’re on sale and cook them before they’ve been frozen they’ll still be tender and juicy the next day when you slice them for a toasted sandwich (with cheese and lettuce and/or mustard), like I did for the work crew.&lt;/p&gt;
-
-&lt;h2 id=&quot;corn-pone&quot;&gt;Corn Pone&lt;/h2&gt;
-
-&lt;p&gt;The recipe for the “corn pone” (cornbread) I served the crew today was a bit more complicated. Set the oven to 425 again. Mix together in a bowl: 1 cup flour, 1.5 cup fine cornmeal, 1/4 cup sugar (preferably brown sugar or raw), 1/2 tsp salt, 2 tsp cayenne pepper (optional), and 1.5 tbsp (5 tsp) baking powder. Beat 2 eggs and a cup of milk and 1/3 cup canola or olive oil together with a fork in a measuring cup and then stir that into the flour mixture. 10 strokes is usually enough to get everything wet, but not doughy. Lumps are good. Finely chop some onions, garlic, and broccoli stems and stir them into the batter to add a little eco-friendly nutrition and texture to the mix. Bake it in a 10 x 10 x 2 inch (or 12 inch diameter) baking pan at 425 deg F for 20 minutes or so. Like brownies, the key is to not over-cook. But if it doesn’t seem done at 20 minutes turn off the oven and put it back in for 5 more minutes. &lt;/p&gt;
-
-&lt;p&gt;“That’s the best cornbread I’ve ever had,” according to Larissa. Perhaps that was the drop of vanilla or quarter cup of unsweetened almond + coconut milk that she was tasting. I snuck that into the mix this time. Basically, cornmeal is very forgiving, add whatever you like. Bake it, boil it, pound it into a flat bread… it all tastes great.&lt;/p&gt;
-
-&lt;p&gt;Thank you to the native North and South Americans that went to the trouble of domesticating and breeding that tiny little inedible flower bud that grew into corn ears whose kernels are ground and put in everything these days.&lt;/p&gt;
-</description>
-        <pubDate>Mon, 04 May 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Southern-Recipes/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Southern-Recipes/</guid>
-      </item>
-    
-      <item>
-        <title>Model and Diagram Any Database Using SQLAlchemy</title>
-        <description>&lt;p&gt;I needed to model and diagram (ERD) a client’s database schema in order to understand their machine learning task. They don’t use Django, so I can’t just &lt;code&gt;manage.py inspectdb&lt;/code&gt; and &lt;a href=&quot;http://django-extensions.readthedocs.org/en/latest/graph_models.html&quot;&gt;&lt;code&gt;manage.py graph_models&lt;/code&gt;&lt;/a&gt;. But fortunately, sqlalchemy makes both of these tasks easy. &lt;/p&gt;
-
-&lt;p&gt;It will work on any database that sqlalchemy knows how to deal with (many more &lt;a href=&quot;http://docs.sqlalchemy.org/en/latest/core/engines.html#others&quot;&gt;supported databases&lt;/a&gt; than Django’s ORM). Look, Ma, no Django!&lt;/p&gt;
-
-&lt;h2 id=&quot;autocoding-your-sqlalchemy-models-inspectdb&quot;&gt;Autocoding Your SQLAlchemy Models (&lt;code&gt;inspectdb&lt;/code&gt;)&lt;/h2&gt;
-
-&lt;p&gt;The &lt;a href=&quot;https://code.google.com/p/sqlautocode/&quot;&gt;&lt;code&gt;sqlautocode&lt;/code&gt;&lt;/a&gt; package creates models.py files (an sqlalchemy schema) for any database. Unfortunately there’s an incompatibility with the latest sqlalchemy, but [a patch] and &lt;a href=&quot;https://bitbucket.org/x746e/sqlautocode&quot;&gt;fork&lt;/a&gt; fixed that up. So you’ll want to download this fork rather than installing from pypi or the official mercurial repo on code.google.com. Here’s the bash trifecta that’ll install it an model your database:&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;hg clone https://bitbucket.org/x746e/sqlautocode
-pip install sqlautocode
-sqlautocode postgres://username:password@host.domain.com/dewey -o models.py&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;diagramming-your-database-graphmodels&quot;&gt;Diagramming Your Database (&lt;code&gt;graph_models&lt;/code&gt;)&lt;/h2&gt;
-
-&lt;p&gt;Unless sqlalchemy has fixed things, you’ll need a special pyparsing version for pydot to play nice with sqlalchemy:&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;pip uninstall pyparsing
-pip install -Iv https://pypi.python.org/packages/source/p/pyparsing/pyparsing-1.5.7.tar.gz#md5&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;9be0fcdcc595199c646ab317c1d9a709 pydot&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;To diagram a PostrgreSQL database:&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sqlalchemy_schemadisplay&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;create_schema_graph&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;postgres://username:password@host.server.url.com/database_name&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;graph&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;create_schema_graph&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MetaData&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show_datatypes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;show_indexes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rankdir&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;LR&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;concentrate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;graph&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write_png&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;database_schema_diagram.png&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;I’ll post an example once I have need to model an open-data database.  They are really quite well-done. The layout optimizer leaves just enough white space and the edges/relationships are untangled into a presentable/readable form.&lt;/p&gt;
-
-&lt;h2 id=&quot;glossary&quot;&gt;Glossary&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;ERD&lt;/strong&gt;: Entity-Relationship Diagram – a block diagram of your DB tables and their connections (relationships)&lt;/p&gt;
-</description>
-        <pubDate>Mon, 27 Apr 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Autocode-and-Diagram-Any-Database/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Autocode-and-Diagram-Any-Database/</guid>
-      </item>
-    
-      <item>
-        <title>Graph Theory Basics, and Speech Recognition with Neural Nets</title>
-        <description>&lt;p&gt;Here are the highlights from this week’s &lt;a href=&quot;http://www.thetalkingmachines.com/&quot;&gt;“Talking Machines”&lt;/a&gt; podcast from &lt;a href=&quot;https://twitter.com/tlkngmchns&quot;&gt;@tlkngmchns&lt;/a&gt;. Thank you &lt;a href=&quot;https://github.com/ThunderShiviah/&quot;&gt;Thunder&lt;/a&gt; for turning me on to this awesome podcast! &lt;/p&gt;
-
-&lt;h2 id=&quot;graphs-networks&quot;&gt;Graphs (Networks)&lt;/h2&gt;
-
-&lt;p&gt;Kyle Adams (Harvard) started the podcast with an overview of graph theory. The only thing I got out of it was that “graph limits” are a recent area of research in graph theory – techniques for dealing with large networks.&lt;/p&gt;
-
-&lt;h2 id=&quot;where-to-start&quot;&gt;Where to Start?&lt;/h2&gt;
-
-&lt;p&gt;Katherine Gorman and Kyle Adams answered a caller’s question about selecting a model for a given Data Science problem. Kyle recommends first trying simple, off-the-shelf implementations of simple algorithms like Logistic Regression, Support Vector Machines, or Random Forests.&lt;/p&gt;
-
-&lt;p&gt;Then there are two main forks in the “decision tree” when you encounter a one of the two main classes of “difficult problems.”&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Significant nonlinearities (logistic Regression will fail)
-    &lt;ol&gt;
-      &lt;li&gt;Try adding nonlinearities (kernels or transformations) to your LR, SVM&lt;/li&gt;
-      &lt;li&gt;Pursue neural nets or other nonlinear techniques&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;High dimensionality
-    &lt;ol&gt;
-      &lt;li&gt;If you need all the dimensions (e.g. image processing), use convolutional neural nets to segment the dimensions&lt;/li&gt;
-      &lt;li&gt;If your data is sparsely influential (e.g. bioinformatics) – shrink most weights down to zero to extract strongest influencers &lt;/li&gt;
-      &lt;li&gt;Use probabilistic matrix factorization and SVD extract latent features. &lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;neural-nets-for-speech&quot;&gt;Neural Nets for Speech&lt;/h2&gt;
-
-&lt;p&gt;In the second half they got to the meat of the podcast, an interview with George Dahl. Dr. Dahl (just defended) shook up the world of speech recognition by employing neural nets in place of Gaussian Mixture Models. He used this technique to win the Kaggle challenge posed by Merck. He later employed this technique to improve upon speech recognition algorithms in Bing at Microsoft.&lt;/p&gt;
-
-&lt;p&gt;The open source package &lt;a href=&quot;http://kaldi.sourceforge.net/about.html&quot;&gt;Kaldi&lt;/a&gt; has recently incorporated neural nets into its speech recognition algorithm. This was the only open source implementation of Dahl’s approach that he mentioned. The others are at Microsoft, IBM, and Google.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.cs.toronto.edu/~asamir/&quot;&gt;Abdel-rahman Mohamed&lt;/a&gt; and &lt;a href=&quot;http://www.cs.toronto.edu/~gdahl/&quot;&gt;George Dahl&lt;/a&gt; at Toronto worked on phone recognition for &lt;a href=&quot;https://en.wikipedia.org/wiki/TIMIT&quot;&gt;TIMIT&lt;/a&gt;.
-Lee Dang at Microsoft understood TIMIT, a dataset of only a few hours of speech segmented into phones. Phones are actual utterances of phonemes. Lee hired Abdel and George on an internship to try their technique on large vocabularies (Bing searches). It continued to work well once they solved a low level bug in the code, a hard-coded symbol/phone(?) limit of 1250 or 4000 bits.&lt;/p&gt;
-
-&lt;p&gt;“The biggest problems with the current pipeline are the GMM, HMM, N-gram language model.” Basically, everything except the beam search decoder part of the pipeline “which is pretty good.”&lt;/p&gt;
-
-&lt;p&gt;Bioinformatics ignored neural nets until George Dahl and Ruslan (Rus) Salakhutdinov won the Merck challenge on Kaggle.
-Russ Sulukudena 15% improvement on baseline by Merck
-Bayesian Neural Nets useful on large datasets as opposed to conventional multilayer perceptron Neural Nets.&lt;/p&gt;
-
-&lt;h2 id=&quot;alphabet-soup&quot;&gt;Alphabet Soup&lt;/h2&gt;
-
-&lt;p&gt;&lt;strong&gt;FMLLR&lt;/strong&gt;: Linear Logistic Regression&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;GBRBM&lt;/strong&gt;: Gaussian Bernoulli Restricted Boltzmann machine&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;GMM&lt;/strong&gt;: Gaussian Mixture Model, first step in speech recognition, creates training set&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;HMM&lt;/strong&gt;: Hidden Markov Model (equivalent to an N-gram language model?)&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;LR&lt;/strong&gt;: Logistic Regression&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;LVCSR&lt;/strong&gt;: Large Vocabulary Continuous Speech Recognition&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;MCMC&lt;/strong&gt;: Markov Chain Monte Carlo&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;MCRBM&lt;/strong&gt;: Monte Carlo Restricted Boltzmann Machine&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;NNLM&lt;/strong&gt;: Neural Net Language Models, N-gram Language Model?&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;QSAR&lt;/strong&gt;: Quantitative Structural Activity Relation prediction (the Merck Kaggle challenge)&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;RNN&lt;/strong&gt;: Recurrent Neural Net&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;SVM&lt;/strong&gt;: Support Vector Machines&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/TIMIT&quot;&gt;TIMIT&lt;/a&gt;&lt;/strong&gt;: Texas Instruments and Mass. Inst. Tech, speech recognition data set and problem&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;VMI?&lt;/strong&gt;: Verbmobil-I? VM-I was the first integrated system to perform spontaneous speech to speech translation/transcoding&lt;/p&gt;
-
-&lt;h2 id=&quot;people&quot;&gt;People&lt;/h2&gt;
+&lt;p&gt;This script builds on some erroneous ideas at &lt;a href=&quot;http://www.cyberciti.biz/tips/fdisk-unable-to-create-partition-greater-2tb.html&quot;&gt;“cyberciti tips”&lt;/a&gt; by incorporating some AskUbuntu wisdom to:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Dong Yu – fixed hard-coded 1250 limit on 4-bit symbols in the encoder.&lt;/li&gt;
-  &lt;li&gt;Peter Orbans – network theory&lt;/li&gt;
-  &lt;li&gt;John Hopfield – went to University of Toronto&lt;br /&gt;
-&lt;a href=&quot;http://www.cs.toronto.edu/~hinton&quot;&gt;Geoffrey (Geoff) Hinton&lt;/a&gt; – researcher at University of Toronto &lt;/li&gt;
-  &lt;li&gt;Alex Graves – using RNN for for a language model&lt;/li&gt;
-  &lt;li&gt;Russ Salakhutdinov – collaborated with Geof and George Dahl on the Merck challenge&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://www.cs.toronto.edu/~asamir/&quot;&gt;Abdel-rahman Mohamed&lt;/a&gt; – collaborator with George Dahl on neural nets in speech recognition&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://askubuntu.com/questions/386536/how-to-find-the-attached-devices-uuid-through-terminal&quot;&gt;find your UUID&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://askubuntu.com/questions/156994/partition-does-not-start-on-physical-sector-boundary&quot;&gt;align your partition with modern physical sector boundaries&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;p&gt;&lt;code&gt;bash
+MOUNTPOINT=/midata
+# find the unmounted device with the 3-4 TB of capacity (4TB drives only have 3.7TiB here)
+# (no filter for mounted devices so be careful!
+# this is where interactivity (confirmation) and robust safety checks should be implemented
+DEVICE=`sudo sfdisk -l | grep -E &#39;[3-4][.][0-9][ ]T&#39; | grep -Eoh &#39;/dev/sd[a-z]&#39;`
+DEVICE_LETTER=${DEVICE: -1}
+# to find your disk if it doesn&#39;t show up above
+sudo lshw -C disk
+# this will ask for confirmation
+sudo parted --script $DEVICE \
+    mklabel gpt mkpart \
+    primary 1MiB 4T &amp;amp;&amp;amp; sudo mkfs.ext4 $DEVICE
+sudo mkdir -p &quot;$MOUNTPOINT&quot; &amp;amp;&amp;amp; sudo mount $DEVICE &quot;$MOUNTPOINT&quot;
+sudo lsblk
+sudo blkid
+DEVICE_UUID=`ls -l /dev/disk/by-uuid | grep -E &quot;../sd$DEVICE_LETTER&quot; | grep -Eoh &#39;[-a-f0-9]{32,42}&#39;`
+sudo cp /etc/fstab &quot;/etc/fstab.$(date +&#39;%Y%m%d_%H%M%S&#39;).bak&quot;
+sudo echo &quot;# new hard drive installed &#39;`date`&#39;: when it was mounted at device $DEVICE&quot; | sudo tee -a /etc/fstab
+sudo echo &quot;UUID=$DEVICE_UUID $MOUNTPOINT         ext4    errors=remount-ro 0       1&quot; | sudo tee -a /etc/fstab
+sudo cat /etc/fstab
+sudo mount -a
+cd &quot;$MOUNTPOINT&quot;
+ls -hal
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;For now, don’t do this at home. But you can certainly use these commands manually to get going with yoru new drive. And if you get inspired, make it more robust, general, interractive, then submit an add_my_drive.sh utility to the Ubuntu distribution.&lt;/p&gt;
 </description>
-        <pubDate>Sat, 25 Apr 2015 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Graph-Theory-Basics-and-Advanced-Speech-Recognition-with-Neural-Nets/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Graph-Theory-Basics-and-Advanced-Speech-Recognition-with-Neural-Nets/</guid>
+        <pubDate>Sat, 17 Sep 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/-Automation-Safer-Than-Manual/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/-Automation-Safer-Than-Manual/</guid>
+      </item>
+    
+      <item>
+        <title>Python-Birth-Microsecond-Paradox</title>
+        <description>&lt;p&gt;&lt;a href=&quot;http://uglyboxer.github.io/&quot;&gt;Cole&lt;/a&gt; got bit by the Birthday Paradox when using python &lt;code&gt;random.randint()&lt;/code&gt; and &lt;code&gt;time.time()&lt;/code&gt; to generate a random number to tag a DB record with a unique ID. I think &lt;a href=&quot;http://hanneshapke.github.io/&quot;&gt;Hannes&lt;/a&gt; does something similar to ensure user-provided files are all unique, even a user uploads the exact same file twice.&lt;/p&gt;
+
+&lt;p&gt;I &lt;a href=&quot;https://docs.python.org/2/library/random.html&quot;&gt;read the docs&lt;/a&gt; and found that python uses system time, and &lt;code&gt;time.time()&lt;/code&gt; has microsecond resolution (hence the title of this post) to seed the random number generator on some machines during &lt;code&gt;import random&lt;/code&gt;. If the machine and OS provides a random number source, it’ll use that instead. The servers where this happened must not have a random source, so appending a random number from python’s &lt;code&gt;random&lt;/code&gt; package to a microsecond-resolution timestamp won’t add any randomness at all. If the two processes happen to start at the same microsecond they’ll produce the same answer. I couldn’t force the collision on my machine.&lt;/p&gt;
+
+&lt;p&gt;Here’s the docs. TLDR: skip to the bottom of this post.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h4 id=&quot;randomseedx&quot;&gt;random.seed(&lt;em&gt;x&lt;/em&gt;)&lt;/h4&gt;
+
+&lt;p&gt;Initialize the basic random number generator. Optional argument, &lt;em&gt;x&lt;/em&gt;, can be any &lt;a href=&quot;https://docs.python.org/2/glossary.html#term-hashable&quot;&gt;hashable&lt;/a&gt; object. If &lt;em&gt;x&lt;/em&gt; is omitted or &lt;code&gt;None&lt;/code&gt;, current system time is used; current system time is also used to initialize the generator when the module is first imported.  If randomness sources are provided by the operating system, they are used instead of the system time. See the &lt;a href=&quot;https://docs.python.org/2/os.html#os.urandom&quot;&gt;&lt;code&gt;os.urandom()&lt;/code&gt;&lt;/a&gt; function for details on availability.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;The “birthday paradox” is what it’s called when these collisions happen more often than you expect, like when generating a random integer between 1 and 365 in a room full of friends for their birthdays. So the concept doesn’t apply here. And this collision problem is not really a paradox anyway. But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn’t trick tmux into doing it, and the stack overflow answers seemed broken to me. But here’s my quick fail at repro:&lt;/p&gt;
+
+&lt;p&gt;This is the tmux approach I couldn’t get working&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+#!/bin/sh 
+tmux new-session -s collider -d &#39;python -c &quot;import random; print(random.randint(0,1000000000));&quot;&#39; &amp;amp;
+tmux new-window -s collider &#39;python -c &quot;import random; print(random.randint(0,1000000000));&quot;&#39;
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;So I just loaded up the OS process queue with a bunch of python interpreter processes in the hopes a few of them would pass through cores at the same time.&lt;/p&gt;
+
+&lt;p&gt;```bash
+for ((i=0; i&amp;lt;100; i++))
+do 
+    python -c “import random; print(random.randint(0,1000000000));” &amp;gt; /tmp/collider.${i}.log &amp;amp;
+done&lt;/p&gt;
+
+&lt;p&gt;for ((i=0; i&amp;lt;100; i++))
+do 
+    python -c “import time; print(repr(time.time()));” &amp;gt; /tmp/collidetime.${i}.log &amp;amp;
+done
+```&lt;/p&gt;
+
+&lt;p&gt;No luck with collisions (so my motherboard and python interpreter are too clever for my trickery), &lt;code&gt;uniq&lt;/code&gt; can’t find any dupes.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+cat /tmp/collider.*.log | sort | uniq -c
+#      1 105969327
+#      1 126048218
+# ...
+#      1 146990491
+#      1 148685188
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;bingo&quot;&gt;BINGO!&lt;/h2&gt;
+
+&lt;p&gt;The clock did a 2-step for the same microsecond, 3 times out of 100:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+cat /tmp/collidetime.*.log | sort | uniq -c | grep -e &#39;\b[2-9]\b&#39;
+#      2 1473613474.737581
+#      2 1473613474.743379
+#      2 1473613474.755999
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Did I do anything wrong?  What can Cole do to avoid this in the future (on a machine without a random source, like an AWS EC2 instance)?&lt;/p&gt;
+</description>
+        <pubDate>Sat, 10 Sep 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/-Python-Birth-Microsecond-Paradox/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/-Python-Birth-Microsecond-Paradox/</guid>
+      </item>
+    
+      <item>
+        <title>Now THAT&#39;s Open Data -- The Google NGram Viewer Corpus</title>
+        <description>&lt;p&gt;Now THAT’s &lt;a href=&quot;http://storage.googleapis.com/books/ngrams/books/datasetsv2.html&quot;&gt;Open Data&lt;/a&gt;!&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+FINISHED --2016-08-18 15:30:00--
+Total wall clock time: 3d 23h 19m 17s
+Downloaded: 6833 files, 3.2T in 3d 14h 55m 31s (10.7 MB/s)
+Converted links in 0 files in 0 seconds.
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;It’s 10% of &lt;a href=&quot;https://en.wikipedia.org/wiki/Google_Ngram_Viewer&quot;&gt;all the books published up until 2008&lt;/a&gt;, on one (&lt;em&gt;large&lt;/em&gt;) harddrive. It’s only the N-grams, rather than full text with punctuation, like Gutenberg. But N = 5. So you could reconstruct a lot of the books from that, if it weren’t for that pesky minimum document (book) frequency threshold of 40 books…&lt;/p&gt;
+
+&lt;p&gt;For those less hordy than me, you can just query the data through the slick API for fun things like officiating a “race” between &lt;a href=&quot;https://books.google.com/ngrams/graph?content=Python+development%2CRuby+development%2CC+development%2CPerl+development&amp;amp;year_start=1800&amp;amp;year_end=2008&amp;amp;corpus=15&amp;amp;smoothing=2&amp;amp;share=&amp;amp;direct_url=t1%3B%2CPython%20development%3B%2Cc0%3B.t1%3B%2CRuby%20development%3B%2Cc0%3B.t1%3B%2CC%20development%3B%2Cc0%3B.t1%3B%2CPerl%20development%3B%2Cc0&quot;&gt;Python, Ruby, C/C++, and Perl&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, I’d already used quite a bit of the 4T USB drive (downloading the Gutenberg Project books, among other things). So I scrolled further up the terminal log to see:&lt;/p&gt;
+
+&lt;p&gt;```bash
+storage.googleapis.com/books/ngrams/books/googlebooks-spa-all-5gram-20090715-99.csv.zip: No space left on deviceCannot write to ‘storage.googleapis.com/books/ngrams/books/googlebooks-spa-all-5gram-20090715-99.csv.zip’ (Success).&lt;/p&gt;
+
+&lt;p&gt;hobs@adder:/media/nas/data/corpora/googlebooks$ df -h
+Filesystem                   Size  Used Avail Use% Mounted on
+//totalgood/disk1_pt1/       3.7T  3.7T   20K 100% /media/nas
+```&lt;/p&gt;
+
+&lt;p&gt;Time to RAID up, I guess, before I rerun&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+wget -r --accept gz,zip --mirror --adjust-extension --convert-links --no-parent --backup-converted --level 1 http://storage.googleapis.com/books/ngrams/books/datasetsv2.html
+&lt;/code&gt;&lt;/p&gt;
+</description>
+        <pubDate>Thu, 18 Aug 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/-Now-That's-Open-Data--Google-NGram-Viewer/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/-Now-That's-Open-Data--Google-NGram-Viewer/</guid>
+      </item>
+    
+      <item>
+        <title>Comparison of Hybrid Mobile App Javascript Frameworks</title>
+        <description>&lt;p&gt;&lt;a href=&quot;http://totalgood.org/bicycle&quot;&gt;Zak&lt;/a&gt; and &lt;a href=&quot;http://totalgood.org/hope&quot;&gt;I&lt;/a&gt; are building frontends for DRF that we’d like to go mobile with eventually.&lt;/p&gt;
+
+&lt;p&gt;So choosing between React and Angular hinges on the hybrid app framework alternatives (ReactNative or Ionic).&lt;/p&gt;
+
+&lt;p&gt;Ionic is more mature but it’s app &lt;a href=&quot;http://ionicframework.com/&quot;&gt;“showcase”&lt;/a&gt; is no more impressive than &lt;a href=&quot;https://facebook.github.io/react-native/showcase.html&quot;&gt;ReactNative&lt;/a&gt;’s&lt;/p&gt;
+
+&lt;p&gt;So I guess I’ll go with the latest hottness (React) and let Zak use the more standard Angular.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 31 Jul 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/Comparison-of-Hybrid-Mobile-App-Javascript-Frameworks/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/Comparison-of-Hybrid-Mobile-App-Javascript-Frameworks/</guid>
+      </item>
+    
+      <item>
+        <title>History Temp Panic</title>
+        <description>ls /usr/local
+rm siteconf.p
+ls /usr/include/boost
+ls /usr/include/
+sudo apt install boost
+sudo apt install python-boost
+workon hope
+pip3 install boost
+pip3 search boost
+exit
+nvcc
+nvcc --help
+history | grep BLAS
+exit
+ls -al
+cd src
+ls -al
+tar -xvzf boost_1_61_0.tar.gz 
+cd boost_1_61_0/
+ls -al
+sudo apt install python3-dev
+sudo apt install python3-devel
+sudo apt install python-dev
+history | grep BLAS
+exit
+history | grep BLAS
+sudo apt search BLAS
+sudo apt install libopenblas-*
+cd src
+ls -al
+# sudo dpkg -i cuda-repo-ubuntu1504-7-5-local_7.5-18_amd64.deb 
+sudo apt-get install linux-headers-$(uname -r)
+sudo dpkg -i cuda-repo-ubuntu1504-7-5-local_7.5-18_amd64.deb 
+sudo apt uninstall cuda
+sudo apt-get  uninstall cuda
+sudo apt-get remove cuda
+ls /usr/local/
+ls /usr/local/cuda
+ls /usr/local/cuda/README 
+more /usr/local/cuda/README 
+more /usr/local/cuda/version.txt 
+more /usr/local/cuda-7.5/version.txt 
+sudo apt-get --purge remove cuda-7.5
+ls /usr/local/cuda/README 
+ls /usr/local/cuda/
+ls /usr/local/cuda-7.5/
+sudo dpkg -i cuda-repo-ubuntu1504-7-5-local_7.5-18_amd64.deb 
+sudo apt-get update
+sudo apt-get install cuda
+sudo shutdown -r now
+modprobe nvidia
+more /etc/modules
+sudo modprobe nvidia
+sudo modprobe nvidia-uvm
+ls /usr/local
+nano /etc/bash.bashrc 
+exit
+nano .theanorc
+workon hope
+ipython
+python3 -c &#39;import theano; theano.test()&#39;
+exit
+update-alternatives g++
+update-alternatives --list
+update-alternatives --list g++
+update-alternatives --list gcc
+gcc -V
+gcc -v
+g++ -v
+exit
+htop
+PW=&quot;`echo $UN | md5sum | cut -c2-7`&quot;
+UN=hannes
+PW=&quot;`echo $UN | md5sum | cut -c2-7`&quot;
+echo $UN | md5sum | cut -c2-7
+echo zak | md5sum | cut -c2-7
+echo cole | md5sum | cut -c2-7
+echo hannes | md5sum | cut -c2-7
+exit
+sudo apt-get install mpixx
+mpixx
+sudo apt-get install libopenmpi-dev
+cd src
+cd devops/
+ls -al
+cd scripts/
+ls
+nano addusers 
+chmod +x addusers 
+sudo ./addusers hannes cole matt erin andrew
+sudo ./addusers riley
+cd /usr/local/cuda-7.5/samples/
+ls -al
+cd bin
+ls -al
+cd x86_64/
+ls
+cd linux/
+ls
+cd release/
+ls
+cd ..
+cd release
+./deviceQuery
+./bandwidthTest 
+sudo apt install cuda-gdb-src
+sudo apt search cuda-gdb-src
+sudo apt-get install cuda-gdb-src
+cd ~/src/
+ls
+sudo apt-get update
+sudo apt-get install cuda-gdb
+sudo apt-get install cuda-command-line-tools-7-5-src
+sudo apt-get install cuda-command-line-tools-7-5-devel
+sudo apt-get install cuda-command-line-tools-7-5-dev
+echo -e &quot;\n[nvcc]\nflags=-D_FORCE_INLINES\n&quot; &gt;&gt; ~/.theanorc
+workon hope
+pip install Theano
+pip uninstall Theano
+pip remove Theano
+pip purge Theano
+pip cleanup
+pip install Theano
+python3 -c &quot;import theano;&quot;
+python3 -c &quot;import theano; theano.test()&quot;
+cd ../devops/
+nano configure_theano
+chmod +x configure_theano 
+./configure_theano 
+sudo apt install gcc-5.2
+sudo apt install gcc-5.2.1
+sudo apt install --update gcc
+sudo apt install --upgrade gcc
+which gcc
+ls /usr/bin/gcc
+/usr/bin/gcc
+/usr/bin/gcc -v
+python -c &quot;import theano; theano.test()&quot;
+nano ~/.theanorc
+python -c &quot;import theano; theano.test()&quot;
+pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
+pip install scipy
+cd ..
+cd devops/
+ls
+mv configure_theano scripts/
+cd ..
+sudo cp .theanorc ~hannes/
+sudo su hannes
+sudo chown hannes:hannes ~hannes/src/*
+sudo chown hannes:hannes ~hannes/.theanorc 
+sudo chown -R hannes:hannes ~hannes/src/
+sudo su hannes
+pip install lasagna
+pip install Lasagna
+pip install https://github.com/Lasagne/Lasagne/archive/master.zip
+pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
+sudo pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
+deactivate
+exit
+cd src
+cd devops/
+ls
+cd scripts/
+ls
+addusers thunder
+sudo ./addusers thunder
+more addusers
+echo hannes | md5sum | cut -c2-7
+echo thunder | md5sum | cut -c2-7
+exit
+ls
+cd src
+ls
+tar -xvzf cudnn-7.5-linux-x64-v5.1-rc.tgz 
+cd cuda
+ls -al
+export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
+exit
+env
+env | grep LD
+nano /etc/bash.bashrc 
+nvcc -V
+ls -al
+cd src
+ls -al
+cd cuda
+ls -al
+cd ..
+cd /usr/local
+ls -al
+cd cuda-7.5/
+ls -al
+cd samples
+ls -al
+make
+gcc -V
+gcc -v
+sudo update-alternatives --remove-all gcc 
+sudo update-alternatives --remove-all g++
+sudo apt-get install gcc-4.9
+sudo update-alternatives --remove-all g++
+sudo apt-get install g++-4.9
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 10
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 10
+make
+sudo make
+cd ~/
+workon hope
+pip install -r https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt
+pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
+ipython
+pip freeze &gt; requirements.gpu.txt
+more requirements.gpu.txt 
+nano requirements.gpu.txt 
+cp requirements.gpu.txt ../../../hannes/
+sudo cp requirements.gpu.txt ../../../hannes/
+sudo chmod a+r ../../../hannes/requirements.gpu.txt 
+sudo chmod a+w ../../../hannes/requirements.gpu.txt 
+sudo chmod a+d ../../../hannes/requirements.gpu.txt 
+sudo chmod a+x ../../../hannes/requirements.gpu.txt 
+sudo su hannes
+sudo pip3 install theano
+sudo pip3 install --upgrade pip
+sudo pip3 install --upgrade theano
+cd src
+sudo su hannes
+sudo pip3 install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
+sudo pip3 install --upgrade https://github.com/Theano/Theano/archive/master.zip
+ls -al
+cd devops
+sudo nano test_theano_gpu.py
+python3 test_theano_gpu.py 
+cd ..
+cd devops
+mv test_theano_gpu.py scripts/
+cd ..
+mv cuda cuda_base
+tar -xvzf cudnn-7.5-linux-x64-v5.1-rc.tgz 
+ls -al
+cd cuda
+which nvcc
+ls -al
+sudo cp -P include/cudnn.h /usr/local/cuda-7.5/include
+sudo cp -P lib64/libcudnn* /usr/local/cuda-7.5/lib/x86_64-linux-gnu/
+sudo cp -P lib64/libcudnn* /usr/local/cuda-7.5/lib64/
+sudo chmod a+r /usr/local/cuda-7.5/lib64/libcudnn*
+cd /usr/local/cuda-7.5/
+ls -al
+cd ~/src/devops
+ls -al
+cd scripts/
+git status
+ls -al
+sudo chmod +x test_theano_gpu.py 
+./test_theano_gpu.py
+sudo pip install twip
+sudo pip install pug-nlp
+workon hope
+ls -al
+cd hope
+ls -al
+cd hope
+ls -al
+cd ..
+htop
+w
+sudo su hannes
+python
+ipython
+write hannes &quot;noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff&quot;
+sensors
+write hannes &lt; `sensors` 
+sensors | write hannes
+write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type `sensors` to see status&quot;
+write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type &#39;sensors&#39; to see status&quot;
+write hannes &quot;I have $2 CPU cooler/radiator from free geek without any thermal paste, etc&quot;
+write hannes &quot;So probably need to get a water-cooled radiator if you are going to run it continuously for long periods&quot;
+sensors
+sensorsensor
+sensors
+htop
+sensors</description>
+        <pubDate>Sat, 30 Jul 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/history-temp-panic/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/history-temp-panic/</guid>
+      </item>
+    
+      <item>
+        <title>Cpu Gpu Temp Sensors Log</title>
+        <description>(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff&quot;
+write: hannes is not logged in on noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +62.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +64.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +64.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +65.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &lt; `sensors` 
+-bash: `sensors`: ambiguous redirect
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors | write hannes
+write: hannes is logged in more than once; writing to pts/9
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type `sensors` to see status&quot;
+write: hannes is not logged in on Nothing to worry about yet, but CPU is getting hot. Type coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +81.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +78.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM to see status
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type &#39;sensors&#39; to see status&quot;
+write: hannes is not logged in on Nothing to worry about yet, but CPU is getting hot. Type &#39;sensors&#39; to see status
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;I have $2 CPU cooler/radiator from free geek without any thermal paste, etc&quot;
+write: hannes is not logged in on I have  CPU cooler/radiator from free geek without any thermal paste, etc
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;So probably need to get a water-cooled radiator if you are going to run it continuously for long periods&quot;
+write: hannes is not logged in on So probably need to get a water-cooled radiator if you are going to run it continuously for long periods
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +86.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +78.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +79.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +81.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +77.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +84.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +79.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +81.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +80.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +80.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +66.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +60.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +62.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +65.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +59.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +60.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensorsensor
+sensorsensor: command not found
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +63.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +52.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +52.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ htop
+(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
+coretemp-isa-0000
+Adapter: ISA adapter
+Physical id 0:  +64.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 0:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 1:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 2:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 3:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 4:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 5:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 6:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
+Core 7:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
+
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+</description>
+        <pubDate>Sat, 30 Jul 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/cpu-gpu-temp-sensors-log/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/cpu-gpu-temp-sensors-log/</guid>
+      </item>
+    
+      <item>
+        <title>PenTesting Peanut Gallery</title>
+        <description>&lt;p&gt;Really enjoyed getting a crash course in InfoSec and PenTesting by &lt;a href=&quot;http://deanpierce.net&quot;&gt;Dean&lt;/a&gt; at the Ctrl-H HackerSpace meetup. Here’s how to get some tools for easy, ethical hacking.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/sqlmapproject/sqlmap&quot;&gt;sqlmap&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+git clone git@github.com:sqlmapproject/sqlmap.git
+# pip install -e `pwd`/sqlmap/  # no joy, help them with a PR setup.py?
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Give &lt;code&gt;sqlmap&lt;/code&gt; a URL with a ?id=42” at the end of it and you might get lucky. I may try to pull out links from the twip scraped tweets and &lt;code&gt;sqlmap&lt;/code&gt; the ones with a GET query that looks SQL-ish. Would have to follow the bit.ly redirects before it would be possible to filter them, but what the heck, my server has cycles to spare.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+python sqlmap.py -a -u vuln.com?id=42
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Another python-ish tool is &lt;a href=&quot;http://wapiti.sourceforge.net/&quot;&gt;Wapiti&lt;/a&gt;. Not sure how it works, but this tool has a bunch of python CLI tools for scanning networks.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+curl -O -L http://downloads.sourceforge.net/project/wapiti/wapiti/wapiti-2.3.0/wapiti-2.3.0.tar.gz
+tar xvzf wapiti-2.3.0.tar.gz
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;An enterprise (Windoze) security expert showed up late and talked about following infosec since the opensource, CLI BackTrack days. BackTrack is a linux distro with a lot of pen testing tools installed/configured. Kali is a similar set of tools used for Enterprise testing. He mentioned Nessus’s open source fork, &lt;a href=&quot;http://openvas.org/&quot;&gt;OpenVAS&lt;/a&gt;. He says it fizzled as the community deflated as they went closed source as Nessus. But here’s how to get by sourceforge click-traps and snag it:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;bash
+curl -L -O http://wald.intevation.org/frs/download.php/2325/greenbone-security-assistant-6.1+beta4.tar.gz
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;So with these two keywords it was a cynch to find high-traffic security tools lists like these:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://resources.infosecinstitute.com/14-popular-web-application-vulnerability-scanners/&quot;&gt;naggy addy list of 14 open source tools&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This script will download the python ones:&lt;/p&gt;
+
+&lt;p&gt;And here are some references to level up your skilz&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.offensive-security.com/metasploit-unleashed/&quot;&gt;Metasploit Free Online Offensive Security Training Course&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://sites.google.com/site/infosecrocks/&quot;&gt;Parisa Tariz’s infosec resources list&lt;/a&gt; - focus on XSS&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=kxqci2mZdrc&quot;&gt;Parisa Tariz’s PyCon Keynote on Python vulnerabilities&lt;/a&gt; - avoid pickling&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;cheapbugs.net&quot;&gt;Dean’s InfoSec Mailing list&lt;/a&gt; - near-free tier coming soon&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Here’s some terminology for you&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;OSCP: Offensive Security Certified Professional (enterprise ‘sploit folks)&lt;/li&gt;
+  &lt;li&gt;InfoSec: Information Security&lt;/li&gt;
+  &lt;li&gt;PenTesting: Penetration Testing&lt;/li&gt;
+  &lt;li&gt;Ethical Hacking: Hacking sites to help them harden (share your results)&lt;/li&gt;
+  &lt;li&gt;BackTrack: Pentesting linux distro toolbox&lt;/li&gt;
+  &lt;li&gt;Kali: Recent pentesting linux distro toolbox&lt;/li&gt;
+  &lt;li&gt;BackBox: Yet another pentesting linux distro&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Wed, 06 Jul 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/InfoSec-Resources/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/InfoSec-Resources/</guid>
+      </item>
+    
+      <item>
+        <title>Wildlife Survey and Cowboy Drone</title>
+        <description>&lt;p&gt;I spend a lot of time hiking around in the snow taking pictures of animal tracks and maintaining wildlife survey cameras for &lt;a href=&quot;http://www.cascadiawild.org/&quot;&gt;Cascadia Wild&lt;/a&gt;. And I can’t help but daydream about Drone/Robot assistants doing a lot of this for me.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;a fixed autonomous camera that can identify animals&lt;/li&gt;
+  &lt;li&gt;a wheeled/legged robot that could survey a trail for tracks&lt;/li&gt;
+  &lt;li&gt;a drone that could survey for tracks&lt;/li&gt;
+  &lt;li&gt;a cowboy drone to scare wolves away from livestock&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;It turns out ranchers let their cattle run wild on public lands without any cowboys to protect them from wolves. And when wolves take a bit to much of their bottom line, they ask the forest service to &lt;a href=&quot;http://www.takepart.com/article/2016/04/02/oregon-just-killed-family-wolves&quot;&gt;exterminate whole packs&lt;/a&gt;. That’s what inspired the cowboy drone idea.&lt;/p&gt;
+
+&lt;p&gt;If I just mash these tutorials together (with Cole’s help) we might be able to make something out of these daydreams.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://blog.yhat.com/posts/autonomous-droning-with-python.html&quot;&gt;tutorial on building a semi-autonomous drone&lt;/a&gt;  last piece of the puzzle falling into place &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://uglyboxer.github.io/&quot;&gt;image classification neural nets&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 24 Apr 2016 00:00:00 -0700</pubDate>
+        <link>http://www.hobsonlane.com/wildlife-survey-drone/</link>
+        <guid isPermaLink="true">http://www.hobsonlane.com/wildlife-survey-drone/</guid>
       </item>
     
   </channel>

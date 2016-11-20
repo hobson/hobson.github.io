@@ -1,9 +1,9 @@
 ---
 layout: post
-title: [PyDX](http://pydx.org) is Awesome!
+title: PyDX is Awesome!
 ---
 
-Watched a lot of great Python talks this weekend. Here are some memorable ones:
+Watched a lot of great Python talks at [PyDX](http://pydx.org) this weekend. Here are some memorable ones:
 
 - [Portia Burton's Talk](http://lanyrd.com/2016/pydx/sfmtdw/) on the Future of Cryptocurrency
 - [Servo Behind the Scene by E. Dunham](http://edunham.net/pages/talks.html) (Mozilla): How to Automate Your DevOps with Bots
