@@ -1,34 +1,34 @@
 # A Multicultural (red and blue) Christmas Oatmeal Cookie
 
-I modified the Blueberry Oatmeal Cookie recipe on [AllRecipes](http://allrecipes.com/recipe/231981/blueberry-oatmeal-cookies/) to make it a bit more festive and healthy. I gave it more antioxidants, less gluten, and used less refined sugar. And, as is my want, I doubled most of the ingredients.
+I modified the Blueberry Oatmeal Cookie recipe on [AllRecipes](http://allrecipes.com/recipe/231981/blueberry-oatmeal-cookies/) to make it a bit more festive and healthy. I gave it more antioxidants, less gluten, and used less refined sugar. And, of course, I doubled everything.
 
-Start preheating the oven to 350 deg F (175 deg C), then beat (whip) sugar and fat together. I used canola oil (unsalted butter or margarine tastes better), maple syrup, and brown sugar. Whip the egg and vanilla in last to preserve their delicate chemical bonds.
+Start preheating the oven to 350 deg F (175 deg C), then beat (whip) sugar and fat together. I used canola and olive oil (unsalted butter or margarine work well too). Beat in maple syrup and brown sugar. Beat the egg and vanilla in last. Their chemical bonds are more fragile.
 
-  1 cup canola oil unsalted butter, softened
-  1 cup brown sugar
-  1/2 cup maple sugar
-  1 Tbsp molasses
+* 1 cup canola oil unsalted butter, softened
+* 1 cup brown sugar
+* 1/2 cup maple sugar
+* 1 Tbsp molasses (to taste)
 
-2 eggs
-2 tsp vanilla extract
+* 2 eggs
+* 2 tsp vanilla extract
 
 Next, mix the dry ingredients with the flour (but not the oats, yet).
 
-  2 tbsp cinnamon
-  1/2 teaspoon baking soda
-  1/2 teaspoon baking powder
-  1/2 teaspoon salt
-  2 cup brown rice flour (or wheat flour)
+* 2 tbsp cinnamon
+* 1/2 teaspoon baking soda
+* 1/2 teaspoon baking powder
+* 1/2 teaspoon salt
+* 2 cup brown rice flour (or wheat flour)
 
 Stir in the oil/fat with a whisk, but not too much (to avoid breaking down the heat-activated part of the double-acting baking powder). Fold in the oats next.
 
-  1 cup old-fashioned rolled oats
-  1 cup quick-cook oats (to help stick together)
+* 1 cup old-fashioned rolled oats
+* 1 cup quick-cook oats (to help stick together)
 
 Add blueberries and cranberries to taste. Keep adding more oats until the blobs stay put on a baking sheet.
 
-  1 1/2 cup frozen blueberries
-  1 cup dry cranberries
+* 1 1/2 cup frozen blueberries
+* 1 cup dry cranberries
 
 I tried adding Gheridelli dark chocolate chips, but they overwhelmed the cranberry and blueberries, so I don't recommend that.
 
