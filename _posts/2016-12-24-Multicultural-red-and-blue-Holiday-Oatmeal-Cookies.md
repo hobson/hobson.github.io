@@ -1,3 +1,8 @@
+---
+layout: post
+title: Gluten-Free Antioxidant Oatmeal Cookies
+---
+
 # Gluten-Free Oatmeal Cookies
 
 I modified the [Blueberry Oatmeal Cookie recipe on AllRecipes](http://allrecipes.com/recipe/231981/blueberry-oatmeal-cookies/) to make it a bit more healthy and colorful for the holidays. I gave it more antioxidants and used less refined sugar and salt, and no wheat flour. And, of course, I doubled everything.
