@@ -20,7 +20,7 @@ Next, mix the dry ingredients with the flour (but not the oats, yet).
 * 1/2 teaspoon baking soda
 * 1/2 teaspoon baking powder
 * 1/2 teaspoon salt
-* 2 cup brown rice flour (or wheat flour)
+* 2 cups brown rice flour
 
 Stir in the oil/fat with a whisk, but not too much (to avoid breaking down the heat-activated part of the double-acting baking powder). Fold in the oats next.
 
