@@ -1,13 +1,15 @@
-# A Multicultural (red and blue) Christmas Oatmeal Cookie
+# Gluten-Free Oatmeal Cookies
 
-I modified the Blueberry Oatmeal Cookie recipe on [AllRecipes](http://allrecipes.com/recipe/231981/blueberry-oatmeal-cookies/) to make it a bit more festive and healthy. I gave it more antioxidants, less gluten, and used less refined sugar. And, of course, I doubled everything.
+I modified the [Blueberry Oatmeal Cookie recipe on AllRecipes](http://allrecipes.com/recipe/231981/blueberry-oatmeal-cookies/) to make it a bit more healthy and colorful for the holidays. I gave it more antioxidants and used less refined sugar and salt, and no wheat flour. And, of course, I doubled everything.
 
-Start preheating the oven to 350 deg F (175 deg C), then beat (whip) sugar and fat together. I used canola and olive oil (unsalted butter or margarine work well too). Beat in maple syrup and brown sugar. Beat the egg and vanilla in last. Their chemical bonds are more fragile.
+Start preheating the oven to 350 deg F (175 deg C), then beat (whip) sugar and fat together. I used canola and olive oil (unsalted butter or margarine work well too). Beat in maple syrup and brown sugar.
 
 * 1 cup canola oil unsalted butter, softened
 * 1 cup brown sugar
 * 1/2 cup maple sugar
 * 1 Tbsp molasses (to taste)
+
+Beat the egg and vanilla in last. Their chemical bonds are more fragile.
 
 * 2 eggs
 * 2 tsp vanilla extract
