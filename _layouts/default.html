@@ -11,12 +11,18 @@
     <meta name="author" content="{{ site.name }}" />
     <meta name="description" content="{{ site.description }}">
 
+    <script type="text/javascript">
+        var host = "hobsonlane.com";
+        if ((host == window.location.host) && (window.location.protocol != "https:"))
+            window.location.protocol = "https";
+    </script>
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+    <link rel="canonical" href=" { { site.url } }{ { page.url } }" />
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css" />
     <link rel="alternate" type="application/rss+xml" title="{{ site.name }} - {{ site.description }}" href="{{ site.baseurl }}/feed.xml" />
     <link rel="shortcut icon" href="http://www.hobsonlane.com/favicon.ico" sizes="16x16 24x24 32x32" type="image/vnd.microsoft.icon"/>
