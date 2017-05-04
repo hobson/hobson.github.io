@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Default to Open vs. Closed
+title: Default to Open
 ---
 
 ## You Decide
