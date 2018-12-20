@@ -38,10 +38,26 @@ def test(decoder, libdir=None, datadir=DATADIR):
         else:
             break
     decoder.end_utt()
-    return decoder.seg()
+    return decoder
+
+
+def evaluate_results(dec):
+    hypothesis = dec.hyp()
+    logmath = dec.get_logmath()
+    report = dict(
+        text=hypothesis.hypstr,
+        score=hypothesis.best_score,
+    	confidence=logmath.exp(hypothesis.prob),
+        segments=tuple((seg.word for seg in dec.seg()))
+        )
+    return report
+
 
 if __name__ == '__main__':
     dec = get_decoder()
-    test(dec)
-    print('Best hypothesis segments: ', [seg.word for seg in decoder.seg()])
+    dec = test(dec)
+    report = evaluate_results(dec)
+    print(report)
+
+
     print('Decoder instance: ', str(dec))
