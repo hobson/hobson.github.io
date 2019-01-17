@@ -1,9 +1,13 @@
 ---
 layout: post
-title: Raspberry Pi Camera
+title: Nginx web server setup
 ---
 
-Each time I have to set up a domain name for a server I forget how to do it, and there doesn't seem to be a good online guide for it. So here are my notes. I use namecheap and AWS as my registrar and sometimes I set up a domain to point from namecheap to AWS to handle the actual DNS records.
+Each time I have to set up a domain name service table or database access for a web server server I forget how to do it. And there doesn't seem to be a good online guide for it. So here are my notes.
+
+## DNS Records
+
+I use namecheap and AWS as my registrar and sometimes I set up a domain to point from namecheap to AWS to handle the actual DNS records.
 
 ## Appoach 1: [Namecheap](namecheap.com) Only
 
@@ -46,6 +50,8 @@ And on the NETGEAR wifi router console at 192.168.1.1 I set up Port Forwarding f
 """.format(**os.environ)
 ```
 
+## NGINX
+
 And then my nginx conf file in /etc/nginx/sites-enabled/django_app_name.conf on the server looks like this:
 
 ```config
@@ -67,6 +73,8 @@ server {
     }
 }
 ```
+
+## `postgres`
 
 And the postgres db setup script looks like this:
 
@@ -115,5 +123,7 @@ def execute_sql(engine='postgres://postgres@/postgres', sql=CREATEDB_SQL_TEMPLAT
 if __name__ == '__main__':
     execute_sql()
 ```
+
+## Secrets
 
 I keep secret network configuration settings in a shell script run by `~/.bash_profile` or `~/.bashrc` so that they are always in environment variables I can use with `envsubst` in bash or `.format()` string interpolation in a python app. 
