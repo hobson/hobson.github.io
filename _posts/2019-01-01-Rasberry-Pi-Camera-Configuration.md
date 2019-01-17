@@ -36,3 +36,14 @@ From a novice computer vision engineer, Amazon's Deep Lens is the system to beat
 - low res camera, IR cameras available
 - CPU: rpi zero ? Flops, 500MB RAM
 - OS: raspbian
+
+## Blink
+
+This isn't one you can hack around with, but it's the only wireless camera option. Similar to Wyze cam.
+
+- Power: camera 2xAA lithium batteries (2yr life) or microusb power, WiFi synchub needs AC-DC 5V converter
+- Size: 71x71x30 mm
+- Weight: .07 kg
+- CPU: Immedia Proprietary - ISI108, 4 / 100Mhz.
+- Connectivity: Wi-Fi with diversity 2.4 Ghz 802.11g/n but not ad-hoc
+- camera: 720p HD, 30 fps for 5 s clips, mono audio

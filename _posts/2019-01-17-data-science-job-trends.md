@@ -7,6 +7,4 @@ title: Data Science Jobs
 
 ![AIIndex DS Job Trends]({{ BASE_PATH }}/images/DS-job-growth-by-specialty.png)
 
-[![AIIndex DS Job Trends](http://hobsonlane.com/images/DS-job-growth-by-specialty.png)](http://hobsonlane.com/images/DS-job-growth-by-specialty.png)
-
-![AIIndex DS Job Trends]({{ BASE_PATH }}/images/DS-job-growth-by-specialty.png)
+![AIIndex DS Job Trends](images/DS-job-growth-by-specialty.png)
