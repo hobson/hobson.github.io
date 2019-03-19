@@ -78,6 +78,12 @@ sass:
 gems:
   - jemoji # Emoji please!
   - jekyll-sitemap # Create a sitemap using the official Jekyll sitemap gem
+  - jekyll-feed
+
+plugins:
+  - jemoji # Emoji please!
+  - jekyll-sitemap # Create a sitemap using the official Jekyll sitemap gem
+  - jekyll-feed  # RSS feed at hobsonlane.com/feed.xml
 
 # Exclude these files from your production _site
 exclude:
