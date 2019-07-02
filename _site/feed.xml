@@ -1,874 +1,554 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Hobson&#39;s Blog</title>
+    <title>Hobson's Blog</title>
     <description>A blog about Data Science, Python, AI, ... basically life.</description>
-    <link>http://www.hobsonlane.com</link>
-    <atom:link href="http://www.hobsonlane.com/feed.xml" rel="self" type="application/rss+xml" />
+    <link>http://localhost:4000</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>Hyper-Indexing with LSHash (Locality Sensitive Hashing)</title>
-        <description>&lt;p&gt;Indexing topic vectors from an LSI Model is more difficult than it seems.  My first instinct was to use the 3D indexer plugin for PostgreSQL, &lt;code&gt;PostGIS&lt;/code&gt;. After all that’s the typical example I keep in my head for indexing. You create a discrete “on or off” label for each location based on whether it is present or absent within a grid point. This allows you to efficiently find it (and any nearby points) with a query with a &lt;code&gt;WHERE grid = &#39;A11&#39;&lt;/code&gt; for a letter/int 2D indexing system that you see on old paper road maps from AAA. &lt;/p&gt;
+        <title>Word Patterns</title>
+        <description>&lt;p&gt;Word patterns are what you can use to match or generate phrases. They’re usually called grammars, in math and computer science courses. But this post is about word grammars rather than character grammars. And the word grammar means something very precise to a lot of people, so I don’t want to step on any toes by using the word incorrectly. So I’ll just talk about word patterns.&lt;/p&gt;
 
-&lt;p&gt;I assumed this simple approach would extend out to multiple dimensions, but it doesn’t. Turns out, it’s not possible to efficiently index and search on hyperdimensional space (out beyond a few dimensions). But you can push the limits with a python package calls &lt;code&gt;LSHash&lt;/code&gt; which implements Locality Sensitive Hashing. This approach isn’t theoretically as efficent as R*Tree (the current state of the art for multi-dimensional indexing), but it’s pretty darn powerful up to 8 dimensions.&lt;/p&gt;
+&lt;p&gt;Word patterns work best on short, focused text documents, so I’m going to talk about word patterns for sentences, sometimes called &lt;em&gt;phrase structure grammars&lt;/em&gt; (PSGs).&lt;/p&gt;
 
-&lt;p&gt;```python
-import numpy as np
-from lshash import LSHash&lt;/p&gt;
+&lt;p&gt;And word patterns are useful for 2 things:&lt;/p&gt;
 
-&lt;p&gt;tenthclosest = []  # for each test, record distance to the 10th closest point for a random query
-for D in range(2, 11):  # Run tests for 2D through 10D
-    X = np.random.normal(size=(200000, D))  # Fill the N-D space with 200k random vectors
-    lsh = LSHash(hash_size=int(64 / D) + D, input_dim=D, num_hashtables=D)&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;matching&lt;/li&gt;
+  &lt;li&gt;generating&lt;/li&gt;
+&lt;/ol&gt;
 
-&lt;pre&gt;&lt;code&gt;# query vector
-q = np.random.normal(size=(D,))
-q /= np.linalg.norm(q)
+&lt;p&gt;The &lt;em&gt;matching&lt;/em&gt; part is mostly used to extract information, like a name, date, or serial number. It can also be used to measure well-formedness (grammatical correctness), but that can be hard. It’s hard to compose formal grammar rules that capture all the possible well-formed sentences without accidentally including some bad sentences. Natural language grammars depend on the meaning of words. And that isn’t easily captured in formal word patterns. The matching part can also be used to &lt;em&gt;search&lt;/em&gt; within a lot of sentences to narrow your sentences down to a few that match your pattern and use that to make some decisions, like what your chatbot should say in response.&lt;/p&gt;
 
-distances = []
-for x in X:
-    lsh.index(x)
-    x /= np.linalg.norm(x)  # topic vectors are typically normalized
-    distances += [1 - np.sum(x * q)]  # keep track of all the cosine distances to double check
+&lt;p&gt;That brings us to the &lt;em&gt;generating&lt;/em&gt; use for word patterns. It turns out you can generate the word sequences that match your word patterns. The word patterns gives you the rules for doing that generation. Sometimes it can be so broad that the number of possible patterns you could generate would be too big for you to ever actually produce. But you can still generate a &lt;em&gt;sample&lt;/em&gt; of all these phrases or sentences. You might do this sometimes to generate a response from your chatbot.&lt;/p&gt;
 
-distances = sorted(distances)
-closest = lsh.query(x, distance_func=&#39;cosine&#39;)
-N = len(closest)
-rank = min(10, N)
-tenthclosest += [[D, N - 1, closest[rank - 1][-1] if N else None, distances[rank - 1]]]
-print(tenthclosest[-1]) ```
+&lt;p&gt;Now you just need a pattern specification language. Regular expressions work great for character patterns. But for word patterns we need to use something like &lt;code class=&quot;highlighter-rouge&quot;&gt;SpaCy&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt;. The NLPIA book talks a log about &lt;code class=&quot;highlighter-rouge&quot;&gt;SpaCy&lt;/code&gt;. &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt; uses the &lt;a href=&quot;https://www.wikiwand.com/en/Extended_Backus%E2%80%93Naur_form&quot;&gt;EBNF&lt;/a&gt; (Extended Backus Naur Form) syntax and that’s the syntax used by Python’s own parser generator (interpreter). Frederico Tomassetti has a pretty awesome and &lt;a href=&quot;https://tomassetti.me/parsing-in-python/&quot;&gt;thorough explanation&lt;/a&gt; of all your options. Here, you’re just going to learn about &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here’s a paraphrasing of the &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt; documentation for what a word pattern looks like:&lt;/p&gt;
+
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rule_name : list of rules and {terminal_name}s to match
+          | another possible list of items
+          | ...
+
+terminal_name: &quot;token&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And here’s the first line of the python parser generator EBNF grammar:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-lark&quot;&gt;single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That looks like it might be compatible with the Lark parser generator. It’s pretty simple, basically a valid statement can be a blank line (only a &lt;code class=&quot;highlighter-rouge&quot;&gt;NEWLINE&lt;/code&gt;), or it can be a &lt;code class=&quot;highlighter-rouge&quot;&gt;simple_stmnt&lt;/code&gt; (defined further down in the grammar), or it can be a &lt;code class=&quot;highlighter-rouge&quot;&gt;compound_stmt&lt;/code&gt; (also defined further down) that combines a bunch of &lt;code class=&quot;highlighter-rouge&quot;&gt;simple_stmt&lt;/code&gt; phrases and terminates them with a NEWLINE.&lt;/p&gt;
+
+&lt;p&gt;Here’s the EBNF word pattern from a &lt;a href=&quot;https://github.com/lark-parser/lark/blob/master/docs/json_tutorial.md&quot;&gt;lark tutorial&lt;/a&gt; on using Lark to match another syntax you might be familiar with, &lt;code class=&quot;highlighter-rouge&quot;&gt;JSON&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-lark&quot;&gt;value: dict
+     | list
+     | STRING
+     | NUMBER
+     | &quot;true&quot; | &quot;false&quot; | &quot;null&quot;
+
+list : &quot;[&quot; [value (&quot;,&quot; value)*] &quot;]&quot;
+
+dict : &quot;{&quot; [pair (&quot;,&quot; pair)*] &quot;}&quot;
+pair : STRING &quot;:&quot; value
+
+%import common.ESCAPED_STRING   -&amp;gt; STRING
+%import common.SIGNED_NUMBER    -&amp;gt; NUMBER
+%import common.WS
+%ignore WS
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;For 8D space and higher you’ll need millions of points in your space to have a chance of finding anything nearby. And the lshash will be less and less useful at these higher dimensions because it won’t be possible to partition the space with a reasonable number of hyperplanes so that the returned points truly are the closest points. &lt;/p&gt;
+&lt;p&gt;Be sure to &lt;code class=&quot;highlighter-rouge&quot;&gt;pip install lark-parser&lt;/code&gt; &lt;strong&gt;NOT&lt;/strong&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;lark&lt;/code&gt;! The &lt;a href=&quot;https://pypi.org/project/lark/&quot;&gt;PyPi package &lt;code class=&quot;highlighter-rouge&quot;&gt;lark&lt;/code&gt;&lt;/a&gt; is only for transforming HTML into redis requests. The &lt;a href=&quot;https://pypi.org/project/lark-parser/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;lark-parser&lt;/code&gt; package&lt;/a&gt; package is the one you want.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;python
-&amp;gt;&amp;gt;&amp;gt; tenthclosest
-[
-  [2, 9480, 1.8566308490619576e-09, 1.8566308490619576e-09]
-  [3, 1791, 9.3939812061627492e-05, 9.3939812061738515e-05]
-  [4, 2492, 0.0016495388314403669, 0.0016495388314402559]
-  [5, 1042, 0.0062851055257979738, 0.0062851055257979738]
-  [6, 1161, 0.01919247547800762, 0.01919247547800762]
-  [7, 1298, 0.037779915230408245, 0.037190703103046285]   # the hashes didn&#39;t find them all
-  [8, 932, 0.040481502423105997, 0.040481502423105997]
-  [9, 1230, 0.066732165658179299, 0.066732165658179188]   # the hashes didn&#39;t find them all
-  [10, 835, 0.10840345965900211, 0.095584594509859677]    # the hashes didn&#39;t find them all
-]
-&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;lark&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Lark&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;json_parser&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Lark&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;r&quot;&quot;&quot;
+    value: dict
+         | list
+         | ESCAPED_STRING
+         | SIGNED_NUMBER
+         | &quot;true&quot; | &quot;false&quot; | &quot;null&quot;
 
-&lt;p&gt;So the lesson here is.&lt;/p&gt;
+    list : &quot;[&quot; [value (&quot;,&quot; value)*] &quot;]&quot;
 
-&lt;ul&gt;
-  &lt;li&gt;LSH partitions the space with hyperplanes through the origin, so it works best for normalized vectors&lt;/li&gt;
-  &lt;li&gt;As the number of dimensions increases your need more hashtables to ensure you can find points in neighboring grid cells in case some queries lie near the boundary of a grid in one of the hashtables&lt;/li&gt;
-  &lt;li&gt;As the number of dimensions increases the number of hyperplanes you need to slice the space decreases proportionately&lt;/li&gt;
-  &lt;li&gt;As the number of dimensions incrases the distance to the nearest points will increase exponentially, even for dimension-insensitive metrics like cosine distance.&lt;/li&gt;
-&lt;/ul&gt;
+    dict : &quot;{&quot; [pair (&quot;,&quot; pair)*] &quot;}&quot;
+    pair : ESCAPED_STRING &quot;:&quot; value
+
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;import common.ESCAPED_STRING
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;import common.SIGNED_NUMBER
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;import common.WS
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;ignore WS
+
+    &quot;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'value'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s pretty nifty. Only a few lines to define a pattern that can match a pretty wide range of documents (all the valid JSON strings out there).&lt;/p&gt;
+
+&lt;p&gt;Let’s try it out:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json_parser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;r'[{&quot;key&quot;: &quot;value&quot;}, {&quot;ans&quot;: 42}]'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ESCAPED_STRING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&quot;key&quot;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ESCAPED_STRING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&quot;value&quot;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])])])]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ESCAPED_STRING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&quot;ans&quot;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SIGNED_NUMBER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'42'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])])])])])])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nice! Now if only I could turn that back into a nice pretty-printable string with indentation.&lt;/p&gt;
+
 </description>
-        <pubDate>Sat, 12 Nov 2016 00:00:00 -0800</pubDate>
-        <link>http://www.hobsonlane.com/-Hyper-Indexing-with-LSHash-Locality-Sensitive-Hashing/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/-Hyper-Indexing-with-LSHash-Locality-Sensitive-Hashing/</guid>
+        <pubDate>Tue, 12 Feb 2019 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/Word-Patterns/</link>
+        <guid isPermaLink="true">http://localhost:4000/Word-Patterns/</guid>
       </item>
     
       <item>
-        <title>PyDX is Awesome!</title>
-        <description>&lt;p&gt;Watched a lot of great Python talks at &lt;a href=&quot;http://pydx.org&quot;&gt;PyDX&lt;/a&gt; this weekend. Here are some memorable ones:&lt;/p&gt;
+        <title>Word Patterns</title>
+        <description>&lt;p&gt;Word patterns are what you can use to match or generate phrases. They’re usually called grammars, in math and computer science courses. But this post is about word grammars rather than character grammars. And the word grammar means something very precise to a lot of people, so I don’t want to step on any toes by using the word incorrectly. So I’ll just talk about word patterns.&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://lanyrd.com/2016/pydx/sfmtdw/&quot;&gt;Portia Burton’s Talk&lt;/a&gt; on the Future of Cryptocurrency&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://edunham.net/pages/talks.html&quot;&gt;Servo Behind the Scene by E. Dunham&lt;/a&gt; (Mozilla): How to Automate Your DevOps with Bots&lt;/li&gt;
-  &lt;li&gt;“A Gentle Introduction to Python Performance” by Nathaniel Smith&lt;/li&gt;
-  &lt;li&gt;“Machine Learning for Absolute Beginners” by Hailey Buckingham&lt;/li&gt;
-  &lt;li&gt;“Moneyball.py” by Jeremy Tanner (from &lt;a href=&quot;http://sendgrid.com/&quot;&gt;SendGrid&lt;/a&gt;)&lt;/li&gt;
-  &lt;li&gt;“Adding Celery to your Salad” by Hannes Hapke&lt;/li&gt;
-  &lt;li&gt;“Wayback Machine” by Barbara Miller&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Word patterns work best on short, focused text documents, so I’m going to talk about word patterns for sentences, sometimes called &lt;em&gt;phrase structure grammars&lt;/em&gt; (PSGs).&lt;/p&gt;
 
-&lt;p&gt;And my talk…&lt;/p&gt;
+&lt;p&gt;And word patterns are useful for 2 things:&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://totalgood.github.io/hope&quot;&gt;There’s Hope for Chatbots&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;ol&gt;
+  &lt;li&gt;matching&lt;/li&gt;
+  &lt;li&gt;generating&lt;/li&gt;
+&lt;/ol&gt;
 
-&lt;p&gt;My talk was a big disappointment for me and some in the audience because I couldn’t get the Django interface to &lt;a href=&quot;http://github.com/totalgod/hope&quot;&gt;hope&lt;/a&gt; working. The talk is more of an overview of current chatbot tech rather than a &lt;em&gt;HOWTO&lt;/em&gt;. But Cole’s LSTM-brained bot trained on movie dialog was a nice highlight and conclusion for the talk. &lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;matching&lt;/em&gt; part is mostly used to extract information, like a name, date, or serial number. It can also be used to measure well-formedness (grammatical correctness), but that can be hard. It’s hard to compose formal grammar rules that capture all the possible well-formed sentences without accidentally including some bad sentences. Natural language grammars depend on the meaning of words. And that isn’t easily captured in formal word patterns. The matching part can also be used to &lt;em&gt;search&lt;/em&gt; within a lot of sentences to narrow your sentences down to a few that match your pattern and use that to make some decisions, like what your chatbot should say in response.&lt;/p&gt;
 
-&lt;p&gt;There’s a double reversal on &lt;a href=&quot;http://github.com/gunthercox/ChatterBot&quot;&gt;Chatterbot&lt;/a&gt;’s repsonse.in_response_to self relationship for the &lt;code&gt;Statement(Model)&lt;/code&gt; through &lt;code&gt;Response(Model)&lt;/code&gt; asymmetrical relation. And something’s going on in the DjangoStorage plugin that sort-of untangles it, but I wasn’t able to unmigrate all my training data etc. Cowboy coding &lt;strong&gt;fail&lt;/strong&gt; again. Gotta start writing tests first. Will get it going soon.&lt;/p&gt;
+&lt;p&gt;That brings us to the &lt;em&gt;generating&lt;/em&gt; use for word patterns. It turns out you can generate the word sequences that match your word patterns. The word patterns gives you the rules for doing that generation. Sometimes it can be so broad that the number of possible patterns you could generate would be too big for you to ever actually produce. But you can still generate a &lt;em&gt;sample&lt;/em&gt; of all these phrases or sentences. You might do this sometimes to generate a response from your chatbot.&lt;/p&gt;
 
-&lt;p&gt;Slides and videos will be online soon at &lt;a href=&quot;http://blog.pydx.org/talk-list/&quot;&gt;PyDX&lt;/a&gt;, I’m sure. So check back for more links.&lt;/p&gt;
+&lt;p&gt;Now you just need a pattern specification language. Regular expressions work great for character patterns. But for word patterns we need to use something like &lt;code class=&quot;highlighter-rouge&quot;&gt;SpaCy&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt;. The NLPIA book talks a log about &lt;code class=&quot;highlighter-rouge&quot;&gt;SpaCy&lt;/code&gt;. &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt; uses the &lt;a href=&quot;https://www.wikiwand.com/en/Extended_Backus%E2%80%93Naur_form&quot;&gt;EBNF&lt;/a&gt; (Extended Backus Naur Form) syntax and that’s the syntax used by Python’s own parser generator (interpreter). Frederico Tomassetti has a pretty awesome and &lt;a href=&quot;https://tomassetti.me/parsing-in-python/&quot;&gt;thorough explanation&lt;/a&gt; of all your options. Here, you’re just going to learn about &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Rami and I had a few questions for Nathan but didn’t want to ask publicly… so how about an unread blog post about it ;)&lt;/p&gt;
+&lt;p&gt;Here’s a paraphrasing of the &lt;code class=&quot;highlighter-rouge&quot;&gt;Lark&lt;/code&gt; documentation for what a word pattern looks like:&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;code&gt;set&lt;/code&gt;s are &lt;code&gt;dict&lt;/code&gt;s without values, only keys&lt;/li&gt;
-  &lt;li&gt;I don’t think you can depend on any sort order for &lt;code&gt;set&lt;/code&gt;s&lt;/li&gt;
-  &lt;li&gt;appending to&lt;/li&gt;
-&lt;/ul&gt;
+&lt;div class=&quot;language-text highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rule_name : list of rules and {terminal_name}s to match
+          | another possible list of items
+          | ...
 
-&lt;p&gt;One thing that I learned was that you can append tuples like&lt;/p&gt;
+terminal_name: &quot;token&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;code&gt;python
-&amp;gt;&amp;gt;&amp;gt; tuple(&#39;ABC&#39;) + tuple(&#39;DEF&#39;)
-(&#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;)
-&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;And here’s the first line of the python parser generator EBNF grammar:&lt;/p&gt;
 
+&lt;pre&gt;&lt;code class=&quot;language-lark&quot;&gt;single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That looks like it might be compatible with the Lark parser generator. It’s pretty simple, basically a valid statement can be a blank line (only a &lt;code class=&quot;highlighter-rouge&quot;&gt;NEWLINE&lt;/code&gt;), or it can be a &lt;code class=&quot;highlighter-rouge&quot;&gt;simple_stmnt&lt;/code&gt; (defined further down in the grammar), or it can be a &lt;code class=&quot;highlighter-rouge&quot;&gt;compound_stmt&lt;/code&gt; (also defined further down) that combines a bunch of &lt;code class=&quot;highlighter-rouge&quot;&gt;simple_stmt&lt;/code&gt; phrases and terminates them with a NEWLINE.&lt;/p&gt;
+
+&lt;p&gt;Here’s the EBNF word pattern from a &lt;a href=&quot;https://github.com/lark-parser/lark/blob/master/docs/json_tutorial.md&quot;&gt;lark tutorial&lt;/a&gt; on using Lark to match another syntax you might be familiar with, &lt;code class=&quot;highlighter-rouge&quot;&gt;JSON&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-lark&quot;&gt;value: dict
+     | list
+     | STRING
+     | NUMBER
+     | &quot;true&quot; | &quot;false&quot; | &quot;null&quot;
+
+list : &quot;[&quot; [value (&quot;,&quot; value)*] &quot;]&quot;
+
+dict : &quot;{&quot; [pair (&quot;,&quot; pair)*] &quot;}&quot;
+pair : STRING &quot;:&quot; value
+
+%import common.ESCAPED_STRING   -&amp;gt; STRING
+%import common.SIGNED_NUMBER    -&amp;gt; NUMBER
+%import common.WS
+%ignore WS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Be sure to &lt;code class=&quot;highlighter-rouge&quot;&gt;pip install lark-parser&lt;/code&gt; &lt;strong&gt;NOT&lt;/strong&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;lark&lt;/code&gt;! The &lt;a href=&quot;https://pypi.org/project/lark/&quot;&gt;PyPi package &lt;code class=&quot;highlighter-rouge&quot;&gt;lark&lt;/code&gt;&lt;/a&gt; is only for transforming HTML into redis requests. The &lt;a href=&quot;https://pypi.org/project/lark-parser/&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;lark-parser&lt;/code&gt; package&lt;/a&gt; package is the one you want.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;lark&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Lark&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;json_parser&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Lark&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;r&quot;&quot;&quot;
+    value: dict
+         | list
+         | ESCAPED_STRING
+         | SIGNED_NUMBER
+         | &quot;true&quot; | &quot;false&quot; | &quot;null&quot;
+
+    list : &quot;[&quot; [value (&quot;,&quot; value)*] &quot;]&quot;
+
+    dict : &quot;{&quot; [pair (&quot;,&quot; pair)*] &quot;}&quot;
+    pair : ESCAPED_STRING &quot;:&quot; value
+
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;import common.ESCAPED_STRING
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;import common.SIGNED_NUMBER
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;import common.WS
+    &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;ignore WS
+
+    &quot;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'value'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s pretty nifty. Only a few lines to define a pattern that can match a pretty wide range of documents (all the valid JSON strings out there).&lt;/p&gt;
+
+&lt;p&gt;Let’s try it out:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tree&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;json_parser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;r'[{&quot;key&quot;: &quot;value&quot;}, {&quot;ans&quot;: 42}]'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tree&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ESCAPED_STRING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&quot;key&quot;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ESCAPED_STRING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&quot;value&quot;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])])])]),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ESCAPED_STRING&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&quot;ans&quot;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Tree&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Token&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SIGNED_NUMBER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'42'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])])])])])])&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Nice! Now if only I could turn that back into a nice pretty-printable string with indentation. ;-)&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tree&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pretty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
+      &lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;
+          &lt;span class=&quot;s&quot;&gt;&quot;key&quot;&lt;/span&gt;
+          &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;	&lt;span class=&quot;s&quot;&gt;&quot;value&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;
+      &lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;pair&lt;/span&gt;
+          &lt;span class=&quot;s&quot;&gt;&quot;ans&quot;&lt;/span&gt;
+          &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 </description>
-        <pubDate>Sun, 02 Oct 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/-PyDX-is-Awesome/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/-PyDX-is-Awesome/</guid>
+        <pubDate>Tue, 12 Feb 2019 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/Grammars-and-Patterns/</link>
+        <guid isPermaLink="true">http://localhost:4000/Grammars-and-Patterns/</guid>
       </item>
     
       <item>
-        <title>Automation-Safer-Than-Manual</title>
-        <description>&lt;p&gt;Interactive automation is much better than fully manual keyboard &lt;code&gt;bash&lt;/code&gt;ing for a lot of linux tasks. It’s taken decades but many linux distributions have finally made it possible to install linux automatically without too much hassel. But other mundane tasks like adding or swapping out a harddrive are a real bear. And the online instructions (especially at Canonical’s Ubuntu docs site) sound overly protective, cautious, encouraging the user to do everything by hand instead of automating things with a script. And they often get critical steps wrong, endangering your data and your computer.&lt;/p&gt;
+        <title>Infinite-vocabulary word embeddings</title>
+        <description>&lt;p&gt;Word embeddings are at the core of the most impressive natural language models. Dialog systems, abstractive summarizers, universal sentence embeddings, question answering systems and even unsupervised knowledge extraction  engines all rely on broad vocabularies of word embeddings. But even the 1M word vocabulary of Word2vec and GloVE embeddings isn’t broad enough to solve the most useful challenges for natural language processing, such as medical record summarization, or even dialog engines that can handle the ever expanding vocabulary of teenagers.&lt;/p&gt;
 
-&lt;p&gt;Here’s my first cut at a bash script that could be used to automate the process of adding a new disk (hard drive). It needs some work, but with a little interractivity and less unexpected magic, it could really improve the safety of destructive operations like partitioning and formatting.&lt;/p&gt;
-
-&lt;p&gt;This script builds on some erroneous ideas at &lt;a href=&quot;http://www.cyberciti.biz/tips/fdisk-unable-to-create-partition-greater-2tb.html&quot;&gt;“cyberciti tips”&lt;/a&gt; by incorporating some AskUbuntu wisdom to:&lt;/p&gt;
+&lt;p&gt;Examples of architectures built on top of the wordvector foundation&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://askubuntu.com/questions/386536/how-to-find-the-attached-devices-uuid-through-terminal&quot;&gt;find your UUID&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://askubuntu.com/questions/156994/partition-does-not-start-on-physical-sector-boundary&quot;&gt;align your partition with modern physical sector boundaries&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;CNNs&lt;/li&gt;
+  &lt;li&gt;LSTMs&lt;/li&gt;
+  &lt;li&gt;GRUs&lt;/li&gt;
+  &lt;li&gt;GANS&lt;/li&gt;
+  &lt;li&gt;encoder-decoder&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;code&gt;bash
-MOUNTPOINT=/midata
-# find the unmounted device with the 3-4 TB of capacity (4TB drives only have 3.7TiB here)
-# (no filter for mounted devices so be careful!
-# this is where interactivity (confirmation) and robust safety checks should be implemented
-DEVICE=`sudo sfdisk -l | grep -E &#39;[3-4][.][0-9][ ]T&#39; | grep -Eoh &#39;/dev/sd[a-z]&#39;`
-DEVICE_LETTER=${DEVICE: -1}
-# to find your disk if it doesn&#39;t show up above
-sudo lshw -C disk
-# this will ask for confirmation
-sudo parted --script $DEVICE \
-    mklabel gpt mkpart \
-    primary 1MiB 4T &amp;amp;&amp;amp; sudo mkfs.ext4 $DEVICE
-sudo mkdir -p &quot;$MOUNTPOINT&quot; &amp;amp;&amp;amp; sudo mount $DEVICE &quot;$MOUNTPOINT&quot;
-sudo lsblk
-sudo blkid
-DEVICE_UUID=`ls -l /dev/disk/by-uuid | grep -E &quot;../sd$DEVICE_LETTER&quot; | grep -Eoh &#39;[-a-f0-9]{32,42}&#39;`
-sudo cp /etc/fstab &quot;/etc/fstab.$(date +&#39;%Y%m%d_%H%M%S&#39;).bak&quot;
-sudo echo &quot;# new hard drive installed &#39;`date`&#39;: when it was mounted at device $DEVICE&quot; | sudo tee -a /etc/fstab
-sudo echo &quot;UUID=$DEVICE_UUID $MOUNTPOINT         ext4    errors=remount-ro 0       1&quot; | sudo tee -a /etc/fstab
-sudo cat /etc/fstab
-sudo mount -a
-cd &quot;$MOUNTPOINT&quot;
-ls -hal
-&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;It may be possible to keep NLP pipelines up to speed on the ever changing and mistaken world of human language with online incremental learning of word embeddings. An initial seed of word embeddings can be perpetually refined to continually improve the precision of existing embeddings to match a particular domain’s use of words (such as medical texts). In addition, new tokens can be added to the vocabulary as they become commonplace in communication among multiple people. This can be accomplished with a simple hybrid architecture of character-based LSTM models with the feedforward (fully-connected) network required for the embedding vector.&lt;/p&gt;
 
-&lt;p&gt;For now, don’t do this at home. But you can certainly use these commands manually to get going with yoru new drive. And if you get inspired, make it more robust, general, interractive, then submit an add_my_drive.sh utility to the Ubuntu distribution.&lt;/p&gt;
+&lt;p&gt;Word vectors gave us embeddings that capture the meaning of individual words. Sentence encoders built on that foundation by giving us nonlinear embeddings of short word vector sequences. These thought vectors extract much more of the meaning left behind by linear combinations word vectors. But some important chunks of meaning are invisible to this high level representation of meaning and thought. When new words are encountered they must be treated as blanks or approximated with other word vectors. The most effective approach developed to date has been to simple select a random word vector from your vocabulary to represent the new word. This noise minimizes the discontinuity in the encoder’s learned model of the thought within a sentence.&lt;/p&gt;
+
+&lt;p&gt;We propose a more thoughtful encoding new words into a word vector. We propose to &lt;strong&gt;learn&lt;/strong&gt; a character sequence encoding that generates word vectors. And we suggest that employing existing word vector representations to represent the new words to give the character-based model a head start on learning the semantics of character sequences.&lt;/p&gt;
+
+&lt;p&gt;One logistics challenge when training character-based encodings of words is similar to the challenge faced when generating skip-grams for the original training of word vectors. Statistics of word usage must be used to optimize the selection of token boundaries, particularly for compound words and optimal n-grams that minimize the loss of information resulting from this windowing of character sequences. For a character-based model that does not depend upon tokenizers for this windowing, it is particularly critical. The character-based model will also learn the boundaries of tokens from the tokenizer that was used to train the original word vectors. And this model can be used to continue segmenting unfamiliar sequences of characters into tokens that capture comparable amounts of meaning, thought.&lt;/p&gt;
+
+&lt;p&gt;Once this character-based word vector encoder can predict word vectors boundaries and the word vectors themselves with sufficient accuracy it can be unleashed from the original word vector vocabulary. Dealing with semantic drift of the word vectors as well as the tokenizer may be a detriment or desirable flexibility of the new approach.
+Our algorithm can encode new words and find new compound words while simultaneously incrementally adjusting the “legacy” word vectors.&lt;/p&gt;
 </description>
-        <pubDate>Sat, 17 Sep 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/-Automation-Safer-Than-Manual/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/-Automation-Safer-Than-Manual/</guid>
+        <pubDate>Sat, 09 Feb 2019 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/Word-Embeddings-for-mispelled-words/</link>
+        <guid isPermaLink="true">http://localhost:4000/Word-Embeddings-for-mispelled-words/</guid>
       </item>
     
       <item>
-        <title>Python-Birth-Microsecond-Paradox</title>
-        <description>&lt;p&gt;&lt;a href=&quot;http://uglyboxer.github.io/&quot;&gt;Cole&lt;/a&gt; got bit by the Birthday Paradox when using python &lt;code&gt;random.randint()&lt;/code&gt; and &lt;code&gt;time.time()&lt;/code&gt; to generate a random number to tag a DB record with a unique ID. I think &lt;a href=&quot;http://hanneshapke.github.io/&quot;&gt;Hannes&lt;/a&gt; does something similar to ensure user-provided files are all unique, even a user uploads the exact same file twice.&lt;/p&gt;
+        <title>SSH Server On Office PC Behind Building's NAT Router</title>
+        <description>&lt;p&gt;Say you’re leasing space in an office building for your startup and you share the network with all the other tennants. This could be a wireless router or hard-wired ethernet router. The problem is you don’t have the password for the admin page on that router. So you can’t expose a port on your server for ssh or webhosting or whatever. 
+Normally you’d just add a port-forwarding rule on the router to send 22 and 80 and 443 all through to your server. But that might mess up somebody else using the same router to serve up &lt;strong&gt;their&lt;/strong&gt; page.&lt;/p&gt;
 
-&lt;p&gt;I &lt;a href=&quot;https://docs.python.org/2/library/random.html&quot;&gt;read the docs&lt;/a&gt; and found that python uses system time, and &lt;code&gt;time.time()&lt;/code&gt; has microsecond resolution (hence the title of this post) to seed the random number generator on some machines during &lt;code&gt;import random&lt;/code&gt;. If the machine and OS provides a random number source, it’ll use that instead. The servers where this happened must not have a random source, so appending a random number from python’s &lt;code&gt;random&lt;/code&gt; package to a microsecond-resolution timestamp won’t add any randomness at all. If the two processes happen to start at the same microsecond they’ll produce the same answer. I couldn’t force the collision on my machine.&lt;/p&gt;
+&lt;p&gt;So you need to set up an ssh tunnel (actually a reverse tunnel) to a server (an ssh relay server) outside your LAN. It needs to have a public IP so you need to have control of the router or port forwarding on that relay server. This could be your home internet wifi router connected a GPU doing ML training for your &lt;a href=&quot;springboard.com&quot;&gt;Springboard.com&lt;/a&gt; and &lt;a href=&quot;https://totalgood.com&quot;&gt;totalgood.com&lt;/a&gt; mentees and serving up your experimental &lt;a href=&quot;http://gpu.totalgood.org/&quot;&gt;Django apps&lt;/a&gt;. You’re probably using NAT port forwarding like we talked about in &lt;a href=&quot;2019-01-04-Nginx-webserver-network-configuration.md&quot;&gt;Nginx Webserver Network Configuration&lt;/a&gt; last month.&lt;/p&gt;
 
-&lt;p&gt;Here’s the docs. TLDR: skip to the bottom of this post.&lt;/p&gt;
+&lt;p&gt;So now we can use our home GPU as a relay for our office GPU tunnel to the outside world. So I came across this &lt;a href=&quot;http://xmodulo.com/access-linux-server-behind-nat-reverse-ssh-tunnel.html&quot;&gt;blog post&lt;/a&gt; and added a few other firewall steps from &lt;a href=&quot;https://www.digitalocean.com/community/tutorials/ufw-essentials-common-firewall-rules-and-commands&quot;&gt;here&lt;/a&gt;. As usual, we don’t use port 22 for ssh, just to reduce script kiddie discovery of the ssh service on our ISP’s public IP for my home router.&lt;/p&gt;
 
-&lt;hr /&gt;
+&lt;p&gt;First log onto your office server that you want to expose an ssh port on through the NAT router for the office building. You can do this directly if you have a keyboard, monitor, and chair connected to the office server. Or you can use TeamViewer or any other remote control application. Once you’ve logged onto the office server,open an SSH connection to your home ssh relay server and keep the connection open permanently:&lt;/p&gt;
 
-&lt;h4 id=&quot;randomseedx&quot;&gt;random.seed(&lt;em&gt;x&lt;/em&gt;)&lt;/h4&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;officeserver~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ssh &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-N&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; 9923:localhost:9922 relayuser@1.2.3.4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Initialize the basic random number generator. Optional argument, &lt;em&gt;x&lt;/em&gt;, can be any &lt;a href=&quot;https://docs.python.org/2/glossary.html#term-hashable&quot;&gt;hashable&lt;/a&gt; object. If &lt;em&gt;x&lt;/em&gt; is omitted or &lt;code&gt;None&lt;/code&gt;, current system time is used; current system time is also used to initialize the generator when the module is first imported.  If randomness sources are provided by the operating system, they are used instead of the system time. See the &lt;a href=&quot;https://docs.python.org/2/os.html#os.urandom&quot;&gt;&lt;code&gt;os.urandom()&lt;/code&gt;&lt;/a&gt; function for details on availability.&lt;/p&gt;
+&lt;p&gt;Here the port 9923 is any arbitrary port number that you chose. It only needs to be accessible from within your home relay server like &lt;code class=&quot;highlighter-rouge&quot;&gt;ssh relayuser@localhost -p 9923&lt;/code&gt;. Just make sure that this port is not used by other programs on your home relay server at the public IP address &lt;code class=&quot;highlighter-rouge&quot;&gt;1.2.3.4&lt;/code&gt;.  Replace &lt;code class=&quot;highlighter-rouge&quot;&gt;1.2.3.4&lt;/code&gt; with your relay server’s public IP which you can find out with &lt;code class=&quot;highlighter-rouge&quot;&gt;relayserver~$ curl ifconfig.co&lt;/code&gt;.&lt;/p&gt;
 
-&lt;hr /&gt;
+&lt;p&gt;Port 9922 in the command above must be the port that your office computer behind the firewall is listening to with the sshd. Normally this will be port 22, unless you’re trying to hide from script kiddies within your office building LAN.  You can set/check this port in the ssh daemon config file with &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo nano /etc/ssh/sshd_config&lt;/code&gt;. Don’t forget to restart the sshd service if you change this port: &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo service sshd restart&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;reload&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;The “birthday paradox” is what it’s called when these collisions happen more often than you expect, like when generating a random integer between 1 and 365 in a room full of friends for their birthdays. So the concept doesn’t apply here. And this collision problem is not really a paradox anyway. But it was fun to try to reproduce it on my recent HP laptop. Getting two processes to run simultaneously on separate cores turned out to be harder than I imagined. I couldn’t trick tmux into doing it, and the stack overflow answers seemed broken to me. But here’s my quick fail at repro:&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;-R&lt;/code&gt; option defines a reverse tunnel. It forwards any traffic that it receives on port 9923 on the office pc to the home relay server on port 9922. This will be all the stdout flowing back to your external ssh connection.&lt;/p&gt;
 
-&lt;p&gt;This is the tmux approach I couldn’t get working&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;-N&lt;/code&gt; option ensures that SSH doesn’t execute a remote command, like it normally would. This forces it to just relay (tunnel) traffic to the requested IP address and port.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;bash
-#!/bin/sh 
-tmux new-session -s collider -d &#39;python -c &quot;import random; print(random.randint(0,1000000000));&quot;&#39; &amp;amp;
-tmux new-window -s collider &#39;python -c &quot;import random; print(random.randint(0,1000000000));&quot;&#39;
-&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;-f&lt;/code&gt; option SSH will send the ssh process to the background immediately, before it sets up the tunnel or executes a remote command, which we prevented with &lt;code class=&quot;highlighter-rouge&quot;&gt;-N&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;So I just loaded up the OS process queue with a bunch of python interpreter processes in the hopes a few of them would pass through cores at the same time.&lt;/p&gt;
+&lt;p&gt;So when you run that command you should immediately return to the shell prompt and you can see your background ssh tunnel process on the office server with:&lt;/p&gt;
 
-&lt;p&gt;```bash
-for ((i=0; i&amp;lt;100; i++))
-do 
-    python -c “import random; print(random.randint(0,1000000000));” &amp;gt; /tmp/collider.${i}.log &amp;amp;
-done&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;officeserver~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ps aux | &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'ssh\ \-f'&lt;/span&gt;
+officeuser     13519  0.0  0.0  49052   716 ?        Ss   13:23   0:00 ssh &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-N&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; 9923:localhost:9922 relayuser@1.2.3.4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;for ((i=0; i&amp;lt;100; i++))
-do 
-    python -c “import time; print(repr(time.time()));” &amp;gt; /tmp/collidetime.${i}.log &amp;amp;
-done
-```&lt;/p&gt;
+&lt;p&gt;and&lt;/p&gt;
 
-&lt;p&gt;No luck with collisions (so my motherboard and python interpreter are too clever for my trickery), &lt;code&gt;uniq&lt;/code&gt; can’t find any dupes.&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;officeserver~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;netstat &lt;span class=&quot;nt&quot;&gt;-nap&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;grep &lt;/span&gt;9922
+tcp        0      0 0.0.0.0:9922           0.0.0.0:&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;               LISTEN      13057/sshd      
+tcp6       0      0 :::9922                :::&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;                    LISTEN      13057/sshd    
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;code&gt;bash
-cat /tmp/collider.*.log | sort | uniq -c
-#      1 105969327
-#      1 126048218
-# ...
-#      1 146990491
-#      1 148685188
-&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;So now you can log into the home relay server like you normally do with ssh. After that you can then access the office server by &lt;code class=&quot;highlighter-rouge&quot;&gt;ssh&lt;/code&gt;ing to localhost on the tunneling port (the port on the left-hand side of the reverse tunnel command you ran on the office computer):&lt;/p&gt;
 
-&lt;h2 id=&quot;bingo&quot;&gt;BINGO!&lt;/h2&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;relayserver~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ssh &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 9923 officeuser@localhost
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;The clock did a 2-step for the same microsecond, 3 times out of 100:&lt;/p&gt;
+&lt;p&gt;Now you’ll have to use your officeuser password to log onto the officeserver through the tunnel, until you set up a ~/.ssh/config file with the appropriate keys for passwordless login.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;bash
-cat /tmp/collidetime.*.log | sort | uniq -c | grep -e &#39;\b[2-9]\b&#39;
-#      2 1473613474.737581
-#      2 1473613474.743379
-#      2 1473613474.755999
-&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id=&quot;automatic-relay-server-login-and-passthrough&quot;&gt;Automatic Relay Server Login and Passthrough&lt;/h2&gt;
 
-&lt;p&gt;Did I do anything wrong?  What can Cole do to avoid this in the future (on a machine without a random source, like an AWS EC2 instance)?&lt;/p&gt;
+&lt;p&gt;Unfortunately with the manual tunneling you set up you have to ssh twice: first to relayserver, and then to officeserver through the relayserver localhost. But it’s possible to let your ssh daemon on your home relayserver forward a port from an external host, like your laptop. This is achieved by specifying &lt;code class=&quot;highlighter-rouge&quot;&gt;GatewayPorts&lt;/code&gt; configuration options in the ssh server running on relayserver:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;relayserver~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;GatewayPorts clientspecified&quot;&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;tee /etc/ssh/sshd_conf
+relayserver~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;service sshd restart  &lt;span class=&quot;c&quot;&gt;# or reload&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 </description>
-        <pubDate>Sat, 10 Sep 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/-Python-Birth-Microsecond-Paradox/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/-Python-Birth-Microsecond-Paradox/</guid>
+        <pubDate>Fri, 01 Feb 2019 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/SSH-Server-On-Office-PC-Behind-Building-NAT-Router/</link>
+        <guid isPermaLink="true">http://localhost:4000/SSH-Server-On-Office-PC-Behind-Building-NAT-Router/</guid>
       </item>
     
       <item>
-        <title>Now THAT&#39;s Open Data -- The Google NGram Viewer Corpus</title>
-        <description>&lt;p&gt;Now THAT’s &lt;a href=&quot;http://storage.googleapis.com/books/ngrams/books/datasetsv2.html&quot;&gt;Open Data&lt;/a&gt;!&lt;/p&gt;
+        <title>Data Science Trends</title>
+        <description>&lt;p&gt;&lt;a href=&quot;springboard.com&quot;&gt;Springboard&lt;/a&gt; &lt;em&gt;Data Science Careers&lt;/em&gt; students keep asking me which specialization they should pursue. And they often want to know which specialization are most likely to hire a junior data science coming out of Springboard. I try to encourage my students to pursue something that they are good at, because there will always be a market for someone who is good at what they do. But if you really want to follow the crowd and go where the employers are hiring check out the &lt;a href=&quot;aiindex.org&quot;&gt;AIIndex.org&lt;/a&gt; 2018 report. It looks like NLP was popular in 2016 and 2017 but may be overtaken by computer vision and “deep learning” by 2020. This roughly corresponds to the widespread deployment of self-driving cars, which will eventually replace apoproximately 10% of the US workforce with machines. And those driving and logistics jobs have been “transformed” into data science jobs over the past few years. So if you’re a full time Lyft Driver, now might be a good time to start taking night classes in Data Science and getting reconnected to your nerdy friends.&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;bash
-FINISHED --2016-08-18 15:30:00--
-Total wall clock time: 3d 23h 19m 17s
-Downloaded: 6833 files, 3.2T in 3d 14h 55m 31s (10.7 MB/s)
-Converted links in 0 files in 0 seconds.
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;It’s 10% of &lt;a href=&quot;https://en.wikipedia.org/wiki/Google_Ngram_Viewer&quot;&gt;all the books published up until 2008&lt;/a&gt;, on one (&lt;em&gt;large&lt;/em&gt;) harddrive. It’s only the N-grams, rather than full text with punctuation, like Gutenberg. But N = 5. So you could reconstruct a lot of the books from that, if it weren’t for that pesky minimum document (book) frequency threshold of 40 books…&lt;/p&gt;
-
-&lt;p&gt;For those less hordy than me, you can just query the data through the slick API for fun things like officiating a “race” between &lt;a href=&quot;https://books.google.com/ngrams/graph?content=Python+development%2CRuby+development%2CC+development%2CPerl+development&amp;amp;year_start=1800&amp;amp;year_end=2008&amp;amp;corpus=15&amp;amp;smoothing=2&amp;amp;share=&amp;amp;direct_url=t1%3B%2CPython%20development%3B%2Cc0%3B.t1%3B%2CRuby%20development%3B%2Cc0%3B.t1%3B%2CC%20development%3B%2Cc0%3B.t1%3B%2CPerl%20development%3B%2Cc0&quot;&gt;Python, Ruby, C/C++, and Perl&lt;/a&gt;:&lt;/p&gt;
-
-&lt;p&gt;Unfortunately, I’d already used quite a bit of the 4T USB drive (downloading the Gutenberg Project books, among other things). So I scrolled further up the terminal log to see:&lt;/p&gt;
-
-&lt;p&gt;```bash
-storage.googleapis.com/books/ngrams/books/googlebooks-spa-all-5gram-20090715-99.csv.zip: No space left on deviceCannot write to ‘storage.googleapis.com/books/ngrams/books/googlebooks-spa-all-5gram-20090715-99.csv.zip’ (Success).&lt;/p&gt;
-
-&lt;p&gt;hobs@adder:/media/nas/data/corpora/googlebooks$ df -h
-Filesystem                   Size  Used Avail Use% Mounted on
-//totalgood/disk1_pt1/       3.7T  3.7T   20K 100% /media/nas
-```&lt;/p&gt;
-
-&lt;p&gt;Time to RAID up, I guess, before I rerun&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;bash
-wget -r --accept gz,zip --mirror --adjust-extension --convert-links --no-parent --backup-converted --level 1 http://storage.googleapis.com/books/ngrams/books/datasetsv2.html
-&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/images/DS-job-growth-by-specialty.png&quot;&gt;&lt;img src=&quot;/images/DS-job-growth-by-specialty.png&quot; alt=&quot;AIIndex DS Job Trends&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 </description>
-        <pubDate>Thu, 18 Aug 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/-Now-That's-Open-Data--Google-NGram-Viewer/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/-Now-That's-Open-Data--Google-NGram-Viewer/</guid>
+        <pubDate>Thu, 17 Jan 2019 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/data-science-job-trends/</link>
+        <guid isPermaLink="true">http://localhost:4000/data-science-job-trends/</guid>
       </item>
     
       <item>
-        <title>Comparison of Hybrid Mobile App Javascript Frameworks</title>
-        <description>&lt;p&gt;&lt;a href=&quot;http://totalgood.org/bicycle&quot;&gt;Zak&lt;/a&gt; and &lt;a href=&quot;http://totalgood.org/hope&quot;&gt;I&lt;/a&gt; are building frontends for DRF that we’d like to go mobile with eventually.&lt;/p&gt;
+        <title>Nginx web server setup</title>
+        <description>&lt;p&gt;Each time I have to set up a domain name service table or database access for a web server server I forget how to do it. And there doesn’t seem to be a good online guide for it. So here are my notes.&lt;/p&gt;
 
-&lt;p&gt;So choosing between React and Angular hinges on the hybrid app framework alternatives (ReactNative or Ionic).&lt;/p&gt;
+&lt;h2 id=&quot;dns-records&quot;&gt;DNS Records&lt;/h2&gt;
 
-&lt;p&gt;Ionic is more mature but it’s app &lt;a href=&quot;http://ionicframework.com/&quot;&gt;“showcase”&lt;/a&gt; is no more impressive than &lt;a href=&quot;https://facebook.github.io/react-native/showcase.html&quot;&gt;ReactNative&lt;/a&gt;’s&lt;/p&gt;
+&lt;p&gt;I use namecheap and AWS as my registrar and sometimes I set up a domain to point from namecheap to AWS to handle the actual DNS records.&lt;/p&gt;
 
-&lt;p&gt;So I guess I’ll go with the latest hottness (React) and let Zak use the more standard Angular.&lt;/p&gt;
+&lt;h2 id=&quot;appoach-1-namecheap-only&quot;&gt;Appoach 1: &lt;a href=&quot;namecheap.com&quot;&gt;Namecheap&lt;/a&gt; Only&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Log onto namecheap.&lt;/li&gt;
+  &lt;li&gt;Click on the “DomainList” tab&lt;/li&gt;
+  &lt;li&gt;Click on the “Manage” button next the one you want to configure&lt;/li&gt;
+  &lt;li&gt;Find the “Advanced DNS” tab to the upper right&lt;/li&gt;
+  &lt;li&gt;Set up your records to look like this:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;A Record&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Host&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;@&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;{WIFI_ROUTER_IP_ADDRESS}&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;TTL&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20 min (or Automatic)&lt;/span&gt;
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;A Record &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;	&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;gpu&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;{WIFI_ROUTER_IP_ADDRESS}&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;TTL&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20 min (or Automatic)&lt;/span&gt;
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;A Record &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;	&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Host&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;www&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;{WIFI_ROUTER_IP_ADDRESS}&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;TTL&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20 min (or Automatic)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And on the NETGEAR wifi router console at 192.168.1.1 I set up Port Forwarding for ssh (custom port), http (80), https (443), and sometimes postgres (custom {PSQL_PORT} other than 5432) or the Django debug port (8000). Port Forwarding is on the &lt;a href=&quot;http://192.168.1.1/adv_index.htm&quot;&gt;advanced tab&lt;/a&gt; under the bottom left “Advanced Setup”, clicking on the menu item link/button midway down called “Port Forwarding / Port Triggering.”  Here are my LAN port forwarding settings:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;
+# 	Service Name 	ExternalStartPort	ExternalEndPort	InternalStartPort	InternalEndPort	InternalIPaddress
+1	WEB	            80	                80	            80	                80	            {SERVER_LAN_IP_ADDRESS}
+2	hhtps	        443	                443	            443	                443	            {SERVER_LAN_IP_ADDRESS}
+3	pgwebadmin	    5050	            5050	        5050	            5050	        {SERVER_LAN_IP_ADDRESS}
+4	postgres	    {PSQL_PORT}	        {PSQL_PORT}	    {PSQL_PORT}	        {PSQL_PORT}	    {SERVER_LAN_IP_ADDRESS}
+5	django debug	8000	            8000	        8000	            8000	        {SERVER_LAN_IP_ADDRESS}
+6	gunicorn proxy	{GUNICORN_PORT}     {GUNICORN_PORT} {GUNICORN_PORT}     {GUNICORN_PORT} {SERVER_LAN_IP_ADDRESS}
+7	ssh	            {SSH_PORT}	        {SSH_PORT}	    {SSH_PORT}	        {SSH_PORT}	    {SERVER_LAN_IP_ADDRESS}
+&quot;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;environ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;nginx&quot;&gt;NGINX&lt;/h2&gt;
+
+&lt;p&gt;And then my nginx conf file in /etc/nginx/sites-enabled/django_app_name.conf on the server looks like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-config highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;server&lt;/span&gt; {
+    &lt;span class=&quot;n&quot;&gt;listen&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;80&lt;/span&gt;;
+    &lt;span class=&quot;n&quot;&gt;server_name&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gpu&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;totalgood&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;org&lt;/span&gt; {&lt;span class=&quot;n&quot;&gt;WIFI_ROUTER_IP_ADDRESS&lt;/span&gt;} {&lt;span class=&quot;n&quot;&gt;SERVER_LAN_IP_ADDRESS&lt;/span&gt;} &lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;;
+    &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt; / {
+        &lt;span class=&quot;n&quot;&gt;proxy_pass&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;http&lt;/span&gt;://&lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;.&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;:{&lt;span class=&quot;n&quot;&gt;GUNICORN_PORT&lt;/span&gt;};
+    }
+    &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;static&lt;/span&gt;/ {
+        &lt;span class=&quot;n&quot;&gt;autoindex&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;on&lt;/span&gt;;
+        &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;www&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;knowledgequest&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;collected_static&lt;/span&gt;/;
+    }
+    &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;robots&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;txt&lt;/span&gt; {
+        &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;www&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;knowledgequest&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;collected_static&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;robots&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;txt&lt;/span&gt;;
+    }
+    &lt;span class=&quot;n&quot;&gt;location&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;favicon&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;ico&lt;/span&gt; {
+        &lt;span class=&quot;n&quot;&gt;alias&lt;/span&gt; /&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;www&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;knowledgequest&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;collected_static&lt;/span&gt;/&lt;span class=&quot;n&quot;&gt;favicon&lt;/span&gt;.&lt;span class=&quot;n&quot;&gt;ico&lt;/span&gt;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;postgres&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;postgres&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;And the postgres db setup script looks like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sqlalchemy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;create_engine&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;DEFAULT_ENVIRON&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;POSTGRES_KNOWLEDGEQUEST_DB_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'knowledgequest'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;POSTGRES_KNOWLEDGEQUEST_DB_USERNAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'kq'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;POSTGRES_KNOWLEDGEQUEST_DB_PW&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;3.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'{:5g}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;round&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;abs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rand&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))),&lt;/span&gt;  
+    &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;CREATEDB_SQL_TEMPLATE&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot;
+    CREATE DATABASE {POSTGRES_KNOWLEDGEQUEST_DB_NAME};
+    CREATE USER {POSTGRES_KNOWLEDGEQUEST_DB_USERNAME} WITH PASSWORD '{POSTGRES_KNOWLEDGEQUEST_DB_PW}';
+    ALTER ROLE {POSTGRES_KNOWLEDGEQUEST_DB_USERNAME} SET client_encoding TO 'utf8';
+    ALTER ROLE {POSTGRES_KNOWLEDGEQUEST_DB_USERNAME} SET default_transaction_isolation TO 'read committed';
+    ALTER ROLE {POSTGRES_KNOWLEDGEQUEST_DB_USERNAME} SET timezone TO 'UTC';
+    GRANT ALL PRIVILEGES ON DATABASE knowledgequest TO {POSTGRES_KNOWLEDGEQUEST_DB_USERNAME};
+    &quot;&quot;&quot;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;execute_sql&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'postgres://postgres@/postgres'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sql&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CREATEDB_SQL_TEMPLATE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kwargs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;&quot;&quot; Based on stackoverflow.com/a/8977109/623735 -- create a postgres database using sqlalchemy &quot;&quot;&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;env&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DEFAULT_ENVIRON&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;copy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;environ&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;update&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kwargs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;sql&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;**&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;splitlines&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;create_engine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'sqlite:///enron_emails.db'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;echo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;False&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;isinstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;engine&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;commit&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# can't create a database from withing a transaction, so close the current transaction with a commit&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;statement&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sql&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'SQL: {}'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;format&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;statement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;statement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;commit&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# commit each transaction individually&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'RESULT TABLE'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'------------'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'------------'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'__main__'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;execute_sql&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;secrets&quot;&gt;Secrets&lt;/h2&gt;
+
+&lt;p&gt;I keep secret network configuration settings in a shell script run by &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.bash_profile&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.bashrc&lt;/code&gt; so that they are always in environment variables I can use with &lt;code class=&quot;highlighter-rouge&quot;&gt;envsubst&lt;/code&gt; in bash or &lt;code class=&quot;highlighter-rouge&quot;&gt;.format()&lt;/code&gt; string interpolation in a python app.&lt;/p&gt;
 </description>
-        <pubDate>Sun, 31 Jul 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/Comparison-of-Hybrid-Mobile-App-Javascript-Frameworks/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/Comparison-of-Hybrid-Mobile-App-Javascript-Frameworks/</guid>
+        <pubDate>Fri, 04 Jan 2019 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/Nginx-webserver-network-configuration/</link>
+        <guid isPermaLink="true">http://localhost:4000/Nginx-webserver-network-configuration/</guid>
       </item>
     
       <item>
-        <title>History Temp Panic</title>
-        <description>ls /usr/local
-rm siteconf.p
-ls /usr/include/boost
-ls /usr/include/
-sudo apt install boost
-sudo apt install python-boost
-workon hope
-pip3 install boost
-pip3 search boost
-exit
-nvcc
-nvcc --help
-history | grep BLAS
-exit
-ls -al
-cd src
-ls -al
-tar -xvzf boost_1_61_0.tar.gz 
-cd boost_1_61_0/
-ls -al
-sudo apt install python3-dev
-sudo apt install python3-devel
-sudo apt install python-dev
-history | grep BLAS
-exit
-history | grep BLAS
-sudo apt search BLAS
-sudo apt install libopenblas-*
-cd src
-ls -al
-# sudo dpkg -i cuda-repo-ubuntu1504-7-5-local_7.5-18_amd64.deb 
-sudo apt-get install linux-headers-$(uname -r)
-sudo dpkg -i cuda-repo-ubuntu1504-7-5-local_7.5-18_amd64.deb 
-sudo apt uninstall cuda
-sudo apt-get  uninstall cuda
-sudo apt-get remove cuda
-ls /usr/local/
-ls /usr/local/cuda
-ls /usr/local/cuda/README 
-more /usr/local/cuda/README 
-more /usr/local/cuda/version.txt 
-more /usr/local/cuda-7.5/version.txt 
-sudo apt-get --purge remove cuda-7.5
-ls /usr/local/cuda/README 
-ls /usr/local/cuda/
-ls /usr/local/cuda-7.5/
-sudo dpkg -i cuda-repo-ubuntu1504-7-5-local_7.5-18_amd64.deb 
-sudo apt-get update
-sudo apt-get install cuda
-sudo shutdown -r now
-modprobe nvidia
-more /etc/modules
-sudo modprobe nvidia
-sudo modprobe nvidia-uvm
-ls /usr/local
-nano /etc/bash.bashrc 
-exit
-nano .theanorc
-workon hope
-ipython
-python3 -c &#39;import theano; theano.test()&#39;
-exit
-update-alternatives g++
-update-alternatives --list
-update-alternatives --list g++
-update-alternatives --list gcc
-gcc -V
-gcc -v
-g++ -v
-exit
-htop
-PW=&quot;`echo $UN | md5sum | cut -c2-7`&quot;
-UN=hannes
-PW=&quot;`echo $UN | md5sum | cut -c2-7`&quot;
-echo $UN | md5sum | cut -c2-7
-echo zak | md5sum | cut -c2-7
-echo cole | md5sum | cut -c2-7
-echo hannes | md5sum | cut -c2-7
-exit
-sudo apt-get install mpixx
-mpixx
-sudo apt-get install libopenmpi-dev
-cd src
-cd devops/
-ls -al
-cd scripts/
-ls
-nano addusers 
-chmod +x addusers 
-sudo ./addusers hannes cole matt erin andrew
-sudo ./addusers riley
-cd /usr/local/cuda-7.5/samples/
-ls -al
-cd bin
-ls -al
-cd x86_64/
-ls
-cd linux/
-ls
-cd release/
-ls
-cd ..
-cd release
-./deviceQuery
-./bandwidthTest 
-sudo apt install cuda-gdb-src
-sudo apt search cuda-gdb-src
-sudo apt-get install cuda-gdb-src
-cd ~/src/
-ls
-sudo apt-get update
-sudo apt-get install cuda-gdb
-sudo apt-get install cuda-command-line-tools-7-5-src
-sudo apt-get install cuda-command-line-tools-7-5-devel
-sudo apt-get install cuda-command-line-tools-7-5-dev
-echo -e &quot;\n[nvcc]\nflags=-D_FORCE_INLINES\n&quot; &gt;&gt; ~/.theanorc
-workon hope
-pip install Theano
-pip uninstall Theano
-pip remove Theano
-pip purge Theano
-pip cleanup
-pip install Theano
-python3 -c &quot;import theano;&quot;
-python3 -c &quot;import theano; theano.test()&quot;
-cd ../devops/
-nano configure_theano
-chmod +x configure_theano 
-./configure_theano 
-sudo apt install gcc-5.2
-sudo apt install gcc-5.2.1
-sudo apt install --update gcc
-sudo apt install --upgrade gcc
-which gcc
-ls /usr/bin/gcc
-/usr/bin/gcc
-/usr/bin/gcc -v
-python -c &quot;import theano; theano.test()&quot;
-nano ~/.theanorc
-python -c &quot;import theano; theano.test()&quot;
-pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
-pip install scipy
-cd ..
-cd devops/
-ls
-mv configure_theano scripts/
-cd ..
-sudo cp .theanorc ~hannes/
-sudo su hannes
-sudo chown hannes:hannes ~hannes/src/*
-sudo chown hannes:hannes ~hannes/.theanorc 
-sudo chown -R hannes:hannes ~hannes/src/
-sudo su hannes
-pip install lasagna
-pip install Lasagna
-pip install https://github.com/Lasagne/Lasagne/archive/master.zip
-pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
-sudo pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
-deactivate
-exit
-cd src
-cd devops/
-ls
-cd scripts/
-ls
-addusers thunder
-sudo ./addusers thunder
-more addusers
-echo hannes | md5sum | cut -c2-7
-echo thunder | md5sum | cut -c2-7
-exit
-ls
-cd src
-ls
-tar -xvzf cudnn-7.5-linux-x64-v5.1-rc.tgz 
-cd cuda
-ls -al
-export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
-exit
-env
-env | grep LD
-nano /etc/bash.bashrc 
-nvcc -V
-ls -al
-cd src
-ls -al
-cd cuda
-ls -al
-cd ..
-cd /usr/local
-ls -al
-cd cuda-7.5/
-ls -al
-cd samples
-ls -al
-make
-gcc -V
-gcc -v
-sudo update-alternatives --remove-all gcc 
-sudo update-alternatives --remove-all g++
-sudo apt-get install gcc-4.9
-sudo update-alternatives --remove-all g++
-sudo apt-get install g++-4.9
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 10
-sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 10
-make
-sudo make
-cd ~/
-workon hope
-pip install -r https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt
-pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
-ipython
-pip freeze &gt; requirements.gpu.txt
-more requirements.gpu.txt 
-nano requirements.gpu.txt 
-cp requirements.gpu.txt ../../../hannes/
-sudo cp requirements.gpu.txt ../../../hannes/
-sudo chmod a+r ../../../hannes/requirements.gpu.txt 
-sudo chmod a+w ../../../hannes/requirements.gpu.txt 
-sudo chmod a+d ../../../hannes/requirements.gpu.txt 
-sudo chmod a+x ../../../hannes/requirements.gpu.txt 
-sudo su hannes
-sudo pip3 install theano
-sudo pip3 install --upgrade pip
-sudo pip3 install --upgrade theano
-cd src
-sudo su hannes
-sudo pip3 install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
-sudo pip3 install --upgrade https://github.com/Theano/Theano/archive/master.zip
-ls -al
-cd devops
-sudo nano test_theano_gpu.py
-python3 test_theano_gpu.py 
-cd ..
-cd devops
-mv test_theano_gpu.py scripts/
-cd ..
-mv cuda cuda_base
-tar -xvzf cudnn-7.5-linux-x64-v5.1-rc.tgz 
-ls -al
-cd cuda
-which nvcc
-ls -al
-sudo cp -P include/cudnn.h /usr/local/cuda-7.5/include
-sudo cp -P lib64/libcudnn* /usr/local/cuda-7.5/lib/x86_64-linux-gnu/
-sudo cp -P lib64/libcudnn* /usr/local/cuda-7.5/lib64/
-sudo chmod a+r /usr/local/cuda-7.5/lib64/libcudnn*
-cd /usr/local/cuda-7.5/
-ls -al
-cd ~/src/devops
-ls -al
-cd scripts/
-git status
-ls -al
-sudo chmod +x test_theano_gpu.py 
-./test_theano_gpu.py
-sudo pip install twip
-sudo pip install pug-nlp
-workon hope
-ls -al
-cd hope
-ls -al
-cd hope
-ls -al
-cd ..
-htop
-w
-sudo su hannes
-python
-ipython
-write hannes &quot;noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff&quot;
-sensors
-write hannes &lt; `sensors` 
-sensors | write hannes
-write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type `sensors` to see status&quot;
-write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type &#39;sensors&#39; to see status&quot;
-write hannes &quot;I have $2 CPU cooler/radiator from free geek without any thermal paste, etc&quot;
-write hannes &quot;So probably need to get a water-cooled radiator if you are going to run it continuously for long periods&quot;
-sensors
-sensorsensor
-sensors
-htop
-sensors</description>
-        <pubDate>Sat, 30 Jul 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/history-temp-panic/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/history-temp-panic/</guid>
-      </item>
-    
-      <item>
-        <title>Cpu Gpu Temp Sensors Log</title>
-        <description>(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff&quot;
-write: hannes is not logged in on noticed that your env defaults to python2.7 mine is python 3.4.3 for all the root-install theano/nolearn stuff
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +75.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +62.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +64.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +64.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +65.0°C  (high = +77.0°C, crit = +87.0°C)
+        <title>Raspberry Pi Camera Configuration</title>
+        <description>&lt;p&gt;I’ll eventually figure out where I put my notes on configuring a Raspberry Pi camera for streaming video and offline object detection.  But for now, check out the &lt;a href=&quot;https://github.com/DT42/BerryNet&quot;&gt;BerryNet&lt;/a&gt; repo. These guys have done it right!&lt;/p&gt;
 
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &lt; `sensors` 
--bash: `sensors`: ambiguous redirect
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors | write hannes
-write: hannes is logged in more than once; writing to pts/9
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type `sensors` to see status&quot;
-write: hannes is not logged in on Nothing to worry about yet, but CPU is getting hot. Type coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +81.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +78.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM to see status
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;Nothing to worry about yet, but CPU is getting hot. Type &#39;sensors&#39; to see status&quot;
-write: hannes is not logged in on Nothing to worry about yet, but CPU is getting hot. Type &#39;sensors&#39; to see status
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;I have $2 CPU cooler/radiator from free geek without any thermal paste, etc&quot;
-write: hannes is not logged in on I have  CPU cooler/radiator from free geek without any thermal paste, etc
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ write hannes &quot;So probably need to get a water-cooled radiator if you are going to run it continuously for long periods&quot;
-write: hannes is not logged in on So probably need to get a water-cooled radiator if you are going to run it continuously for long periods
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +86.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +78.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +79.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +81.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +77.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +84.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +79.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +81.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +74.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +76.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +80.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +70.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +80.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +67.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +72.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +73.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +75.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +71.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +69.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +66.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +60.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +62.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +65.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +59.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +60.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +55.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensorsensor
-sensorsensor: command not found
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +63.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +52.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +58.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +52.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ htop
-(hope)hobs@hobs-black-gpu:~/src/hope/hope$ sensors
-coretemp-isa-0000
-Adapter: ISA adapter
-Physical id 0:  +64.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 0:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 1:         +56.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 2:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 3:         +57.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 4:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 5:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 6:         +53.0°C  (high = +77.0°C, crit = +87.0°C)
-Core 7:         +54.0°C  (high = +77.0°C, crit = +87.0°C)
-
-asus-isa-0000
-Adapter: ISA adapter
-cpu_fan:        0 RPM
-</description>
-        <pubDate>Sat, 30 Jul 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/cpu-gpu-temp-sensors-log/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/cpu-gpu-temp-sensors-log/</guid>
-      </item>
-    
-      <item>
-        <title>PenTesting Peanut Gallery</title>
-        <description>&lt;p&gt;Really enjoyed getting a crash course in InfoSec and PenTesting by &lt;a href=&quot;http://deanpierce.net&quot;&gt;Dean&lt;/a&gt; at the Ctrl-H HackerSpace meetup. Here’s how to get some tools for easy, ethical hacking.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/sqlmapproject/sqlmap&quot;&gt;sqlmap&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;bash
-git clone git@github.com:sqlmapproject/sqlmap.git
-# pip install -e `pwd`/sqlmap/  # no joy, help them with a PR setup.py?
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Give &lt;code&gt;sqlmap&lt;/code&gt; a URL with a ?id=42” at the end of it and you might get lucky. I may try to pull out links from the twip scraped tweets and &lt;code&gt;sqlmap&lt;/code&gt; the ones with a GET query that looks SQL-ish. Would have to follow the bit.ly redirects before it would be possible to filter them, but what the heck, my server has cycles to spare.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;bash
-python sqlmap.py -a -u vuln.com?id=42
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Another python-ish tool is &lt;a href=&quot;http://wapiti.sourceforge.net/&quot;&gt;Wapiti&lt;/a&gt;. Not sure how it works, but this tool has a bunch of python CLI tools for scanning networks.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;bash
-curl -O -L http://downloads.sourceforge.net/project/wapiti/wapiti/wapiti-2.3.0/wapiti-2.3.0.tar.gz
-tar xvzf wapiti-2.3.0.tar.gz
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;An enterprise (Windoze) security expert showed up late and talked about following infosec since the opensource, CLI BackTrack days. BackTrack is a linux distro with a lot of pen testing tools installed/configured. Kali is a similar set of tools used for Enterprise testing. He mentioned Nessus’s open source fork, &lt;a href=&quot;http://openvas.org/&quot;&gt;OpenVAS&lt;/a&gt;. He says it fizzled as the community deflated as they went closed source as Nessus. But here’s how to get by sourceforge click-traps and snag it:&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;bash
-curl -L -O http://wald.intevation.org/frs/download.php/2325/greenbone-security-assistant-6.1+beta4.tar.gz
-&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;So with these two keywords it was a cynch to find high-traffic security tools lists like these:&lt;/p&gt;
+&lt;h2 id=&quot;berrynet&quot;&gt;BerryNet&lt;/h2&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://resources.infosecinstitute.com/14-popular-web-application-vulnerability-scanners/&quot;&gt;naggy addy list of 14 open source tools&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;any camera compatible with your OS and PC&lt;/li&gt;
+  &lt;li&gt;CPU, GPU options:
+    &lt;ul&gt;
+      &lt;li&gt;rPi 3 B+, movidius&lt;/li&gt;
+      &lt;li&gt;NVIDIA Tx2&lt;/li&gt;
+      &lt;li&gt;Intel NUC&lt;/li&gt;
+      &lt;li&gt;basically any SBC or linux PC hardware you can dream up&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;This script will download the python ones:&lt;/p&gt;
+&lt;h2 id=&quot;deeplens&quot;&gt;DeepLens&lt;/h2&gt;
 
-&lt;p&gt;And here are some references to level up your skilz&lt;/p&gt;
+&lt;p&gt;From a novice computer vision engineer, Amazon’s Deep Lens is the system to beat. But you’d have to do some hacking to get into the OS and customize it without breaking all the cloud integration that Amazon has infected the NUC with.&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.offensive-security.com/metasploit-unleashed/&quot;&gt;Metasploit Free Online Offensive Security Training Course&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://sites.google.com/site/infosecrocks/&quot;&gt;Parisa Tariz’s infosec resources list&lt;/a&gt; - focus on XSS&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=kxqci2mZdrc&quot;&gt;Parisa Tariz’s PyCon Keynote on Python vulnerabilities&lt;/a&gt; - avoid pickling&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;cheapbugs.net&quot;&gt;Dean’s InfoSec Mailing list&lt;/a&gt; - near-free tier coming soon&lt;/li&gt;
+  &lt;li&gt;Intel NUC&lt;/li&gt;
+  &lt;li&gt;1080p video camera&lt;/li&gt;
+  &lt;li&gt;optimized for mxnet&lt;/li&gt;
+  &lt;li&gt;turnkey integration with AWS services like Lambda and GreenGrass&lt;/li&gt;
+  &lt;li&gt;streaming video (over WiFi)&lt;/li&gt;
+  &lt;li&gt;some Vendor lock&lt;/li&gt;
+  &lt;li&gt;power?&lt;/li&gt;
+  &lt;li&gt;OS?&lt;/li&gt;
+  &lt;li&gt;flops? RAM?&lt;/li&gt;
+  &lt;li&gt;GPU flops? RAM?&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Here’s some terminology for you&lt;/p&gt;
+&lt;h2 id=&quot;google-vision-kit&quot;&gt;Google Vision Kit&lt;/h2&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;OSCP: Offensive Security Certified Professional (enterprise ‘sploit folks)&lt;/li&gt;
-  &lt;li&gt;InfoSec: Information Security&lt;/li&gt;
-  &lt;li&gt;PenTesting: Penetration Testing&lt;/li&gt;
-  &lt;li&gt;Ethical Hacking: Hacking sites to help them harden (share your results)&lt;/li&gt;
-  &lt;li&gt;BackTrack: Pentesting linux distro toolbox&lt;/li&gt;
-  &lt;li&gt;Kali: Recent pentesting linux distro toolbox&lt;/li&gt;
-  &lt;li&gt;BackBox: Yet another pentesting linux distro&lt;/li&gt;
+  &lt;li&gt;connectivity: micro USB only&lt;/li&gt;
+  &lt;li&gt;GPU: movidius&lt;/li&gt;
+  &lt;li&gt;low res camera, IR cameras available&lt;/li&gt;
+  &lt;li&gt;CPU: rpi zero ? Flops, 500MB RAM&lt;/li&gt;
+  &lt;li&gt;OS: raspbian&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;blink&quot;&gt;Blink&lt;/h2&gt;
+
+&lt;p&gt;This isn’t one you can hack around with, but it’s the only wireless camera option. Similar to Wyze cam.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Power: camera 2xAA lithium batteries (2yr life) or microusb power, WiFi synchub needs AC-DC 5V converter&lt;/li&gt;
+  &lt;li&gt;Size: 71x71x30 mm&lt;/li&gt;
+  &lt;li&gt;Weight: .07 kg&lt;/li&gt;
+  &lt;li&gt;CPU: Immedia Proprietary - ISI108, 4 / 100Mhz.&lt;/li&gt;
+  &lt;li&gt;Connectivity: Wi-Fi with diversity 2.4 Ghz 802.11g/n but not ad-hoc&lt;/li&gt;
+  &lt;li&gt;camera: 720p HD, 30 fps for 5 s clips, mono audio&lt;/li&gt;
 &lt;/ul&gt;
 </description>
-        <pubDate>Wed, 06 Jul 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/InfoSec-Resources/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/InfoSec-Resources/</guid>
+        <pubDate>Tue, 01 Jan 2019 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/Rasberry-Pi-Camera-Configuration/</link>
+        <guid isPermaLink="true">http://localhost:4000/Rasberry-Pi-Camera-Configuration/</guid>
       </item>
     
       <item>
-        <title>Wildlife Survey and Cowboy Drone</title>
-        <description>&lt;p&gt;I spend a lot of time hiking around in the snow taking pictures of animal tracks and maintaining wildlife survey cameras for &lt;a href=&quot;http://www.cascadiawild.org/&quot;&gt;Cascadia Wild&lt;/a&gt;. And I can’t help but daydream about Drone/Robot assistants doing a lot of this for me.&lt;/p&gt;
+        <title>Open Source Teleprompter?</title>
+        <description>&lt;p&gt;I’m recording some instructional videos for a &lt;em&gt;&lt;a href=&quot;https://bit.ly/nlpiabook&quot;&gt;Natural Language Processing In Motion&lt;/a&gt;&lt;/em&gt; course for &lt;a href=&quot;https://manning.com&quot;&gt;Manning Publishing&lt;/a&gt; and maybe a &lt;a href=&quot;https://extension.ucsd.edu/courses-and-programs/healthcare-informatics&quot;&gt;Data Science for Healthcare&lt;/a&gt; course for UCSD. I tried using Camtasia to simultaneously record the slides on one monitor and the talking head (webcam). And I tried using a Libre Office in presentation mode to show the slides/animations on my laptop screen and read from the external display (slide notes). But in display mode Libre Office puts the notes to the right in the middle of the screen and my eyes weren’t looking at the camera. Is there a better way to set up a “teleprompter” and webcam so that the top line is always near the webcam? I’d prefer open source and free or low cost.&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;a fixed autonomous camera that can identify animals&lt;/li&gt;
-  &lt;li&gt;a wheeled/legged robot that could survey a trail for tracks&lt;/li&gt;
-  &lt;li&gt;a drone that could survey for tracks&lt;/li&gt;
-  &lt;li&gt;a cowboy drone to scare wolves away from livestock&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;It turns out ranchers let their cattle run wild on public lands without any cowboys to protect them from wolves. And when wolves take a bit to much of their bottom line, they ask the forest service to &lt;a href=&quot;http://www.takepart.com/article/2016/04/02/oregon-just-killed-family-wolves&quot;&gt;exterminate whole packs&lt;/a&gt;. That’s what inspired the cowboy drone idea.&lt;/p&gt;
-
-&lt;p&gt;If I just mash these tutorials together (with Cole’s help) we might be able to make something out of these daydreams.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://blog.yhat.com/posts/autonomous-droning-with-python.html&quot;&gt;tutorial on building a semi-autonomous drone&lt;/a&gt;  last piece of the puzzle falling into place &lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;http://uglyboxer.github.io/&quot;&gt;image classification neural nets&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;Or maybe this would be a good NLP project for someone? I’d be happy to help. We could add it to the &lt;a href=&quot;https://nlpia.org&quot;&gt;NLPIA package&lt;/a&gt; to give it exposure and get help from &lt;a href=&quot;https://bit.ly/nlpiabook&quot;&gt;NLPIA readers&lt;/a&gt;. You’d need a good STT engine with low latency.&lt;/p&gt;
 </description>
-        <pubDate>Sun, 24 Apr 2016 00:00:00 -0700</pubDate>
-        <link>http://www.hobsonlane.com/wildlife-survey-drone/</link>
-        <guid isPermaLink="true">http://www.hobsonlane.com/wildlife-survey-drone/</guid>
+        <pubDate>Wed, 19 Dec 2018 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/Teleprompter-for-video-course/</link>
+        <guid isPermaLink="true">http://localhost:4000/Teleprompter-for-video-course/</guid>
+      </item>
+    
+      <item>
+        <title>Poetix</title>
+        <description>&lt;p&gt;A big thanks to &lt;a href=&quot;https://www.linkedin.com/in/philip-baldwin-1658905/&quot;&gt;Philip R. Baldwin&lt;/a&gt; for sharing this clever &lt;a href=&quot;https://youtu.be/wUFflUsK7Dw&quot;&gt;AI-generated sonnet&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;It’s one of the winners of Dartmouth’s Poetix competition.&lt;/p&gt;
+
+&lt;p&gt;It’s pretty funny, and not completely irrelevant to the sense that we’re all being “dumbe down” down by the Intenet and AI, as they take over more and more of our intellectual chores.&lt;/p&gt;
+</description>
+        <pubDate>Thu, 13 Dec 2018 00:00:00 -0800</pubDate>
+        <link>http://localhost:4000/Poetix/</link>
+        <guid isPermaLink="true">http://localhost:4000/Poetix/</guid>
+      </item>
+    
+      <item>
+        <title>Sentence Embedding</title>
+        <description>&lt;p&gt;Sentence embeddings took off in 2017. When Google released their &lt;a href=&quot;https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/46808.pdf&quot;&gt;Universal Sentence Encoder last year&lt;/a&gt; researchers took notice. Google trained their sentence embedding on a massive corpus of text, everything from wikipedia and news articles to FAQs and forums. And then they refined the accuracy by training it on the Stanford Natural Language Inference corpus. Like word2vec, this enabled NLP enthusiasts to leverage Google’s text-scraping and cleaning infrastructure to build their own models using transfer learning. Transfer Learning is just a fancy way by using one model within another. Usually you’re just doing “activation” or “inference” with the pretrained model and then using its output as a feature (input) for some other model.&lt;/p&gt;
+
+&lt;p&gt;So is this new embedding any better than the other options? John Christian Fjellestad compiled a nice summary of many of the options, to which I’ve added the “naive” versions at the top of the lists here. So these lists should progress from earlier to more recent techniques and from less advanced to more advanced.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;naive word vector embedding &lt;a href=&quot;https://github.com/totalgood/nlpia/blob/master/src/nlpia/book/examples/ch06.py&quot;&gt;sum&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;normalized mean of word embeddings: &lt;a href=&quot;https://github.com/totalgood/nlpia/blob/master/src/nlpia/book/examples/ch06.py&quot;&gt;subtract principal eigenvector&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;thought vectors (LSTM-based word vector autoencoder)&lt;/li&gt;
+  &lt;li&gt;skip thought vectors (next sentence prediction)&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://openreview.net/forum?id=rJvJXZb0W&quot;&gt;Quick-thoughts&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;And you also have to choose a good word embedding:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Word2Vec&lt;/li&gt;
+  &lt;li&gt;GloVE&lt;/li&gt;
+  &lt;li&gt;FastText&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://allennlp.org/elmo&quot;&gt;ELMo&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;To do that you need some measure of &lt;strong&gt;good&lt;/strong&gt; for your machine learning problem. Fortunately John Fjellestad has coded some machine learning problems that are great for generic &lt;strong&gt;goodness&lt;/strong&gt; of a sentence embedding for various problems:&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 01 Nov 2018 00:00:00 -0700</pubDate>
+        <link>http://localhost:4000/Sentence-Embedding/</link>
+        <guid isPermaLink="true">http://localhost:4000/Sentence-Embedding/</guid>
       </item>
     
   </channel>
