@@ -3,9 +3,9 @@ layout: post
 title: Docvectors using spaCy for Springboard
 ---
 
-One of my [Springboard](springboard.com) mentees asked how she should compute document vectors using the word2vec vectors available within a parsed document object from the spaCy parser. Our
+One of my [Springboard](springboard.com) mentees asked how she should compute document vectors using the word2vec vectors available within a parsed document object from the spaCy parser.
 
-You can do it yourself by summing up all the word vectors:
+The straightforward way she came up with was to sum up all the word vectors for a document. As long as you sum along the correct axis, so that each word vector dimension is independently summed, it should work:
 
 ```python
 >>> !python -m spacy download en_core_web_md
@@ -19,7 +19,7 @@ You can do it yourself by summing up all the word vectors:
 2 -0.00  0.47  0.19 -0.43  0.32 -0.31  0.46  ... -0.82  0.25  0.31  0.05  0.07  0.05  0.24
 ```
 
-Or you can just use the doc vector computed internally by Spacy the exact same way (except spaCy calculates the `.mean()` rather than the `.sum()`:
+Or you can just use the doc vector computed internally by Spacy the exact same way:
 
 ```python
 >>> pd.DataFrame((nlp(doc).vector for doc in docs)).round(2)
@@ -30,7 +30,10 @@ Or you can just use the doc vector computed internally by Spacy the exact same w
 [3 rows x 300 columns]
 ```
 
-Notice that the first document vector computed by spaCy is 1/3 the magnitude in each dimension than the sums that we computed for those dimensions, because "Hello world!" tokenizes into 3 tokens 'Hello', 'world', and '!'. So if you replace `sum()` with `mean()`, you should get the exact same values that spaCy returns for the document vectors:
+But wait, those are different document vectors from the ones we computed! The first document vector computed by spaCy is a third of the magnitude in each dimension. Our sum is too big. Why does spaCy divide by 3?
+
+It's because "Hello world!" tokenizes into 3 tokens 'Hello', 'world', and '!'. So if you replace `sum()` with `mean()`, you should get the exact same values that spaCy returns for the document vectors:
+
 
 ```python
 >>> pd.DataFrame((pd.DataFrame([w.vector for w in nlp(doc)]).sum(axis=0) for doc in docs))
