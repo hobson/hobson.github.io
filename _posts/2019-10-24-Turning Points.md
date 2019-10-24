@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Change of the Guard
+title: Turning Points
 ---
 
 I'm listening to the audiobook ["Upheaval: Turning Points for Nations in Crisis" by Jared Diamond](https://sdcl.overdrive.com/media/4264943). Diamond talks at length about the decisions around turning points in his own life and their parallels with those changes in governments and societies. And Fall is when I start thinking about turning points in my life.
