@@ -1,6 +1,6 @@
 ---
 layout post
-title: Smarter Chatbot
+title: Slides -- A Smarter Chatbot
 author: Hobson Lane
 date: Oct 24, 2019
 subtitle: SD Python Monthly Meetup
