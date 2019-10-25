@@ -1,6 +1,0 @@
-Three Areas of Expertise Where Hyper-Parameter Optimization is Demonstrating that Machines are Smarter than Humans
-
-Hyper-parameter optimization is the automatic configuration of machine learning models that predict the future. Just as machines have bested humans at the games of chess, Jeopardy, and securities trading, in early 2014 machines bested human Data Scientists at the task of designing and tuning algorithms for predicting the future.[1][2] What we are seeing is the early stages of self-replicating or self-programming Artificial Intelligence. During my career (and probably yours) these self-teaching machines will take our jobs as data scientists. In this talk we'll show three exciting examples of hyper-parameter optimization combined with deep learning that enable fully autonomous application of machine learning to problems previously requiring significant labor and thought on the part of a human expert: (1) commercial building power consumption forecasting, (2) image classification, and (3) weather forecasting.
-
-[1]: Snoek, Larachelle, Adams, "Practical Bayesian Optimization of Machine Learning Algorithms", 2014
-[2]: Bergstra, Bardenet, Bengio, and Ḱegl, "Algorithms for Hyper-Parameter Optimization," 2014
