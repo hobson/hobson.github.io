@@ -20,12 +20,12 @@ Oct 24, 2019
 
 # Human Initiative
 
-![ ](dark-transparent-bot-initiative.svg)
+![ ](images/dark-transparent-bot-initiative.svg)
 
 
 # Bot Initiative
 
-![ ](dark-transparent-bot-initiative.svg)
+![ ](images/dark-transparent-bot-initiative.svg)
 
 # Language Models
 
@@ -133,7 +133,7 @@ Deep LSTM recurrent neural networks trained to:
 
 # Dialog Tree
 
-![ ](headache.png)
+![ ](images/headache.png)
 
 # Props to **Alfred Francis**
 
