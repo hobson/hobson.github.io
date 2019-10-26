@@ -20,7 +20,7 @@ Oct 24, 2019
 
 # Human Initiative
 
-![ ](images/dark-transparent-bot-initiative.svg)
+![ ](images/dark-transparent-human-initiative.svg)
 
 
 # Bot Initiative

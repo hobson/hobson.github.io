@@ -34,7 +34,7 @@ To diagram a PostrgreSQL database:
 from sqlalchemy_schemadisplay import create_schema_graph
 connection = "postgres://username:password@host.server.url.com/database_name"
 graph = create_schema_graph(metadata=MetaData(connection), show_datatypes=False, show_indexes=False, rankdir='LR', concentrate=False)
-graph.write_png('database_schema_diagram.png')
+graph.write_png('images/database_schema_diagram.png')
 {% endhighlight %}
 
 I'll post an example once I have need to model an open-data database.  They are really quite well-done. The layout optimizer leaves just enough white space and the edges/relationships are untangled into a presentable/readable form.
