@@ -1,5 +1,5 @@
 ---
-layout post
+layout: post
 title: Slides -- A Smarter Chatbot
 author: Hobson Lane
 date: Oct 24, 2019
