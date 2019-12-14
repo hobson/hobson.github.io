@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Holiday party vegan risotto recipe
+title: Holiday Party Vegan Risotto
 ---
 # Vegan Risotto
 
