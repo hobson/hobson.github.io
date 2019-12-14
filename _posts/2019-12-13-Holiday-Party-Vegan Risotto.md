@@ -44,6 +44,3 @@ Stir in spinach and basil, if desired.
 Poor 1 cup of white wine into each of 2 baking pans.
 Bake 15 minutes at 300 or until hot through.
 
-## Ideas?
-
-hobson@totalgood.com
