@@ -17,30 +17,34 @@ avatar: https://raw.githubusercontent.com/hobson/jekyll-now/master/images/graph.
 
 # Includes an icon in the footer for each username you enter
 footer-links:
-  dribbble: 
+  dribbble:
+  github: nlpia/nlpia-bot
   email: admin@totalgood.com
-  facebook: hobsonlane
-  flickr: 
+#  facebook: hobsonlane
+  flickr:
   github: hobson
-  instagram: 
+  instagram:
   linkedin: hobsonlane
-  pinterest: 
-  rss: # just type anything here for a working RSS icon, make sure you set the "url" above!
+  pinterest:
+  rss: rss  # just type anything here for a working RSS icon, make sure you set the "url" above!
   twitter: hobsonlane
   stackoverflow: users/623735/hobs
+  youtube: # channel/<your_long_string> or user/<user-name>
+#  googleplus: # anything in your profile username that comes after plus.google.com/
 
-# Your disqus shortname, entering this will enable commenting on posts
+# Enter your Disqus shortname (not your username) to enable commenting on posts
+# You can find your shortname on the Settings page of your Disqus account
 disqus: hobsblog
 
 # Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
-google_analytics: 
+google_analytics:
 
 # Your website URL (e.g. http://barryclark.github.io or http://www.barryclark.co)
 # Used for Sitemap.xml and your RSS feed
 url: https://hobsonlane.com
 enforce_ssl: hobsonlane.com
 
-# If you're hosting your site at a Project repository on GitHub pages 
+# If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
 # and NOT your User repository (http://yourusername.github.io)
 # then add in the baseurl here, like this: "/repository-name"
@@ -53,45 +57,62 @@ reveal_theme_path: "/css/theme/"
 # Embed Server-side speaker notes?
 reveal_notes_server: false
 # Additional reveal.js options
-reveal_options: 
+reveal_options:
 # Additional reveal.js dependencies
-reveal_dependencies: 
+reveal_dependencies:
 # Reveal.js subdirectory
 reveal_path: "/reveal.js/"
 #
 # !! You don't need to change any of the configuration flags below !!
 #
 
+# original repo deleted these settings
 markdown: kramdown
 highlighter: rouge
+
 permalink: /:title/
 
 # The release of Jekyll Now that you're using
-version: v1.0.0
+version: v1.2.0
+
+# Jekyll 3 now only supports Kramdown for Markdown
+kramdown:
+  # Use GitHub flavored markdown, including triple backtick fenced code blocks
+  input: GFM
+  # Jekyll 3 and GitHub Pages now only support rouge for syntax highlighting
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    # Use existing pygments syntax highlighting css
+    css_class: 'highlight'
 
 # Set the Sass partials directory, as we're using @imports
 sass:
-  sass_dir: _scss
   style: :expanded # You might prefer to minify using :compressed
 
 # Use the following plug-ins
+
 plugins:
   - jemoji # Emoji please!
   - jekyll-sitemap # Create a sitemap using the official Jekyll sitemap gem
   - jekyll-feed  # RSS feed at hobsonlane.com/feed.xml
-
-# Exclude these files from your production _site
-exclude:
-    - Gemfile
-    - Gemfile.lock
-    - LICENSE
-    - README.md
 
 defaults:
   -
     scope:
       path: "" # an empty string here means all files in the project
     values:
-      layout: "default"
+      layout: "customhobs2007"
 
 google_analytics: UA-63029775-1
+
+gems:
+  - jekyll-sitemap # Create a sitemap using the official Jekyll sitemap gem
+  - jekyll-feed # Create an Atom feed using the official Jekyll feed gem
+
+# Exclude these files from your production _site
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE
+  - README.md
+  - CNAME
